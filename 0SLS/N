@@ -1,0 +1,1443 @@
+shared._DLoaded = false
+
+spawn(function()
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+
+local player = Players.LocalPlayer
+
+pcall(function()
+	ReplicatedFirst:RemoveDefaultLoadingScreen()
+end)
+
+local playerGui = player:WaitForChild("PlayerGui")
+
+if not player.Character or not player.Character:FindFirstChild("Humanoid") then
+	player.CharacterAdded:Wait()
+end
+player.Character:WaitForChild("Humanoid")
+
+task.wait(2)
+
+local function destroyGUI()
+	local gameGui = playerGui:FindFirstChild("GameGui")
+
+	local guiNames = {
+		"LoadingScreen",
+		"DailyRewards",
+		"EmoteWheel",
+		"Transition",
+		"KeyHints"
+	}
+
+	for _, name in ipairs(guiNames) do
+		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
+		if gui then
+			gui:Destroy()
+		end
+	end
+end
+
+local function removeBlur()
+	for _, effect in ipairs(Lighting:GetChildren()) do
+		if effect:IsA("BlurEffect") then
+			effect:Destroy()
+		end
+	end
+end
+
+destroyGUI()
+removeBlur()
+    shared._DLoaded = true 
+end)
+
+repeat task.wait() until shared._DLoaded
+
+
+
+local workspace = game:GetService("Workspace")
+local junkFolder = workspace:FindFirstChild("Junk")
+if not junkFolder then
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "WRONG GAME  :/ ",
+    Text = "Join -> Super League Soccer",
+    Duration = 25,
+        Icon = "rbxassetid://140690318962088"
+})  
+return
+end
+local coreGui = game:GetService("CoreGui")
+local starterGui = game:GetService("StarterGui")
+if coreGui:FindFirstChild("ScreenGui") then
+    starterGui:SetCore("SendNotification", {
+        Title = "UI WAS RUNING",
+        Text = " :)",
+        Duration = 3,
+            Icon = "rbxassetid://140690318962088"
+    })
+    return
+end
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "LOADING...",
+    Text = " :)",
+    Duration = 50,
+    Icon = "rbxassetid://140690318962088"
+})
+function createPart0()
+    if game.Workspace:FindFirstChild("^") then
+        return 
+    end
+    local p = Instance.new("Part")
+    p.Name = "^"
+    p.Size = Vector3.new(261,  6, 414)
+    p.Position = Vector3.new(0.087, 87, 0.112)
+    p.Anchored = true
+    p.Locked = true
+    p.CastShadow = false
+    p.Color = Color3.fromRGB(0, 0, 0)
+    p.Material = Enum.Material.ForceField
+    p.Transparency = 0.8
+    p.Reflectance = 0
+    p.Parent = game.Workspace
+end
+createPart0()
+
+
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "NOTHING X HUB",
+    SubTitle = " Super League Soccer V2",
+    TabWidth = 25,
+    Size = UDim2.fromOffset(450, 330),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+local Tabs = {
+    all = Window:AddTab({Title = "", Icon = "list"}),
+        hitbox = Window:AddTab({Title = "", Icon = "box"}),
+                XXX = Window:AddTab({Title = "", Icon = "code"}),
+                FUN = Window:AddTab({Title = "", Icon = "laugh"}),
+        XXXV = Window:AddTab({Title = "", Icon = "flag"}),
+    keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
+    save = Window:AddTab({Title = "", Icon = "save"})
+}
+Window:SelectTab()
+Tabs.XXX:AddButton({
+    Title = "teleported to Pro Server",
+    Callback = function()
+        local id =  126195208568849
+        local p = game.Players.LocalPlayer
+        if p then
+            game:GetService("TeleportService"):Teleport(id, p)
+        end
+    end
+}) --X-X Competitive ID 110948941832728
+local p=game.Players.LocalPlayer local uis=game:GetService("UserInputService") local vim=game:GetService("VirtualInputManager") local ws=game:GetService("Workspace") local ist,l=false,false local ltt,tcd=0,0 local X=false local H,A=CFrame.new(0.283999115,4.0250001,-20.9191837),CFrame.new(0.271869421,4.0250001,20.0689564) local c=p.Character or p.CharacterAdded:Wait() p.CharacterAdded:Connect(function(char)c=char end)
+local function pressEKey() vim:SendKeyEvent(true,Enum.KeyCode.E,false,game) task.wait() vim:SendKeyEvent(false,Enum.KeyCode.E,false,game) end
+local function tpPlayer(pos) if c and c.PrimaryPart and tick()-ltt>tcd then ltt=tick() c:SetPrimaryPartCFrame(CFrame.new(pos)) end end
+local function tpFootballToPlayer(fb) if c and c.PrimaryPart then fb.CFrame=c.PrimaryPart.CFrame end end
+local function getFootball() local j=ws:FindFirstChild("Junk") return j and j:FindFirstChild("Football") end
+local function tpToNetworkOwner() if not(p.Team==game.Teams.Home or p.Team==game.Teams.Away) then ist=false return end while ist do task.wait(tcd) local fb=getFootball() if not fb or fb.Transparency==1 then local owner=fb and fb:GetAttribute("NetworkOwner") if owner==p.Name then ist=false if X then task.spawn(function() task.wait(tcd) if X and(p.Team==game.Teams.Home or p.Team==game.Teams.Away) then ist=true tpToNetworkOwner() end end) end return end local ownerPlayer=owner and game.Players:FindFirstChild(owner) if ownerPlayer and ownerPlayer.Character and ownerPlayer.Character.PrimaryPart and ownerPlayer.Team~=p.Team and not ownerPlayer.Neutral then if p.Team and p.Team.Name~="Goalkeeper" then tpPlayer(ownerPlayer.Character.PrimaryPart.Position) tpFootballToPlayer(fb) pressEKey() end else ist=false if X then task.spawn(function() task.wait(tcd) if X and(p.Team==game.Teams.Home or p.Team==game.Teams.Away) then ist=true tpToNetworkOwner() end end) end return end end end end
+local function tp() local f=getFootball() local r=c and c:FindFirstChild("HumanoidRootPart") if f and r then f.Position=r.Position end end
+local function k() vim:SendMouseButtonEvent(0,0,0,true,game,0) vim:SendMouseButtonEvent(0,0,0,false,game,0) end
+local function g() local f=getFootball() if p.Team and f then f.CFrame=p.Team.Name=="Home" and CFrame.new(-14.13,4,-188.18) or CFrame.new(14.06,4,187.83) end end
+local function r() local r=c and c:FindFirstChild("HumanoidRootPart") if r and p.Team then r.CFrame=p.Team.Name=="Away" and A or H end end
+local function e() vim:SendKeyEvent(true,Enum.KeyCode.E,false,game) vim:SendKeyEvent(false,Enum.KeyCode.E,false,game) end
+local function lf() while l do if p.Team and p.Team.Name~="Goalkeeper" then e() tp() task.wait() k() g() r() task.wait() else l=false task.wait() end end end
+local function tp2() local j=ws:FindFirstChild("Junk") local r=c and c:FindFirstChild("HumanoidRootPart") if j and r then local pp=r.Position for _,o in ipairs(j:GetDescendants()) do if o:IsA("BasePart") and o.Name=="Football" then pcall(function() o.Position=pp end) end end end end
+local function g2() if p.Team then local pos=p.Team.Name=="Home" and Vector3.new(-14.13,4,-188.18) or Vector3.new(14.06,4,187.83) local f=getFootball() if f and f:IsA("BasePart") then f.CFrame=CFrame.new(pos) end end end
+local function lf2() while l do tp2() task.wait() k() g2() task.wait() end end
+if Tabs and Tabs.keybinds then Tabs.keybinds:AddKeybind("Keybind",{Title="Track Ball (Avoid if GK)",Mode="Toggle",Default="B",Callback=function() ist=not ist if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Avoid if GK)",Mode="Toggle",Default="Y",Callback=function() l=not l if l then task.spawn(lf) end X=not X ist=X if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Under if GK)",Mode="Toggle",Default="F2",Callback=function() l=not l if l then task.spawn(lf2) end end}) end
+local uis = game:GetService("UserInputService")
+local pls = game:GetService("Players")
+local lp = pls.LocalPlayer
+local workspace = game:GetService("Workspace")
+local function toggleFbEnabled(f)
+    if f:GetAttribute("NetworkOwner") == lp.Name then
+        local cs = f:GetAttribute("Enabled")
+        f:SetAttribute("Enabled", not cs)
+    end
+end
+Tabs.keybinds:AddKeybind("Keybind", {
+    Title = "not kick ball (Under if Gk)",
+    Mode = "Toggle",
+    Default = "F1",
+    Callback = function()
+        local junk = workspace:FindFirstChild("Junk")
+        if not junk then return end 
+        local footballs = {}
+        for _, c in ipairs(junk:GetChildren()) do
+            if c.Name == "Football" then
+                table.insert(footballs, c)
+            end
+        end
+        if #footballs == 0 then return end 
+        for _, fb in ipairs(footballs) do
+            if fb:GetAttribute("Enabled") == nil then
+                fb:SetAttribute("Enabled", true)
+            end
+            toggleFbEnabled(fb)
+        end
+    end
+})
+local function getNearestPlayer()
+    local fb = workspace.Junk:FindFirstChild("Football")
+    if not fb then
+        return nil
+    end
+    local cp, sd = nil, math.huge
+    local p = game.Players.LocalPlayer 
+    for _, op in pairs(game.Players:GetPlayers()) do
+        if op ~= p and op.Team == p.Team and op.Character and op.Character.PrimaryPart then
+            local d = (op.Character.PrimaryPart.Position - fb.Position).magnitude
+            if d < sd then
+                cp = op
+                sd = d
+            end
+        end
+    end
+    return cp
+end
+local function tpFbToNearestPlayer()
+    local fb = workspace.Junk:FindFirstChild("Football")
+    if not fb then
+        return
+    end
+    local np = getNearestPlayer()
+    if np then
+        local tp = np.Character.PrimaryPart.Position + Vector3.new(0, 0, 0)
+        fb.AssemblyLinearVelocity = Vector3.zero
+        fb.AssemblyAngularVelocity = Vector3.zero
+        fb.CFrame = CFrame.new(tp)
+    end
+end
+if Tabs and Tabs.keybinds then
+    Tabs.keybinds:AddKeybind("Keybind", {
+        Title = "tp close player your team",
+        Mode = "Toggle",
+        Default = "T",
+        Callback = function()
+            tpFbToNearestPlayer()
+        end
+    })
+end
+p.CharacterAdded:Connect(function()
+    wait(1)
+end)
+local p = game.Players.LocalPlayer
+local fb = nil
+local hPos = Vector3.new(-14.130847, 4.00001049, -188.18988)
+local aPos = Vector3.new(14.0604515, 4.00001144, 187.836166)
+local function tpObj(o, pos)
+    if o and o:IsA("BasePart") then
+        o.CFrame = CFrame.new(pos)
+    end
+end
+local function checkAndTpFb()
+    local t = p.Team
+    if t then
+        if t.Name == "Home" then
+            tpObj(fb, hPos)
+        elseif t.Name == "Away" then
+            tpObj(fb, aPos)
+        end
+    end
+end
+Tabs.keybinds:AddKeybind("Keybind", {
+    Title = "gol",
+    Mode = "Toggle",
+    Default = "G",
+    Callback = function()
+        checkAndTpFb()
+    end,
+    debounce = false
+})
+local function updateFbRef()
+    local j = workspace:FindFirstChild("Junk")
+    if j then
+        fb = j:FindFirstChild("Football")
+        if fb and fb:IsA("BasePart") then
+            fb:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
+        end
+    end
+end
+local jf = workspace:WaitForChild("Junk", 10)
+if jf then
+    jf.ChildAdded:Connect(function(c)
+        if c.Name == "Football" and c:IsA("BasePart") then
+            fb = c
+            fb:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
+        end
+    end)
+end
+updateFbRef()
+p.CharacterAdded:Connect(function()
+    updateFbRef()
+end)
+Tabs.keybinds:AddKeybind("Keybind", {
+    Title = "Tp ball",
+    Mode = "Toggle",
+    Default = "LeftControl",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        local football = game.Workspace.Junk.Football
+        
+        if character and character:FindFirstChild("HumanoidRootPart") and football then
+            football.Position = character.HumanoidRootPart.Position
+            football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+        end
+    end
+})
+
+local istp = false
+local p = game.Players.LocalPlayer
+local uis = game:GetService("UserInputService")
+local tpPos = Vector3.new(1000000, 50000, -1000000)
+local cp = nil
+local function createPart()
+    if not cp then
+        cp = Instance.new("Part")
+        cp.Name = "H"
+        cp.Size = Vector3.new(2, 0.5, 2)
+        cp.Material = Enum.Material.Neon
+        cp.Transparency = 0.5
+        cp.Color = Color3.new(0, 0, 0)
+        cp.Position = tpPos
+        cp.Anchored = true
+        cp.Parent = workspace
+    end
+    return cp
+end
+local function tpFootball()
+    local fb = workspace:FindFirstChild("Junk") and workspace.Junk:FindFirstChild("Football")
+    if not fb then
+        return
+    end
+    if not istp then
+        istp = true
+        fb.AssemblyLinearVelocity = Vector3.zero
+        fb.AssemblyAngularVelocity = Vector3.zero
+        createPart()
+        local tp = createPart().Position + Vector3.new(0, 2, 0)
+        fb.CFrame = CFrame.new(tp)
+        task.wait(0.5)
+        istp = false
+    end
+end
+if Tabs and Tabs.keybinds then
+    Tabs.keybinds:AddKeybind("Keybind", {
+        Title = "hide ball",
+        Mode = "Toggle",
+        Default = "H",
+        Callback = function()
+            tpFootball()
+        end
+    })
+end
+local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
+local dt, dc = 1, Color3.fromRGB(255, 255, 255)
+local hsx, hsy, hsz = dsx, dsy, dsz
+local ht, hc = dt, dc
+local iha = false
+local p = game.Players.LocalPlayer
+local c = p.Character or p.CharacterAdded:Wait()
+local hb = c:FindFirstChild("Hitbox")
+local lhp
+local function updRealHb()
+    if hb then
+        hb.Size = Vector3.new(hsx, hsy, hsz)
+        hb.Transparency = ht
+        hb.Color = hc
+    end
+end
+local function resetHbToDefault()
+    if hb then
+        hb.Size = Vector3.new(dsx, dsy, dsz)
+        hb.Transparency = dt
+        hb.Color = dc
+    end
+end
+local function moveOldHbToNewHb()
+    local nhp = c:FindFirstChild("Hitbox")
+    if nhp and hb then
+        hb.CFrame = nhp.CFrame
+        if iha then
+            updRealHb()
+        else
+            resetHbToDefault()
+        end
+    else
+    end
+end
+p.CharacterAdded:Connect(function(c)
+    hb = c:WaitForChild("Hitbox", 10)
+end)
+local tog = Tabs.hitbox:AddToggle("MyToggle", {
+    Title = "",
+    Default = false
+})
+tog:OnChanged(function()
+    iha = tog.Value
+    if iha then
+        while iha do
+            updRealHb()
+            wait(0.1)
+        end
+    else
+        resetHbToDefault()
+    end
+end)
+tog:SetValue(false)
+local ix = Tabs.hitbox:AddInput("InputX", {
+    Title = "Hitbox (X)",
+    Description = "1-2048",
+    Default = 1,
+    Numeric = true,
+    Callback = function(v)
+        hsx = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local iy = Tabs.hitbox:AddInput("InputY", {
+    Title = "Hitbox (Y)",
+    Description = "1-2048",
+    Default = 1,
+    Numeric = true,
+    Callback = function(v)
+        hsy = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local iz = Tabs.hitbox:AddInput("InputZ", {
+    Title = "Hitbox (Z)",
+    Description = "1-2048",
+    Default = 1,
+    Numeric = true,
+    Callback = function(v)
+        hsz = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local ts = Tabs.hitbox:AddSlider("TransparencySlider", {
+    Title = "Transparency",
+    Description = "",
+    Default = 1,
+    Min = 0,
+    Max = 1,
+    Rounding = 1.1,
+    Callback = function(v)
+        ht = v
+        if iha then
+            updRealHb()
+        end
+    end
+})
+ts:SetValue(1)
+local cp = Tabs.hitbox:AddColorpicker("Colorpicker", {
+    Title = "Hitbox Color",
+    Default = Color3.fromRGB(255, 255, 255)
+})
+cp:OnChanged(function()
+    hc = cp.Value
+    if iha then
+        updRealHb()
+    end
+end)
+Tabs.XXX:AddSection("Control ball ")
+
+local ks, vma = 80, 80
+local ce = false
+local p = game.Players.LocalPlayer
+local h, hrp
+local uis = game:GetService("UserInputService")
+local ws = game:GetService("Workspace")
+local function setupChar(c)
+    h = c:WaitForChild("Humanoid")
+    hrp = c:WaitForChild("HumanoidRootPart")
+    if ce then
+        h.WalkSpeed = 0
+    else
+        h.WalkSpeed = 16
+    end
+end
+p.CharacterAdded:Connect(setupChar)
+if p.Character then setupChar(p.Character) end
+local s = Tabs.XXX:AddSlider("Slider", {
+    Title = "Speed -/+",
+    Description = "",
+    Default = 80,
+    Min = 30,
+    Max = 700,
+    Rounding = 1,
+    Callback = function(v) ks = v end
+})
+local vs = Tabs.XXX:AddSlider("VerticalSlider", {
+    Title = "up|down",
+    Description = "",
+    Default = 80,
+    Min = 30,
+    Max = 600,
+    Rounding = 1,
+    Callback = function(v) vma = v end
+})
+local function startControlLoop()
+    controlCoroutine = coroutine.create(function()
+        while ce do
+            if h then
+                h.WalkSpeed = 0
+            end
+            wait(0.01)
+        end
+    end)
+    coroutine.resume(controlCoroutine)
+end
+local function togControls()
+    ce = not ce
+    if ce then
+        if h then h.WalkSpeed = 0 end
+        startControlLoop()
+    else
+        if h then h.WalkSpeed = 16 end
+        controlCoroutine = nil
+    end
+end
+local function getValidFootballs()
+    local junk = ws:FindFirstChild("Junk")
+    if not junk then return {} end
+    local footballs = {}
+    for _, obj in ipairs(junk:GetChildren()) do
+        if obj:IsA("BasePart") and obj.Name == "Football" then
+            table.insert(footballs, obj)
+        end
+    end
+    return footballs
+end
+local function moveFbVert(dir)
+    if not hrp then warn("No HRP") return end
+    local footballs = getValidFootballs()
+    if #footballs == 0 then return end
+    local ma = dir == "up" and vma or -vma
+    for _, fb in ipairs(footballs) do
+        fb.Anchored = false
+        local bv = Instance.new("BodyVelocity")
+        bv.Velocity = Vector3.new(0, ma, 0)
+        bv.MaxForce = Vector3.new(10000, 10000, 10000)
+        bv.Parent = fb
+        game.Debris:AddItem(bv, 0.1)
+    end
+end
+local function kickFbInDir(dir)
+    if not hrp then warn("No HRP") return end
+    local footballs = getValidFootballs()
+    if #footballs == 0 then return end
+    local ld
+    if dir == "forward" then ld = hrp.CFrame.LookVector
+    elseif dir == "backward" then ld = -hrp.CFrame.LookVector
+    elseif dir == "left" then ld = -hrp.CFrame.RightVector
+    elseif dir == "right" then ld = hrp.CFrame.RightVector
+    end
+    for _, fb in ipairs(footballs) do
+        fb.Anchored = false
+        local bv = Instance.new("BodyVelocity")
+        bv.Velocity = ld * ks
+        bv.MaxForce = Vector3.new(10000, 10000, 10000)
+        bv.Parent = fb
+        game.Debris:AddItem(bv, 0.1)
+    end
+end
+Tabs.XXX:AddKeybind("Keybind", {
+    Title = "control",
+    Mode = "Toggle",
+    Default = "Two",
+    Callback = function()
+        togControls()
+    end
+})
+uis.InputBegan:Connect(function(i, gp)
+    if ce then
+        if i.KeyCode == Enum.KeyCode.W and not gp then
+            kickFbInDir("forward")
+        elseif i.KeyCode == Enum.KeyCode.S and not gp then
+            kickFbInDir("backward")
+        elseif i.KeyCode == Enum.KeyCode.A and not gp then
+            kickFbInDir("left")
+        elseif i.KeyCode == Enum.KeyCode.D and not gp then
+            kickFbInDir("right")
+        end
+        if i.KeyCode == Enum.KeyCode.X and not gp then
+            moveFbVert("up")
+        elseif i.KeyCode == Enum.KeyCode.Z and not gp then
+            moveFbVert("down")
+        end
+    end
+end)
+Tabs.XXX:AddSection("fly ")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
+local EmoteIds = {}
+for _, animation in pairs(TauntsFolder:GetChildren()) do
+    if animation:IsA("Animation") then
+        if not string.find(animation.Name:lower(), "universal") then
+            local animationId = animation.AnimationId
+            if animationId:match("rbxassetid://(%d+)") then
+                animationId = animationId:match("rbxassetid://(%d+)")
+            end
+            EmoteIds[animation.Name] = animationId
+        end
+    end
+end
+local Emotes = {}
+for name, _ in pairs(EmoteIds) do
+    table.insert(Emotes, name)
+end
+table.sort(Emotes)
+local cat, iep = nil, false
+local function togEmote(eid)
+    local p = game.Players.LocalPlayer
+    if p and p.Character then
+        local h = p.Character:FindFirstChildOfClass("Humanoid")
+        if h then
+            if iep and cat then
+                cat:Stop()
+                cat = nil
+                iep = false
+            else
+                local a = Instance.new("Animation")
+                a.AnimationId = "rbxassetid://" .. eid
+                cat = h:LoadAnimation(a)
+                cat:Play()
+                iep = true
+                cat.Stopped:Connect(function()
+                    iep = false
+                    cat = nil
+                end)
+            end
+        end
+    end
+end
+local EmoteDropdown1 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv1", {
+    Title = "Emote v1",
+    Values = Emotes,
+    Multi = false,
+    Default = "Backflip",
+})
+local EmoteDropdown2 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv2", {
+    Title = "Emote v2",
+    Values = Emotes,
+    Multi = false,
+    Default = "Backflip",
+})
+local EmoteDropdown3 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv3", {
+    Title = "Emote v3",
+    Values = Emotes,
+    Multi = false,
+    Default = "Backflip",
+})
+local function playFromDropdown(dropdown)
+    local selected = dropdown.Value or "Backflip"
+    local eid = EmoteIds[selected]
+    if eid then
+        togEmote(eid)
+    end
+end
+Tabs.FUN:AddKeybind("Keybind1", {
+    Title = "Play Emote v1",
+    Mode = "Toggle",
+    Default = "Four",
+    Callback = function()
+        playFromDropdown(EmoteDropdown1)
+    end
+})
+Tabs.FUN:AddKeybind("Keybind2", {
+    Title = "Play Emote v2",
+    Mode = "Toggle",
+    Default = "Five",
+    Callback = function()
+        playFromDropdown(EmoteDropdown2)
+    end
+})
+Tabs.FUN:AddKeybind("Keybind3", {
+    Title = "Play Emote v3",
+    Mode = "Toggle",
+    Default = "Six",
+    Callback = function()
+        playFromDropdown(EmoteDropdown3)
+    end
+})
+Tabs.all:AddSection("Spam give any player")
+local pls = game:GetService("Players")
+local lp = pls.LocalPlayer
+local sp = nil
+local pd = nil
+local vim = game:GetService("VirtualInputManager")
+local ac, tp = false, false
+local ci = 0
+local ts = true
+local function updPlayerList()
+    local pl = {}
+    for _, p in ipairs(pls:GetPlayers()) do
+        if p ~= lp then
+            table.insert(pl, p.Name)
+        end
+    end
+    table.insert(pl, "none")
+    if pd then
+        pd:SetValues(pl)
+    end
+    if sp and not pls:FindFirstChild(sp.Name) then
+        sp = nil
+        pd:SetValue("none")
+    end
+    return pl
+end
+pd = Tabs.all:AddDropdown("Dropdown", {
+    Title = "Select Player",
+    Values = updPlayerList(),
+    Multi = false,
+    Default = "none",
+    Callback = function(v)
+        if v and v ~= "none" then
+            sp = pls:FindFirstChild(v)
+        else
+            sp = nil
+        end
+    end
+})
+local function tpFbToPlayers()
+    while tp do
+        local fb = workspace:FindFirstChild("Junk") and workspace.Junk:FindFirstChild("Football")
+        if fb and lp and lp.Character and ts then
+            local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                fb.CFrame = hrp.CFrame
+            end
+        end
+        if fb and sp and sp.Character and not ts then
+            local hrp = sp.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                fb.CFrame = hrp.CFrame
+            end
+        end
+        ts = not ts
+        task.wait()
+    end
+end
+local function autoClicker()
+    while ac do
+        task.wait(ci)
+        if lp then
+            vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+        end
+    end
+end
+Tabs.all:AddKeybind("Keybind", {
+    Title = "spam ball",
+    Mode = "Toggle",
+    Default = "One",
+    Callback = function()
+        ac = not ac
+        tp = not tp
+        if ac then
+            task.spawn(autoClicker)
+        end
+        if tp then
+            task.spawn(tpFbToPlayers)
+        end
+    end
+})
+pls.PlayerAdded:Connect(updPlayerList)
+pls.PlayerRemoving:Connect(updPlayerList)
+local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK", "None"}
+local teams = {"Home", "Away", "None"}
+
+local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
+    Title = "Team",
+    Values = teams,
+    Multi = false,
+    Default = "None"
+})
+
+local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
+    Title = "Position",
+    Values = positions,
+    Multi = false,
+    Default = "None"
+})
+
+local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {Title = "AUTO POSITION", Default = false})
+
+local player = game.Players.LocalPlayer
+local starterGui = game:GetService("StarterGui")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local teamsService = game:GetService("Teams")
+local notified = {}
+local takenNotified = {}
+
+local function sendNotification(title, text, position)
+    if text == "Position " .. position .. " already taken or unavailable" then
+        if takenNotified[position] then return end
+        takenNotified[position] = true
+    else
+        if notified[position] then return end
+        notified[position] = true
+        task.delay(5, function()
+            notified[position] = nil
+        end)
+    end
+    pcall(function()
+        starterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = 5
+        })
+    end)
+end
+
+local function joinTeam(teamName, position)
+    if teamName == "None" or position == "None" then
+        return true
+    end
+
+    local team = teamsService:FindFirstChild(teamName)
+    if not team then
+        sendNotification("Error", "Team " .. teamName .. " does not exist", position)
+        return false
+    end
+
+    local gamemodeComm = replicatedStorage:FindFirstChild("__GamemodeComm")
+    if not gamemodeComm then
+        sendNotification("Error", "Gamemode communication not found", position)
+        AutoToggle:SetValue(false)
+        return false
+    end
+
+    local requestJoin = gamemodeComm:FindFirstChild("RE") and gamemodeComm.RE:FindFirstChild("_RequestJoin")
+    if not requestJoin then
+        sendNotification("Error", "Join request remote not found", position)
+        AutoToggle:SetValue(false)
+        return false
+    end
+
+    local args = {
+        {
+            Team = team,
+            TeamPosition = position
+        }
+    }
+
+    local success, err = pcall(function()
+        requestJoin:FireServer(unpack(args))
+    end)
+
+    if not success then
+        sendNotification("Error", "Failed to join team: " .. tostring(err), position)
+        return false
+    end
+
+    task.wait(0.5)
+    if player.Team ~= team then
+        sendNotification("Error", "Position " .. position .. " already taken or unavailable", position)
+        return false
+    end
+
+    notified[position] = nil
+    takenNotified[position] = nil
+    return true
+end
+
+PositionDropdown:OnChanged(function()
+    local selectedPosition = PositionDropdown.Value
+    if selectedPosition ~= "None" and (player.Team == nil or (player.Team.Name ~= "Home" and player.Team.Name ~= "Away")) then
+        takenNotified[selectedPosition] = nil
+    end
+end)
+
+AutoToggle:OnChanged(function()
+    if AutoToggle.Value then
+        local selectedTeam = TeamDropdown.Value
+        local selectedPosition = PositionDropdown.Value
+        if selectedTeam ~= "None" and selectedPosition ~= "None" and (player.Team == nil or (player.Team.Name ~= "Home" and player.Team.Name ~= "Away")) then
+            joinTeam(selectedTeam, selectedPosition)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        local gameGui = player.PlayerGui:FindFirstChild("GameGui")
+        if not gameGui then
+            AutoToggle:SetValue(false)
+            task.wait()
+            continue
+        end
+
+        if AutoToggle.Value then
+            local selectedTeam = TeamDropdown.Value
+            local selectedPosition = PositionDropdown.Value
+            if selectedTeam ~= "None" and selectedPosition ~= "None" and (player.Team == nil or (player.Team.Name ~= "Home" and player.Team.Name ~= "Away")) then
+                local success = joinTeam(selectedTeam, selectedPosition)
+                if success then
+                    AutoToggle:SetValue(true)
+                end
+            end
+        end
+
+        task.wait()
+    end
+end)
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local AnimationService = game:GetService("Animation")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+local camera = workspace.CurrentCamera
+local flightEnabled = false
+local bodyVelocity = nil
+local bodyGyro = nil
+local speed = 100
+local maxSpeed = 250
+local moveDirection = Vector3.new(0, 0, 0)
+local flyAnimation = nil
+local animationTrack = nil
+local function setupFlyAnimation()
+    flyAnimation = Instance.new("Animation")
+    flyAnimation.AnimationId = "rbxassetid://3541044388"
+    animationTrack = humanoid:LoadAnimation(flyAnimation)
+    animationTrack.Priority = Enum.AnimationPriority.Action
+end
+local function updateCharacter(newCharacter)
+    character = newCharacter
+    humanoid = character:WaitForChild("Humanoid")
+    rootPart = character:WaitForChild("HumanoidRootPart")
+    setupFlyAnimation()
+    if flightEnabled then
+        toggleFlight()
+        toggleFlight()
+    end
+end
+player.CharacterAdded:Connect(updateCharacter)
+local Slider = Tabs.XXX:AddSlider("SliderSpeedV", {
+    Title = "Speed -/+",
+    Description = "",
+    Default = 100,
+    Min = 10,
+    Max = maxSpeed,
+    Rounding = 0,
+    Callback = function(Value)
+        speed = Value
+    end
+})
+local function toggleFlight()
+    if flightEnabled then
+        flightEnabled = false
+        humanoid.PlatformStand = false
+        if bodyVelocity then
+            bodyVelocity:Destroy()
+            bodyVelocity = nil
+        end
+        if bodyGyro then
+            bodyGyro:Destroy()
+            bodyGyro = nil
+        end
+        if animationTrack then
+            animationTrack:Stop()
+        end
+        humanoid.WalkSpeed = 16
+    else
+        flightEnabled = true
+        humanoid.PlatformStand = true
+        humanoid.WalkSpeed = 0
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.Parent = rootPart
+        bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        bodyGyro.P = 10000
+        bodyGyro.D = 500
+        bodyGyro.Parent = rootPart
+        if animationTrack then
+            animationTrack:Play()
+        end
+    end
+end
+local function updateMovement()
+    if not flightEnabled then return end
+    local move = Vector3.new(0, 0, 0)
+    local forward = UserInputService:IsKeyDown(Enum.KeyCode.W) and 1 or 0
+    local backward = UserInputService:IsKeyDown(Enum.KeyCode.S) and 1 or 0
+    local left = UserInputService:IsKeyDown(Enum.KeyCode.A) and 1 or 0
+    local right = UserInputService:IsKeyDown(Enum.KeyCode.D) and 1 or 0
+    local camCF = camera.CFrame
+    move = move + camCF.LookVector * (forward - backward)
+    move = move + camCF.RightVector * (right - left)
+    if move.Magnitude > 0 then
+        move = move.Unit
+    end
+    moveDirection = move * speed
+end
+RunService.RenderStepped:Connect(function()
+    if flightEnabled and bodyVelocity and bodyGyro then
+        bodyVelocity.Velocity = moveDirection
+        local camLook = camera.CFrame.LookVector
+        if moveDirection.Magnitude > 0 then
+            bodyGyro.CFrame = CFrame.new(Vector3.new(0, 0, 0), moveDirection.Unit)
+        else
+            bodyGyro.CFrame = CFrame.new(Vector3.new(0, 0, 0), camLook)
+        end
+    end
+end)
+UserInputService.InputChanged:Connect(updateMovement)
+UserInputService.InputBegan:Connect(updateMovement)
+UserInputService.InputEnded:Connect(updateMovement)
+Tabs.XXX:AddKeybind("Keybind", {
+    Title = "Fly",
+    Mode = "Toggle",
+    Default = "Three",
+    Callback = function()
+        toggleFlight()
+    end
+})
+setupFlyAnimation()
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+local User = game:GetService("UserInputService")
+local holdingWKey = false
+local holdingSKey = false
+local holdingAKey = false
+local holdingDKey = false
+local Speed = 1.0
+local startup = false
+local StatusParagraph 
+Tabs.XXX:AddKeybind("Keybind", {
+    Title = "Speed",
+    Mode = "Toggle",
+    Default = "F",
+    Callback = function()
+        startup = not startup
+        if StatusParagraph then
+            StatusParagraph:SetTitle(startup and "ON" or "OFF")
+        end
+    end,
+})
+Tabs.XXX:AddSlider("SliderSpeedV", {
+    Title = "Speed +/-",
+    Description = "",
+    Default = 1,
+    Min = 0.1,
+    Max = 3.5,
+    Rounding = 1.1, 
+    Callback = function(Value)
+        Speed = Value
+    end,
+})
+StatusParagraph = Tabs.XXX:AddParagraph({
+    Title = "OFF",
+    Content = ""
+})
+game:GetService("RunService").Stepped:Connect(function()
+    if startup and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local moveVector = Vector3.zero
+        if holdingWKey then
+            moveVector = moveVector + Vector3.new(0, 0, -Speed)
+        end
+        if holdingSKey then
+            moveVector = moveVector + Vector3.new(0, 0, Speed)
+        end
+        if holdingAKey then
+            moveVector = moveVector + Vector3.new(-Speed, 0, 0)
+        end
+        if holdingDKey then
+            moveVector = moveVector + Vector3.new(Speed, 0, 0)
+        end
+        player.Character.HumanoidRootPart.CFrame *= CFrame.new(moveVector)
+    end
+end)
+User.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    if input.KeyCode == Enum.KeyCode.W then
+        holdingWKey = true
+    elseif input.KeyCode == Enum.KeyCode.S then
+        holdingSKey = true
+    elseif input.KeyCode == Enum.KeyCode.A then
+        holdingAKey = true
+    elseif input.KeyCode == Enum.KeyCode.D then
+        holdingDKey = true
+    end
+end)
+User.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.W then
+        holdingWKey = false
+    elseif input.KeyCode == Enum.KeyCode.S then
+        holdingSKey = false
+    elseif input.KeyCode == Enum.KeyCode.A then
+        holdingAKey = false
+    elseif input.KeyCode == Enum.KeyCode.D then
+        holdingDKey = false
+    end
+end)
+Tabs.all:AddSection("Jump")
+local coreGui = game:GetService("CoreGui")
+local sjp = 50
+local Loop = true
+local sj = Tabs.all:AddSlider("Sliderjump", {
+    Title = "Jump Power",
+    Description = "",
+    Default = 50,
+    Min = 50,
+    Max = 165,
+    Rounding = 0.040,
+    Callback = function(v)
+        sjp = v
+    end
+})
+task.spawn(function()
+    while Loop and task.wait(0.1) do
+        local screenGui = coreGui:FindFirstChild("ScreenGui")
+        if not screenGui then
+            Loop = false
+            local p = game.Players.LocalPlayer
+            if p and p.Character and p.Character:FindFirstChild("Humanoid") then
+                p.Character.Humanoid.JumpPower = 50
+            end
+            break
+        end
+        local p = game.Players.LocalPlayer
+        if p and p.Character and p.Character:FindFirstChild("Humanoid") then
+            p.Character.Humanoid.JumpPower = sjp
+        end
+    end
+end)
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local CoreGui = game:GetService("CoreGui")
+Tabs.all:AddSection("TOG")
+
+local antiTackleRunning = false
+local shouldPressQ = false
+
+local tk = Tabs.all:AddToggle("XXTackledToggle", {
+    Title = "Anti Tackled (Q)",
+    Default = false,
+    Callback = function(value)
+        antiTackleRunning = value
+
+        if value then
+            task.spawn(function()
+                while antiTackleRunning do
+                    if not CoreGui:FindFirstChild("ScreenGui") then
+                        tk:Set(false)
+                        break
+                    end
+
+                    if not LocalPlayer:GetAttribute("HasBall") then
+                        shouldPressQ = false
+                        task.wait()
+                        continue
+                    end
+
+                    local char = LocalPlayer.Character
+                    if not char or not char:FindFirstChild("HumanoidRootPart") then
+                        shouldPressQ = false
+                        task.wait()
+                        continue
+                    end
+
+                    local myTeam = LocalPlayer.Team
+                    local myRootPart = char.HumanoidRootPart
+
+                    local threatDetected = false
+
+                    for _, plr in ipairs(Players:GetPlayers()) do
+                        if plr == LocalPlayer or plr.Team == myTeam then
+                            continue
+                        end
+
+                        if plr:GetAttribute("TeamPosition") == "GK" then
+                            continue
+                        end
+
+                        if plr:GetAttribute("_ACTackling") then
+                            local enemyChar = plr.Character
+                            if enemyChar and enemyChar:FindFirstChild("HumanoidRootPart") then
+                                local enemyRootPart = enemyChar.HumanoidRootPart
+                                local distance = (myRootPart.Position - enemyRootPart.Position).Magnitude
+
+                                if distance <= 29 then
+                                    threatDetected = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+
+                    shouldPressQ = threatDetected
+
+                    task.wait()
+                end
+            end)
+
+            task.spawn(function()
+                while antiTackleRunning do
+                    if shouldPressQ then
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Q, false, game)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Q, false, game)
+                        shouldPressQ = false 
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+local Toggle = Tabs.all:AddToggle("tog2xspeed", {
+    Title = "2x speed",
+    Description = "Leftshift",
+    Default = false,
+    Callback = function(Value) end
+})
+local defaultSpeed = 16
+local speedX = 54
+local function setSpeed(speed)
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = speed
+    end
+end
+local function setupShiftLogic()
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if input.KeyCode == Enum.KeyCode.LeftShift and not gameProcessed and Toggle.Value then
+            while UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and Toggle.Value do
+                setSpeed(speedX)
+                task.wait()
+            end
+            setSpeed(defaultSpeed)
+        end
+    end)
+end
+setupShiftLogic()
+LocalPlayer.CharacterAdded:Connect(setupShiftLogic)
+local screenGui = CoreGui:FindFirstChild("ScreenGui")
+if screenGui then
+    screenGui.Destroying:Connect(function()
+        Toggle:SetValue(false)
+        tk:SetValue(false)
+    end)
+end
+local mctRunning = false
+local mct = Tabs.all:AddToggle("MoveCharacterToggle", { 
+    Title = "Delete any Block from the pitch", 
+    Default = false,
+    Callback = function(value)
+        mctRunning = value
+        if value then
+            task.spawn(function()
+                while mctRunning do
+                    for _, team in pairs({"Home", "Away"}) do
+                        local gkFolder = workspace.Stadium.Teams[team].Barriers.Goalkeeper
+                        local penalties = workspace.Stadium.Teams[team].Penalties.Barriers
+                        for _, obj in pairs(gkFolder:GetChildren()) do
+                            if obj:IsA("BasePart") then obj.CanCollide = false end
+                        end
+                        for _, obj in pairs(penalties:GetChildren()) do
+                            if obj:IsA("BasePart") then obj.CanCollide = false end
+                        end
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+local alw = Tabs.all:AddToggle("TackledToggle", { Title = "Tackled Skip Stay", Default = false })
+local ft = Tabs.all:AddToggle("FreezeToggle", { Title = "Disable Freeze", Default = false })
+local cuat = Tabs.all:AddToggle("CanUseAbilitiesToggle", { Title = "Enable Controls", Default = false })
+Tabs.all:AddSection("Ball")
+local BallThemes = {}
+for _, module in pairs(ReplicatedStorage.Assets.Items.BallThemes:GetChildren()) do
+    if module:IsA("ModuleScript") then
+        table.insert(BallThemes, module.Name)
+    end
+end
+local BallDropdown = Tabs.all:AddDropdown("BallthemesDropdown", {
+    Title = "Ball themes",
+    Values = BallThemes,
+    Multi = false,
+    Default = "Default"
+})
+local selectedTheme = "Default"
+BallDropdown:OnChanged(function(value)
+    selectedTheme = value
+    if LocalPlayer then
+        LocalPlayer:SetAttribute("EquippedBallTheme", selectedTheme)
+    end
+end)
+local themeLoopRunning = true
+task.spawn(function()
+    while themeLoopRunning do
+        if LocalPlayer and LocalPlayer:GetAttribute("EquippedBallTheme") ~= selectedTheme then
+            LocalPlayer:SetAttribute("EquippedBallTheme", selectedTheme)
+        end
+        task.wait()
+    end
+end)
+
+local ilr = false
+local function mainLoop()
+    while ilr do
+        if alw.Value then
+            LocalPlayer:SetAttribute("Tackled", false)
+        end
+        if ft.Value then
+            LocalPlayer:SetAttribute("DisableControls", false)
+            LocalPlayer:SetAttribute("Freeze", false)
+        end
+        if cuat.Value then
+            LocalPlayer:SetAttribute("CanUseAbilities", true)
+        end
+        task.wait()
+    end
+end
+local function checkLoop()
+    if ft.Value or cuat.Value or mct.Value or alw.Value then
+        if not ilr then
+            ilr = true
+            task.spawn(mainLoop)
+        end
+    else
+        ilr = false
+    end
+end
+ft:OnChanged(checkLoop)
+cuat:OnChanged(checkLoop)
+mct:OnChanged(checkLoop)
+alw:OnChanged(checkLoop)
+if screenGui then
+    screenGui.Destroying:Connect(function()
+        ft:SetValue(false)
+        cuat:SetValue(false)
+        mct:SetValue(false)
+        alw:SetValue(false)
+        themeLoopRunning = false
+        selectedTheme = "Default"
+        BallDropdown:SetValue("Default")
+        if LocalPlayer then
+            LocalPlayer:SetAttribute("EquippedBallTheme", "Default")
+        end
+    end)
+end
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+SaveManager:SetFolder("HUB")
+SaveManager:BuildConfigSection(Tabs.save)
+SaveManager:LoadAutoloadConfig()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui.Frame:Destroy()
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    
+    Title = "",
+    Text = "",
+    Duration = 0.000000000000000000000000000000000000000000000000000000000000001,
+        Icon = "rbxassetid://140690318962088"
+})  
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "",
+    Text = "",
+    Duration = 0.000000000000000000000000000000000000000000000000000000000000001,
+        Icon = "rbxassetid://140690318962088"
+})  
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "",
+    Text = "",
+    Duration = 0.000000000000000000000000000000000000000000000000000000000000001,
+        Icon = "rbxassetid://140690318962088"
+})
+local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
+local foundPlayers = {}
+local function sendNotification(title, content, subContent)
+    Fluent:Notify({
+        Title = title or "⚠️INFO⚠️",
+        Content = content or "",
+        SubContent = subContent or "",
+        Duration = 65
+    })
+end
+local function updateInServerNotification()
+    if #foundPlayers > 0 then
+        local playerList = table.concat(foundPlayers, ", ")
+        sendNotification("⚠️INFO⚠️", playerList, "In Server")
+    end
+end
+local function onIsStaffChanged(player)
+    local isStaff = player:GetAttribute("IsStaff")
+    if isStaff then
+        if not table.find(foundPlayers, player.Name) then
+            table.insert(foundPlayers, player.Name)
+            updateInServerNotification()
+        end
+    else
+        for i, name in ipairs(foundPlayers) do
+            if name == player.Name then
+                table.remove(foundPlayers, i)
+                sendNotification("⚠️INFO⚠️", player.Name, "Left Server")
+                updateInServerNotification()
+                break
+            end
+        end
+    end
+end
+local function checkPlayerJoin(player)
+    onIsStaffChanged(player)
+    player:GetAttributeChangedSignal("IsStaff"):Connect(function()
+        onIsStaffChanged(player)
+    end)
+end
+local function onPlayerLeave(player)
+    local isStaff = player:GetAttribute("IsStaff")
+    if isStaff then
+        for i, name in ipairs(foundPlayers) do
+            if name == player.Name then
+                table.remove(foundPlayers, i)
+                sendNotification("⚠️INFO⚠️", player.Name, "Left Server")
+                updateInServerNotification()
+                break
+            end
+        end
+    end
+end
+for _, player in ipairs(Players:GetPlayers()) do
+    checkPlayerJoin(player)
+end
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "Enjoy Script  :)",
+    Text = "By NOTHING X",
+    Duration = 15,
+    Icon = "rbxassetid://140690318962088",
+                Button1 = ":)"
+})
+loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/T/main/T/Ping%5Ccolor"))()
