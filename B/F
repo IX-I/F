@@ -1,0 +1,220 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local pushingEnabled = false
+local walkFlingEnabled = false
+local touchPower = 100 
+local walkPower = 100  
+local character, humanoidRootPart
+local function updateCharacter(newCharacter)
+    character = newCharacter
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart", 5)
+end
+if localPlayer.Character then
+    updateCharacter(localPlayer.Character)
+end
+localPlayer.CharacterAdded:Connect(updateCharacter)
+local function createGlowEffect(startPos, endPos)
+    local beamPart1 = Instance.new("Part")
+    beamPart1.Size = Vector3.new(0.2, 0.2, 0.2)
+    beamPart1.Position = startPos
+    beamPart1.Anchored = true
+    beamPart1.CanCollide = false
+    beamPart1.Transparency = 1
+    beamPart1.Parent = workspace
+    local beamPart2 = Instance.new("Part")
+    beamPart2.Size = Vector3.new(0.2, 0.2, 0.2)
+    beamPart2.Position = endPos
+    beamPart2.Anchored = true
+    beamPart2.CanCollide = false
+    beamPart2.Transparency = 1
+    beamPart2.Parent = workspace
+    local beam = Instance.new("Beam")
+    beam.FaceCamera = true
+    beam.Color = ColorSequence.new(Color3.fromRGB(0, 0, 0), Color3.fromRGB(50, 50, 50))
+    beam.Width0 = 0.5
+    beam.Width1 = 0.5
+    beam.Texture = "rbxassetid://7151778302"
+    beam.TextureSpeed = 2
+    beam.Brightness = 0.8
+    beam.LightEmission = 0.2
+    beam.Attachment0 = Instance.new("Attachment", beamPart1)
+    beam.Attachment1 = Instance.new("Attachment", beamPart2)
+    beam.Parent = beamPart1
+    game:GetService("Debris"):AddItem(beamPart1, 0.5)
+    game:GetService("Debris"):AddItem(beamPart2, 0.5)
+end
+local function pushObject(hit)
+    if pushingEnabled and hit and hit:IsA("BasePart") and hit ~= humanoidRootPart then
+        local bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.Velocity = humanoidRootPart.CFrame.LookVector * touchPower 
+        bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bodyVelocity.Parent = hit
+        game:GetService("Debris"):AddItem(bodyVelocity, 0.1)
+        createGlowEffect(humanoidRootPart.Position, hit.Position)
+    end
+end
+local function toggleTouchFling()
+    pushingEnabled = not pushingEnabled
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "Touch Fling: " .. (pushingEnabled and "ON" or "OFF"),
+        Duration = 3
+    })
+end
+local function getRoot(char)
+    return char and char:FindFirstChild("HumanoidRootPart")
+end
+local function toggleWalkFling()
+    walkFlingEnabled = not walkFlingEnabled
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "Walk Fling: " .. (walkFlingEnabled and "ON" or "OFF"),
+        Duration = 3
+    })
+    if not walkFlingEnabled then return end
+    local root = getRoot(character)
+    local vel, movel = nil, 0.1
+    while walkFlingEnabled and character and character.Parent and root and root.Parent do
+        vel = root.Velocity
+        root.Velocity = vel * walkPower + Vector3.new(0, walkPower, 0) 
+        RunService.RenderStepped:Wait()
+        root.Velocity = vel
+        RunService.Stepped:Wait()
+        root.Velocity = vel + Vector3.new(0, movel, 0)
+        movel = movel * -1
+        RunService.Heartbeat:Wait()
+    end
+end
+local Window = Fluent:CreateWindow({
+    Title = "NOTHING X HUB",
+    SubTitle = "",
+    TabWidth = 0,
+    Size = UDim2.fromOffset(215, 410),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+local Tabs = {
+    Main = Window:AddTab({ Title = "FLING", Icon = "" })
+}
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+Fluent:Notify({
+    Title = "NOTHING X HUB",
+    Content = "Script Loaded!",
+    Duration = 3
+})
+Tabs.Main:AddKeybind("TouchFlingKeybind", {
+    Title = "Touch Fling Toggle",
+    Mode = "Toggle",
+    Default = "Z",
+    Callback = toggleTouchFling
+})
+Tabs.Main:AddInput("TouchPowerInput", {
+    Title = "",
+    Default = tostring(touchPower),
+    Placeholder = "Enter Touch Power",
+    Numeric = true,
+    Callback = function(value)
+        touchPower = tonumber(value) or touchPower
+    end
+})
+Tabs.Main:AddKeybind("WalkFlingKeybind", {
+    Title = "Walk Fling Toggle",
+    Mode = "Toggle",
+    Default = "X",
+    Callback = toggleWalkFling
+})
+Tabs.Main:AddInput("WalkPowerInput", {
+    Title = "",
+    Default = tostring(walkPower),
+    Placeholder = "Enter Walk Power",
+    Numeric = true,
+    Callback = function(value)
+        walkPower = tonumber(value) or walkPower
+    end
+})
+Tabs.Main:AddSection("+")
+local Toggle = Tabs.Main:AddToggle("antiflingtog", {Title = "Anti Fling", Default = false})
+local connection
+Toggle:OnChanged(function(value)
+    if value then
+        connection = game:GetService("RunService").Stepped:Connect(function()
+            local localPlayer = game:GetService("Players").LocalPlayer
+            local localCharacter = localPlayer.Character
+            if not localCharacter or not localCharacter.PrimaryPart then return end
+            local localPosition = localCharacter.PrimaryPart.Position
+            for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+                if player ~= localPlayer and player.Character and player.Character.PrimaryPart then
+                    local distance = (player.Character.PrimaryPart.Position - localPosition).Magnitude
+                    if distance <= 20 then 
+                        for _, v in pairs(player.Character:GetDescendants()) do
+                            if v:IsA("BasePart") then
+                                v.CanCollide = false 
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            if player ~= game:GetService("Players").LocalPlayer and player.Character then
+                for _, v in pairs(player.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true 
+                    end
+                end
+            end
+        end
+    end
+end)
+local Toggle = Tabs.Main:AddToggle("freezelocaltog", {Title = "Freeze", Default = false})
+local connection
+
+Toggle:OnChanged(function(value)
+    local localPlayer = game:GetService("Players").LocalPlayer
+    local localCharacter = localPlayer.Character
+    if not localCharacter or not localCharacter.PrimaryPart then return end
+
+    if value then
+        connection = game:GetService("RunService").Stepped:Connect(function()
+            if localCharacter and localCharacter.PrimaryPart then
+                localCharacter.PrimaryPart.Anchored = true
+                for _, v in pairs(localCharacter:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.Anchored = true
+                    end
+                end
+            end
+        end)
+    else
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+        if localCharacter then
+            for _, v in pairs(localCharacter:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.Anchored = false
+                end
+            end
+        end
+    end
+end)
+Window:SelectTab(1)
+local mouse = localPlayer:GetMouse()
+mouse.Button1Down:Connect(function()
+    local target = mouse.Target
+    pushObject(target)
+end)
