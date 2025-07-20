@@ -97,14 +97,14 @@ local Window = Fluent:CreateWindow({
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftAlt
 })
-local Tabs = {
-    Main = Window:AddTab({ Title = "FLING", Icon = "" })
-}
 game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+local Tabs = {
+    Main = Window:AddTab({ Title = "FLING", Icon = "" })
+}
+
 Fluent:Notify({
     Title = "NOTHING X HUB",
     Content = "Script Loaded!",
