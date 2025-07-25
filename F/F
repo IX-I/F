@@ -96,7 +96,7 @@ Toggle:OnChanged(function(value)
             for _, player in pairs(game:GetService("Players"):GetPlayers()) do
                 if player ~= localPlayer and player.Character and player.Character.PrimaryPart then
                     local distance = (player.Character.PrimaryPart.Position - localPosition).Magnitude
-                    if distance <= 75 then 
+                    if distance <= 35 then 
                         for _, v in pairs(player.Character:GetDescendants()) do
                             if v:IsA("BasePart") then
                                 v.CanCollide = false 
