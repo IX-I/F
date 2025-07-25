@@ -85,34 +85,21 @@ Tabs.Main:AddInput("WalkPowerInput", {
 Tabs.Main:AddSection("+")
 
 local Toggle = Tabs.Main:AddToggle("antiflingtog", {Title = "Anti Fling", Default = false})
-local antiflingConnection
-
-Toggle:OnChanged(function(enabled)
-    if enabled then
-        antiflingConnection = RunService.Stepped:Connect(function()
-            local char = localPlayer.Character
-            local root = char and char:FindFirstChild("HumanoidRootPart")
-            if not root then return end
-
-            local localPosition = root.Position
-
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= localPlayer then
-                    local otherChar = player.Character
-                    local otherRoot = otherChar and otherChar:FindFirstChild("HumanoidRootPart")
-                    if otherRoot then
-                        local distance = (otherRoot.Position - localPosition).Magnitude
-                        if distance <= 45 then
-                            for _, part in pairs(otherChar:GetDescendants()) do
-                                if part:IsA("BasePart") then
-                                    part.CanCollide = false
-                                end
-                            end
-                        else
-                            for _, part in pairs(otherChar:GetDescendants()) do
-                                if part:IsA("BasePart") then
-                                    part.CanCollide = true
-                                end
+local connection
+Toggle:OnChanged(function(value)
+    if value then
+        connection = game:GetService("RunService").Stepped:Connect(function()
+            local localPlayer = game:GetService("Players").LocalPlayer
+            local localCharacter = localPlayer.Character
+            if not localCharacter or not localCharacter.PrimaryPart then return end
+            local localPosition = localCharacter.PrimaryPart.Position
+            for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+                if player ~= localPlayer and player.Character and player.Character.PrimaryPart then
+                    local distance = (player.Character.PrimaryPart.Position - localPosition).Magnitude
+                    if distance <= 75 then 
+                        for _, v in pairs(player.Character:GetDescendants()) do
+                            if v:IsA("BasePart") then
+                                v.CanCollide = false 
                             end
                         end
                     end
@@ -120,15 +107,15 @@ Toggle:OnChanged(function(enabled)
             end
         end)
     else
-        if antiflingConnection then
-            antiflingConnection:Disconnect()
-            antiflingConnection = nil
+        if connection then
+            connection:Disconnect()
+            connection = nil
         end
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= localPlayer and player.Character then
-                for _, part in pairs(player.Character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = true
+        for _, player in pairs(game:GetService("Players"):GetPlayers()) do
+            if player ~= game:GetService("Players").LocalPlayer and player.Character then
+                for _, v in pairs(player.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true 
                     end
                 end
             end
