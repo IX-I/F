@@ -1,0 +1,165 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local localPlayer = Players.LocalPlayer
+local walkFlingEnabled = false
+local walkPower = 100
+local character, humanoidRootPart
+
+local function updateCharacter(newCharacter)
+    character = newCharacter
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart", 5)
+end
+
+if localPlayer.Character then
+    updateCharacter(localPlayer.Character)
+end
+localPlayer.CharacterAdded:Connect(updateCharacter)
+
+local function getRoot(char)
+    return char and char:FindFirstChild("HumanoidRootPart")
+end
+
+local function toggleWalkFling()
+    walkFlingEnabled = not walkFlingEnabled
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "Walk Fling: " .. (walkFlingEnabled and "ON" or "OFF"),
+        Duration = 3
+    })
+
+    if not walkFlingEnabled then return end
+
+    local root = getRoot(character)
+    local vel, movel = nil, 0.1
+
+    while walkFlingEnabled and character and character.Parent and root and root.Parent do
+        vel = root.Velocity
+        root.Velocity = vel * walkPower + Vector3.new(0, walkPower, 0)
+        RunService.RenderStepped:Wait()
+        root.Velocity = vel
+        RunService.Stepped:Wait()
+        root.Velocity = vel + Vector3.new(0, movel, 0)
+        movel = movel * -1
+        RunService.Heartbeat:Wait()
+    end
+end
+
+local Window = Fluent:CreateWindow({
+    Title = "",
+    SubTitle = "",
+    TabWidth = 0,
+    Size = UDim2.fromOffset(215, 310),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "", Icon = "" })
+}
+
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+
+Tabs.Main:AddKeybind("WalkFlingKeybind", {
+    Title = "Walk Fling",
+    Mode = "Toggle",
+    Default = "X",
+    Callback = toggleWalkFling
+})
+
+Tabs.Main:AddInput("WalkPowerInput", {
+    Title = "",
+    Default = tostring(walkPower),
+    Placeholder = "Enter Walk Power",
+    Numeric = true,
+    Callback = function(value)
+        walkPower = tonumber(value) or walkPower
+    end
+})
+
+Tabs.Main:AddSection("+")
+
+local Toggle = Tabs.Main:AddToggle("antiflingtog", {Title = "Anti Fling", Default = false})
+local antiflingConnection
+
+Toggle:OnChanged(function(enabled)
+    if enabled then
+        antiflingConnection = RunService.Stepped:Connect(function()
+            local char = localPlayer.Character
+            local root = char and char:FindFirstChild("HumanoidRootPart")
+            if not root then return end
+
+            local localPosition = root.Position
+
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= localPlayer then
+                    local otherChar = player.Character
+                    local otherRoot = otherChar and otherChar:FindFirstChild("HumanoidRootPart")
+                    if otherRoot then
+                        local distance = (otherRoot.Position - localPosition).Magnitude
+                        if distance <= 45 then
+                            for _, part in pairs(otherChar:GetDescendants()) do
+                                if part:IsA("BasePart") then
+                                    part.CanCollide = false
+                                end
+                            end
+                        else
+                            for _, part in pairs(otherChar:GetDescendants()) do
+                                if part:IsA("BasePart") then
+                                    part.CanCollide = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if antiflingConnection then
+            antiflingConnection:Disconnect()
+            antiflingConnection = nil
+        end
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= localPlayer and player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+end)
+
+local freezeConnection
+Tabs.Main:AddToggle("freezelocaltog", {Title = "Freeze", Default = false}):OnChanged(function(value)
+    local char = localPlayer.Character
+    if not char or not char.PrimaryPart then return end
+
+    if value then
+        freezeConnection = RunService.Stepped:Connect(function()
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Anchored = true
+                end
+            end
+        end)
+    else
+        if freezeConnection then
+            freezeConnection:Disconnect()
+            freezeConnection = nil
+        end
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Anchored = false
+            end
+        end
+    end
+end)
+
+Window:SelectTab(1)
