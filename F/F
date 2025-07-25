@@ -49,7 +49,7 @@ local Window = Fluent:CreateWindow({
     Title = "",
     SubTitle = "",
     TabWidth = 0,
-    Size = UDim2.fromOffset(215, 360),
+    Size = UDim2.fromOffset(215, 310),
     Acrylic = true,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.Z
@@ -148,34 +148,6 @@ Tabs.Main:AddToggle("freezelocaltog", {Title = "Freeze", Default = false}):OnCha
         end
     end
 end)
-Tabs.Main:AddButton({
-    Title = "TP to Random Player",
-    Callback = function()
-        local players = {}
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                table.insert(players, player)
-            end
-        end
-
-        if #players > 0 and localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local randomPlayer = players[math.random(1, #players)]
-            local targetPos = randomPlayer.Character.HumanoidRootPart.Position
-            localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPos + Vector3.new(0, 3, 0)) -- slightly above
-            Fluent:Notify({
-                Title = "Teleport",
-                Content = "Teleported to: " .. randomPlayer.Name,
-                Duration = 3
-            })
-        else
-            Fluent:Notify({
-                Title = "Error",
-                Content = "No valid players found.",
-                Duration = 3
-            })
-        end
-    end
-})
 
 
 Window:SelectTab(1)
