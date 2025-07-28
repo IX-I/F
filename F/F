@@ -52,7 +52,7 @@ local Window = Fluent:CreateWindow({
     Size = UDim2.fromOffset(215, 310),
     Acrylic = true,
     Theme = "Darker",
-    MinimizeKey = Enum.KeyCode.Z
+    MinimizeKey = Enum.KeyCode.LeftAlt
 })
 
 local Tabs = {
@@ -68,7 +68,7 @@ game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparen
 Tabs.Main:AddKeybind("WalkFlingKeybind", {
     Title = "Walk Fling",
     Mode = "Toggle",
-    Default = "X",
+    Default = "F",
     Callback = toggleWalkFling
 })
 
