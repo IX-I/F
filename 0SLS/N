@@ -1,28 +1,20 @@
 shared._DLoaded = false
-
 spawn(function()
 local Players = game:GetService("Players")
 local Lighting = game:GetService("Lighting")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-
 local player = Players.LocalPlayer
-
 pcall(function()
 	ReplicatedFirst:RemoveDefaultLoadingScreen()
 end)
-
 local playerGui = player:WaitForChild("PlayerGui")
-
 if not player.Character or not player.Character:FindFirstChild("Humanoid") then
 	player.CharacterAdded:Wait()
 end
 player.Character:WaitForChild("Humanoid")
-
 task.wait(2)
-
 local function destroyGUI()
 	local gameGui = playerGui:FindFirstChild("GameGui")
-
 	local guiNames = {
 		"LoadingScreen",
 		"DailyRewards",
@@ -30,7 +22,6 @@ local function destroyGUI()
 		"Transition",
 		"KeyHints"
 	}
-
 	for _, name in ipairs(guiNames) do
 		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
 		if gui then
@@ -38,7 +29,6 @@ local function destroyGUI()
 		end
 	end
 end
-
 local function removeBlur()
 	for _, effect in ipairs(Lighting:GetChildren()) do
 		if effect:IsA("BlurEffect") then
@@ -46,75 +36,31 @@ local function removeBlur()
 		end
 	end
 end
-
 destroyGUI()
 removeBlur()
     shared._DLoaded = true 
 end)
-
 repeat task.wait() until shared._DLoaded
-
-
-
-local workspace = game:GetService("Workspace")
-local junkFolder = workspace:FindFirstChild("Junk")
-if not junkFolder then
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "WRONG GAME  :/ ",
-    Text = "Join -> Super League Soccer",
-    Duration = 25,
-        Icon = "rbxassetid://140690318962088"
-})  
-return
-end
 local coreGui = game:GetService("CoreGui")
-local starterGui = game:GetService("StarterGui")
 if coreGui:FindFirstChild("ScreenGui") then
-    starterGui:SetCore("SendNotification", {
-        Title = "UI WAS RUNING",
-        Text = " :)",
-        Duration = 3,
-            Icon = "rbxassetid://140690318962088"
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "UI RUNING",
+        SubContent = "", 
+        Duration = 5
     })
     return
 end
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "LOADING...",
-    Text = " :)",
-    Duration = 50,
-    Icon = "rbxassetid://140690318962088"
-})
-function createPart0()
-    if game.Workspace:FindFirstChild("^") then
-        return 
-    end
-    local p = Instance.new("Part")
-    p.Name = "^"
-    p.Size = Vector3.new(261,  6, 414)
-    p.Position = Vector3.new(0.087, 87, 0.112)
-    p.Anchored = true
-    p.Locked = true
-    p.CastShadow = false
-    p.Color = Color3.fromRGB(0, 0, 0)
-    p.Material = Enum.Material.ForceField
-    p.Transparency = 0.8
-    p.Reflectance = 0
-    p.Parent = game.Workspace
-end
-createPart0()
-
-
-
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local Window = Fluent:CreateWindow({
     Title = "NOTHING X HUB",
     SubTitle = " Super League Soccer V2",
-    TabWidth = 25,
-    Size = UDim2.fromOffset(450, 330),
-    Acrylic = true,
-    Theme = "Darker",
+    TabWidth = 30,
+    Size = UDim2.fromOffset(455, 375),
+    Acrylic = false,
+    Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftAlt
 })
 local Tabs = {
@@ -124,19 +70,32 @@ local Tabs = {
                 FUN = Window:AddTab({Title = "", Icon = "laugh"}),
         XXXV = Window:AddTab({Title = "", Icon = "flag"}),
     keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
-    save = Window:AddTab({Title = "", Icon = "save"})
+    save = Window:AddTab({Title = "", Icon = "save"}),
+        Y = Window:AddTab({Title = "", Icon = "settings"})
 }
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Background.BackgroundTransparency = 0.81
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[4]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[3]:Destroy()
 Window:SelectTab()
-Tabs.XXX:AddButton({
-    Title = "teleported to Pro Server",
-    Callback = function()
-        local id =  126195208568849
-        local p = game.Players.LocalPlayer
-        if p then
-            game:GetService("TeleportService"):Teleport(id, p)
-        end
-    end
-}) --X-X Competitive ID 110948941832728
+Window:Minimize()
+for i = 1, 85 do
+    Fluent:Notify({
+        Title = "LOADING...",
+        Content = "",
+        SubContent = "",
+        Duration = 10
+    })
+end
+    Fluent:Notify({
+        Title = "...",
+        Content = "",
+        SubContent = "UI: Left Alt",
+        Duration = 9.98
+    })
+wait (10)
 local p=game.Players.LocalPlayer local uis=game:GetService("UserInputService") local vim=game:GetService("VirtualInputManager") local ws=game:GetService("Workspace") local ist,l=false,false local ltt,tcd=0,0 local X=false local H,A=CFrame.new(0.283999115,4.0250001,-20.9191837),CFrame.new(0.271869421,4.0250001,20.0689564) local c=p.Character or p.CharacterAdded:Wait() p.CharacterAdded:Connect(function(char)c=char end)
 local function pressEKey() vim:SendKeyEvent(true,Enum.KeyCode.E,false,game) task.wait() vim:SendKeyEvent(false,Enum.KeyCode.E,false,game) end
 local function tpPlayer(pos) if c and c.PrimaryPart and tick()-ltt>tcd then ltt=tick() c:SetPrimaryPartCFrame(CFrame.new(pos)) end end
@@ -152,7 +111,7 @@ local function lf() while l do if p.Team and p.Team.Name~="Goalkeeper" then e() 
 local function tp2() local j=ws:FindFirstChild("Junk") local r=c and c:FindFirstChild("HumanoidRootPart") if j and r then local pp=r.Position for _,o in ipairs(j:GetDescendants()) do if o:IsA("BasePart") and o.Name=="Football" then pcall(function() o.Position=pp end) end end end end
 local function g2() if p.Team then local pos=p.Team.Name=="Home" and Vector3.new(-14.13,4,-188.18) or Vector3.new(14.06,4,187.83) local f=getFootball() if f and f:IsA("BasePart") then f.CFrame=CFrame.new(pos) end end end
 local function lf2() while l do tp2() task.wait() k() g2() task.wait() end end
-if Tabs and Tabs.keybinds then Tabs.keybinds:AddKeybind("Keybind",{Title="Track Ball (Avoid if GK)",Mode="Toggle",Default="B",Callback=function() ist=not ist if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Avoid if GK)",Mode="Toggle",Default="Y",Callback=function() l=not l if l then task.spawn(lf) end X=not X ist=X if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Under if GK)",Mode="Toggle",Default="F2",Callback=function() l=not l if l then task.spawn(lf2) end end}) end
+if Tabs and Tabs.keybinds then Tabs.keybinds:AddKeybind("Keybind",{Title="Track Ball (Avoid if GK)",Mode="Toggle",Default="B",Callback=function() ist=not ist if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Avoid if GK)",Mode="Toggle",Default="F3",Callback=function() l=not l if l then task.spawn(lf) end X=not X ist=X if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Under if GK)",Mode="Toggle",Default="F2",Callback=function() l=not l if l then task.spawn(lf2) end end}) end
 local uis = game:GetService("UserInputService")
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
@@ -229,6 +188,16 @@ end
 p.CharacterAdded:Connect(function()
     wait(1)
 end)
+Tabs.XXX:AddButton({
+    Title = "teleported to Pro Server",
+    Callback = function()
+        local id =  126195208568849
+        local p = game.Players.LocalPlayer
+        if p then
+            game:GetService("TeleportService"):Teleport(id, p)
+        end
+    end
+}) 
 local p = game.Players.LocalPlayer
 local fb = nil
 local hPos = Vector3.new(-14.130847, 4.00001049, -188.18988)
@@ -287,7 +256,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
         local player = game.Players.LocalPlayer
         local character = player.Character
         local football = game.Workspace.Junk.Football
-        
         if character and character:FindFirstChild("HumanoidRootPart") and football then
             football.Position = character.HumanoidRootPart.Position
             football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -295,7 +263,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end
     end
 })
-
 local istp = false
 local p = game.Players.LocalPlayer
 local uis = game:GetService("UserInputService")
@@ -380,7 +347,7 @@ p.CharacterAdded:Connect(function(c)
     hb = c:WaitForChild("Hitbox", 10)
 end)
 local tog = Tabs.hitbox:AddToggle("MyToggle", {
-    Title = "",
+    Title = "ON Hitbox ",
     Default = false
 })
 tog:OnChanged(function()
@@ -457,7 +424,6 @@ cp:OnChanged(function()
     end
 end)
 Tabs.XXX:AddSection("Control ball ")
-
 local ks, vma = 80, 80
 local ce = false
 local p = game.Players.LocalPlayer
@@ -763,140 +729,59 @@ pls.PlayerAdded:Connect(updPlayerList)
 pls.PlayerRemoving:Connect(updPlayerList)
 local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK", "None"}
 local teams = {"Home", "Away", "None"}
-
 local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
     Title = "Team",
     Values = teams,
     Multi = false,
     Default = "None"
 })
-
 local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
     Title = "Position",
     Values = positions,
     Multi = false,
     Default = "None"
 })
+local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
+    Title = "AUTO POSITION",
+    Default = false
+})
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TeamsService = game:GetService("Teams")
+local CoreGui = game:GetService("CoreGui")
 
-local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {Title = "AUTO POSITION", Default = false})
-
-local player = game.Players.LocalPlayer
-local starterGui = game:GetService("StarterGui")
-local replicatedStorage = game:GetService("ReplicatedStorage")
-local teamsService = game:GetService("Teams")
-local notified = {}
-local takenNotified = {}
-
-local function sendNotification(title, text, position)
-    if text == "Position " .. position .. " already taken or unavailable" then
-        if takenNotified[position] then return end
-        takenNotified[position] = true
-    else
-        if notified[position] then return end
-        notified[position] = true
-        task.delay(5, function()
-            notified[position] = nil
-        end)
-    end
-    pcall(function()
-        starterGui:SetCore("SendNotification", {
-            Title = title,
-            Text = text,
-            Duration = 5
-        })
-    end)
+local function hasScreenGui()
+    return CoreGui:FindFirstChild("ScreenGui") ~= nil
 end
 
-local function joinTeam(teamName, position)
-    if teamName == "None" or position == "None" then
-        return true
-    end
-
-    local team = teamsService:FindFirstChild(teamName)
-    if not team then
-        sendNotification("Error", "Team " .. teamName .. " does not exist", position)
-        return false
-    end
-
-    local gamemodeComm = replicatedStorage:FindFirstChild("__GamemodeComm")
-    if not gamemodeComm then
-        sendNotification("Error", "Gamemode communication not found", position)
-        AutoToggle:SetValue(false)
-        return false
-    end
-
-    local requestJoin = gamemodeComm:FindFirstChild("RE") and gamemodeComm.RE:FindFirstChild("_RequestJoin")
-    if not requestJoin then
-        sendNotification("Error", "Join request remote not found", position)
-        AutoToggle:SetValue(false)
-        return false
-    end
-
-    local args = {
-        {
-            Team = team,
-            TeamPosition = position
-        }
-    }
-
-    local success, err = pcall(function()
-        requestJoin:FireServer(unpack(args))
-    end)
-
-    if not success then
-        sendNotification("Error", "Failed to join team: " .. tostring(err), position)
-        return false
-    end
-
-    task.wait(0.5)
-    if player.Team ~= team then
-        sendNotification("Error", "Position " .. position .. " already taken or unavailable", position)
-        return false
-    end
-
-    notified[position] = nil
-    takenNotified[position] = nil
-    return true
+local function getRequestJoinEvent()
+    local gamemodeComm = ReplicatedStorage:FindFirstChild("__GamemodeComm")
+    if not gamemodeComm then return nil end
+    local reFolder = gamemodeComm:FindFirstChild("RE")
+    if not reFolder then return nil end
+    local requestJoin = reFolder:FindFirstChild("_RequestJoin")
+    if not requestJoin then return nil end
+    return requestJoin
 end
 
-PositionDropdown:OnChanged(function()
-    local selectedPosition = PositionDropdown.Value
-    if selectedPosition ~= "None" and (player.Team == nil or (player.Team.Name ~= "Home" and player.Team.Name ~= "Away")) then
-        takenNotified[selectedPosition] = nil
-    end
-end)
-
-AutoToggle:OnChanged(function()
-    if AutoToggle.Value then
-        local selectedTeam = TeamDropdown.Value
-        local selectedPosition = PositionDropdown.Value
-        if selectedTeam ~= "None" and selectedPosition ~= "None" and (player.Team == nil or (player.Team.Name ~= "Home" and player.Team.Name ~= "Away")) then
-            joinTeam(selectedTeam, selectedPosition)
-        end
-    end
-end)
-
+local requestJoinEvent = getRequestJoinEvent()
 task.spawn(function()
     while true do
-        local gameGui = player.PlayerGui:FindFirstChild("GameGui")
-        if not gameGui then
-            AutoToggle:SetValue(false)
-            task.wait()
-            continue
-        end
-
-        if AutoToggle.Value then
-            local selectedTeam = TeamDropdown.Value
+        task.wait(0.4)
+        if not hasScreenGui() then
+            AutoToggle:Set(false)
+        elseif AutoToggle.Value and requestJoinEvent then
+            local selectedTeamName = TeamDropdown.Value
             local selectedPosition = PositionDropdown.Value
-            if selectedTeam ~= "None" and selectedPosition ~= "None" and (player.Team == nil or (player.Team.Name ~= "Home" and player.Team.Name ~= "Away")) then
-                local success = joinTeam(selectedTeam, selectedPosition)
-                if success then
-                    AutoToggle:SetValue(true)
+            if selectedTeamName ~= "None" and selectedPosition ~= "None" then
+                local teamObj = TeamsService:FindFirstChild(selectedTeamName)
+                if teamObj then
+                    local args = {{Team = teamObj, TeamPosition = selectedPosition}}
+                    pcall(function() requestJoinEvent:FireServer(unpack(args)) end)
                 end
             end
+        elseif not requestJoinEvent then
+            requestJoinEvent = getRequestJoinEvent()
         end
-
-        task.wait()
     end
 end)
 local UserInputService = game:GetService("UserInputService")
@@ -1131,16 +1016,13 @@ local LocalPlayer = Players.LocalPlayer
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local CoreGui = game:GetService("CoreGui")
 Tabs.all:AddSection("TOG")
-
 local antiTackleRunning = false
 local shouldPressQ = false
-
 local tk = Tabs.all:AddToggle("XXTackledToggle", {
     Title = "Anti Tackled (Q)",
     Default = false,
     Callback = function(value)
         antiTackleRunning = value
-
         if value then
             task.spawn(function()
                 while antiTackleRunning do
@@ -1148,40 +1030,32 @@ local tk = Tabs.all:AddToggle("XXTackledToggle", {
                         tk:Set(false)
                         break
                     end
-
                     if not LocalPlayer:GetAttribute("HasBall") then
                         shouldPressQ = false
                         task.wait()
                         continue
                     end
-
                     local char = LocalPlayer.Character
                     if not char or not char:FindFirstChild("HumanoidRootPart") then
                         shouldPressQ = false
                         task.wait()
                         continue
                     end
-
                     local myTeam = LocalPlayer.Team
                     local myRootPart = char.HumanoidRootPart
-
                     local threatDetected = false
-
                     for _, plr in ipairs(Players:GetPlayers()) do
                         if plr == LocalPlayer or plr.Team == myTeam then
                             continue
                         end
-
                         if plr:GetAttribute("TeamPosition") == "GK" then
                             continue
                         end
-
                         if plr:GetAttribute("_ACTackling") then
                             local enemyChar = plr.Character
                             if enemyChar and enemyChar:FindFirstChild("HumanoidRootPart") then
                                 local enemyRootPart = enemyChar.HumanoidRootPart
                                 local distance = (myRootPart.Position - enemyRootPart.Position).Magnitude
-
                                 if distance <= 29 then
                                     threatDetected = true
                                     break
@@ -1189,13 +1063,10 @@ local tk = Tabs.all:AddToggle("XXTackledToggle", {
                             end
                         end
                     end
-
                     shouldPressQ = threatDetected
-
                     task.wait()
                 end
             end)
-
             task.spawn(function()
                 while antiTackleRunning do
                     if shouldPressQ then
@@ -1299,7 +1170,6 @@ task.spawn(function()
         task.wait()
     end
 end)
-
 local ilr = false
 local function mainLoop()
     while ilr do
@@ -1344,6 +1214,96 @@ if screenGui then
         end
     end)
 end
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CoreGui = game:GetService("CoreGui")
+local Player = Players.LocalPlayer
+local defaultColors = {
+    PowerLeft = Color3.fromRGB(255, 171, 0),
+    PowerRight = Color3.fromRGB(255, 85, 0),
+    StaminaLeft = Color3.fromRGB(74, 192, 255),
+    StaminaRight = Color3.fromRGB(58, 84, 255),
+}
+local customColors = {
+PowerLeft = Color3.fromRGB(0, 0, 255),
+    PowerRight = Color3.fromRGB(0, 255, 255),
+    StaminaLeft = Color3.fromRGB(0,255, 255),
+StaminaRight = Color3.fromRGB(0, 0, 0)
+}
+local function setGradient(bar, colorStart, colorEnd)
+    if not bar then return end
+    local progressBar = bar:FindFirstChild("ProgressBar")
+    if not progressBar then return end
+    local gradient = progressBar:FindFirstChildOfClass("UIGradient")
+    if not gradient then
+        gradient = Instance.new("UIGradient")
+        gradient.Rotation = 90
+        gradient.Parent = progressBar
+    end
+    gradient.Color = ColorSequence.new(colorStart, colorEnd)
+end
+local function applyColors(energyBars, colors)
+    if not energyBars then return end
+    setGradient(energyBars:FindFirstChild("Power"), colors.PowerLeft, colors.PowerRight)
+    setGradient(energyBars:FindFirstChild("Stamina"), colors.StaminaLeft, colors.StaminaRight)
+end
+task.spawn(function()
+    while true do
+        local playerGui = Player:FindFirstChild("PlayerGui")
+        local gameGui = playerGui and playerGui:FindFirstChild("GameGui")
+        local matchHUD = gameGui and gameGui:FindFirstChild("MatchHUD")
+        local energyBars = matchHUD and matchHUD:FindFirstChild("EnergyBars")
+        local screenGuiExists = CoreGui:FindFirstChild("ScreenGui") ~= nil
+        local colors = screenGuiExists and customColors or defaultColors
+        if energyBars then
+            applyColors(energyBars, colors)
+            local powerProgressBar = energyBars:FindFirstChild("Power") and energyBars.Power:FindFirstChild("ProgressBar")
+            local staminaProgressBar = energyBars:FindFirstChild("Stamina") and energyBars.Stamina:FindFirstChild("ProgressBar")
+            local powerGradient = powerProgressBar and powerProgressBar:FindFirstChildOfClass("UIGradient")
+            local staminaGradient = staminaProgressBar and staminaProgressBar:FindFirstChildOfClass("UIGradient")
+            if powerGradient then
+                powerGradient.Color = ColorSequence.new(colors.PowerLeft, colors.PowerRight)
+            end
+            if staminaGradient then
+                staminaGradient.Color = ColorSequence.new(colors.StaminaLeft, colors.StaminaRight)
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+function createPart0()
+    if game.Workspace:FindFirstChild("^") then
+        return 
+    end
+    local p = Instance.new("Part")
+    p.Name = "^"
+    p.Size = Vector3.new(261,  6, 414)
+    p.Position = Vector3.new(0.087, 87, 0.112)
+    p.Anchored = true
+    p.Locked = true
+    p.CastShadow = false
+    p.Color = Color3.fromRGB(0, 0, 0)
+    p.Material = Enum.Material.ForceField
+    p.Transparency = 0.8
+    p.Reflectance = 0
+    p.Parent = game.Workspace
+end
+createPart0()
+Tabs.Y:AddButton({
+    Title = "Destroy UI",
+    Callback = function()
+game:GetService("CoreGui").ScreenGui:Destroy()
+    end
+})
+local Dropdown = Tabs.Y:AddDropdown("ThemeDropdown", {
+    Title = "Change Theme UI",
+    Values = {"Darker", "Dark", "Light", "Aqua", "Amethyst", "Rose"},
+    Multi = false,
+    Default = "Aqua",
+})
+Dropdown:OnChanged(function(value)
+    Fluent:SetTheme(value)
+end)
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
@@ -1351,93 +1311,9 @@ SaveManager:SetIgnoreIndexes({})
 SaveManager:SetFolder("HUB")
 SaveManager:BuildConfigSection(Tabs.save)
 SaveManager:LoadAutoloadConfig()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
-game:GetService("CoreGui").ScreenGui.Frame:Destroy()
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    
-    Title = "",
-    Text = "",
-    Duration = 0.000000000000000000000000000000000000000000000000000000000000001,
-        Icon = "rbxassetid://140690318962088"
-})  
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "",
-    Text = "",
-    Duration = 0.000000000000000000000000000000000000000000000000000000000000001,
-        Icon = "rbxassetid://140690318962088"
-})  
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "",
-    Text = "",
-    Duration = 0.000000000000000000000000000000000000000000000000000000000000001,
-        Icon = "rbxassetid://140690318962088"
-})
-local Players = game:GetService("Players")
-local StarterGui = game:GetService("StarterGui")
-local foundPlayers = {}
-local function sendNotification(title, content, subContent)
     Fluent:Notify({
-        Title = title or "⚠️INFO⚠️",
-        Content = content or "",
-        SubContent = subContent or "",
-        Duration = 65
+        Title = "NOTHING X HUB",
+        Content = "Enjoy Script  :)",
+        SubContent = "BY NOTHING X", 
+        Duration = 5
     })
-end
-local function updateInServerNotification()
-    if #foundPlayers > 0 then
-        local playerList = table.concat(foundPlayers, ", ")
-        sendNotification("⚠️INFO⚠️", playerList, "In Server")
-    end
-end
-local function onIsStaffChanged(player)
-    local isStaff = player:GetAttribute("IsStaff")
-    if isStaff then
-        if not table.find(foundPlayers, player.Name) then
-            table.insert(foundPlayers, player.Name)
-            updateInServerNotification()
-        end
-    else
-        for i, name in ipairs(foundPlayers) do
-            if name == player.Name then
-                table.remove(foundPlayers, i)
-                sendNotification("⚠️INFO⚠️", player.Name, "Left Server")
-                updateInServerNotification()
-                break
-            end
-        end
-    end
-end
-local function checkPlayerJoin(player)
-    onIsStaffChanged(player)
-    player:GetAttributeChangedSignal("IsStaff"):Connect(function()
-        onIsStaffChanged(player)
-    end)
-end
-local function onPlayerLeave(player)
-    local isStaff = player:GetAttribute("IsStaff")
-    if isStaff then
-        for i, name in ipairs(foundPlayers) do
-            if name == player.Name then
-                table.remove(foundPlayers, i)
-                sendNotification("⚠️INFO⚠️", player.Name, "Left Server")
-                updateInServerNotification()
-                break
-            end
-        end
-    end
-end
-for _, player in ipairs(Players:GetPlayers()) do
-    checkPlayerJoin(player)
-end
-game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "Enjoy Script  :)",
-    Text = "By NOTHING X",
-    Duration = 15,
-    Icon = "rbxassetid://140690318962088",
-                Button1 = ":)"
-})
-loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/T/main/T/Ping%5Ccolor"))()
