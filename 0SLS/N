@@ -1056,7 +1056,7 @@ local tk = Tabs.all:AddToggle("XXTackledToggle", {
                             if enemyChar and enemyChar:FindFirstChild("HumanoidRootPart") then
                                 local enemyRootPart = enemyChar.HumanoidRootPart
                                 local distance = (myRootPart.Position - enemyRootPart.Position).Magnitude
-                                if distance <= 29 then
+                                if distance <= 21 then
                                     threatDetected = true
                                     break
                                 end
