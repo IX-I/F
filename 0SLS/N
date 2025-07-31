@@ -96,7 +96,7 @@ game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildr
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[3]:Destroy()
 Window:SelectTab()
 Window:Minimize()
-for i = 1, 10 do
+for i = 1, 25 do
     Fluent:Notify({
         Title = "LOADING...",
         Content = "",
