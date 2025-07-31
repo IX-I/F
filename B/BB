@@ -6,8 +6,8 @@ local Window = Fluent:CreateWindow({
     SubTitle = "Free Boombox",
     TabWidth = 30,
     Size = UDim2.fromOffset(400, 350),
-    Acrylic = true,
-    Theme = "Darker",
+    Acrylic = false,
+    Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftAlt
 })
 local Tabs = {
@@ -17,10 +17,11 @@ local Tabs = {
                 F = Window:AddTab({ Title = "", Icon = "laugh" }),
 }
 game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Background.BackgroundTransparency = 0.81
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[4]:Destroy()
+
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local speaker = Players.LocalPlayer
