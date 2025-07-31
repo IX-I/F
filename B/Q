@@ -5,7 +5,7 @@ local Window = Fluent:CreateWindow({
     TabWidth = 0,
     Size = UDim2.fromOffset(260, 350),
     Acrylic = true,
-    Theme = "Darker",
+    Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftAlt
 })
 local Tabs = {
@@ -13,10 +13,10 @@ local Tabs = {
 }
 Window:SelectTab(1)
 game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Background.BackgroundTransparency = 0.81
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[4]:Destroy()
 local Toggle = Tabs.X:AddToggle("Tog_spam_C", {
     Title = "SPAM Click Killer", 
     Default = false
