@@ -92,15 +92,14 @@ local Window = Fluent:CreateWindow({
     Title = "NOTHING X HUB",
     SubTitle = "",
     TabWidth = 0,
-    Size = UDim2.fromOffset(215, 410),
+    Size = UDim2.fromOffset(215, 510),
     Acrylic = true,
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftAlt
 })
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.BackgroundTransparency = 1
+
+
+
 local Tabs = {
     Main = Window:AddTab({ Title = "FLING", Icon = "" })
 }
@@ -111,11 +110,17 @@ Fluent:Notify({
     Duration = 3
 })
 Tabs.Main:AddKeybind("TouchFlingKeybind", {
-    Title = "Touch Fling Toggle",
+    Title = "Touch Fling",
     Mode = "Toggle",
     Default = "Z",
     Callback = toggleTouchFling
 })
+Tabs.Main:AddButton({
+    Title = "Touch Fling",
+    Callback = toggleTouchFling
+})
+
+
 Tabs.Main:AddInput("TouchPowerInput", {
     Title = "",
     Default = tostring(touchPower),
@@ -126,9 +131,14 @@ Tabs.Main:AddInput("TouchPowerInput", {
     end
 })
 Tabs.Main:AddKeybind("WalkFlingKeybind", {
-    Title = "Walk Fling Toggle",
+    Title = "Walk Fling",
     Mode = "Toggle",
     Default = "X",
+    Callback = toggleWalkFling
+})
+
+Tabs.Main:AddButton({
+    Title = "Walk Fling",
     Callback = toggleWalkFling
 })
 Tabs.Main:AddInput("WalkPowerInput", {
@@ -212,9 +222,12 @@ Toggle:OnChanged(function(value)
         end
     end
 end)
-Window:SelectTab(1)
 local mouse = localPlayer:GetMouse()
 mouse.Button1Down:Connect(function()
     local target = mouse.Target
     pushObject(target)
 end)
+Window:SelectTab(1)
+
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6]:GetChildren()[4]:Destroy()
