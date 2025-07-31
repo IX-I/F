@@ -132,46 +132,70 @@ UserInputService.JumpRequest:Connect(function()
 end)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Toggle = Tabs.X:AddToggle("Tog_NOC", {
-    Title = "Noclip",
-    Default = false
-})
-local XXXVX = false
-Toggle:OnChanged(function(value)
-    XXXVX = value
-    local LocalPlayer = Players.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
+local noclipEnabled = false
+local noclipConnection = nil
+
+local function applyNoclip()
     local Character = LocalPlayer.Character
-    local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
-    if not Character or not HumanoidRootPart then
-        XXXVX = false
-        return
+    if not Character then return end
+    for _, part in pairs(Character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
     end
-    if XXXVX then
+    if noclipConnection then noclipConnection:Disconnect() end
+    noclipConnection = RunService.Stepped:Connect(function()
+        if not noclipEnabled or not Character or not Character.Parent then
+            if noclipConnection then
+                noclipConnection:Disconnect()
+                noclipConnection = nil
+            end
+            return
+        end
         for _, part in pairs(Character:GetDescendants()) do
             if part:IsA("BasePart") then
                 part.CanCollide = false
             end
         end
-        local connection
-        connection = RunService.RenderStepped:Connect(function()
-            if XXXVX and Character and Character.Parent then
-                for _, part in pairs(Character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            else
-                connection:Disconnect()
-            end
-        end)
-    else
-        for _, part in pairs(Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = true
-            end
+    end)
+end
+
+local function removeNoclip()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+    for _, part in pairs(Character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
         end
     end
+    if noclipConnection then
+        noclipConnection:Disconnect()
+        noclipConnection = nil
+    end
+end
+
+local Toggle = Tabs.X:AddToggle("Tog_NOC", {
+    Title = "Noclip",
+    Default = false
+})
+
+Toggle:OnChanged(function(value)
+    noclipEnabled = value
+    if noclipEnabled then
+        applyNoclip()
+    else
+        removeNoclip()
+    end
 end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+    if noclipEnabled then
+        wait(0.1)
+        applyNoclip()
+    end
+end)
+
 local VX = false
 local Toggle = Tabs.X:AddToggle("Tog_spam_CC", {
     Title = "Set 0 Hold Revive", 
