@@ -759,28 +759,27 @@ local function getRequestJoinEvent()
     local reFolder = gamemodeComm:FindFirstChild("RE")
     if not reFolder then return nil end
     local requestJoin = reFolder:FindFirstChild("_RequestJoin")
-    if not requestJoin then return nil end
     return requestJoin
 end
 
-local requestJoinEvent = getRequestJoinEvent()
 task.spawn(function()
     while true do
-        task.wait(0.4)
+        task.wait()
         if not hasScreenGui() then
             AutoToggle:Set(false)
-        elseif AutoToggle.Value and requestJoinEvent then
-            local selectedTeamName = TeamDropdown.Value
-            local selectedPosition = PositionDropdown.Value
-            if selectedTeamName ~= "None" and selectedPosition ~= "None" then
-                local teamObj = TeamsService:FindFirstChild(selectedTeamName)
-                if teamObj then
-                    local args = {{Team = teamObj, TeamPosition = selectedPosition}}
-                    pcall(function() requestJoinEvent:FireServer(unpack(args)) end)
+        elseif AutoToggle.Value then
+            local requestJoinEvent = getRequestJoinEvent()
+            if requestJoinEvent then
+                local selectedTeamName = TeamDropdown.Value
+                local selectedPosition = PositionDropdown.Value
+                if selectedTeamName ~= "None" and selectedPosition ~= "None" then
+                    local teamObj = TeamsService:FindFirstChild(selectedTeamName)
+                    if teamObj then
+                        local args = {{Team = teamObj, TeamPosition = selectedPosition}}
+                        pcall(function() requestJoinEvent:FireServer(unpack(args)) end)
+                    end
                 end
             end
-        elseif not requestJoinEvent then
-            requestJoinEvent = getRequestJoinEvent()
         end
     end
 end)
