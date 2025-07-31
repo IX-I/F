@@ -1,3 +1,18 @@
+function tryFix(func, maxTries)
+    maxTries = maxTries or 3
+    local tries = 0
+    local success, result
+    repeat
+        success, result = pcall(func)
+        if not success then
+            warn("Error: " .. tostring(result) .. " | Attempt: " .. tries + 1)
+            task.wait(1) 
+        end
+        tries = tries + 1
+    until success or tries >= maxTries
+    return success, result
+end
+tryFix(function()
 shared._DLoaded = false
 spawn(function()
 local Players = game:GetService("Players")
@@ -748,11 +763,9 @@ local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeamsService = game:GetService("Teams")
 local CoreGui = game:GetService("CoreGui")
-
 local function hasScreenGui()
     return CoreGui:FindFirstChild("ScreenGui") ~= nil
 end
-
 local function getRequestJoinEvent()
     local gamemodeComm = ReplicatedStorage:FindFirstChild("__GamemodeComm")
     if not gamemodeComm then return nil end
@@ -761,10 +774,9 @@ local function getRequestJoinEvent()
     local requestJoin = reFolder:FindFirstChild("_RequestJoin")
     return requestJoin
 end
-
 task.spawn(function()
     while true do
-        task.wait()
+        task.wait(0.1)
         if not hasScreenGui() then
             AutoToggle:Set(false)
         elseif AutoToggle.Value then
@@ -1316,3 +1328,4 @@ SaveManager:LoadAutoloadConfig()
         SubContent = "BY NOTHING X", 
         Duration = 5
     })
+end)
