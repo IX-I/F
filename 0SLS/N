@@ -96,22 +96,7 @@ game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildr
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[3]:Destroy()
 Window:SelectTab()
 Window:Minimize()
-for i = 1, 25 do
-    Fluent:Notify({
-        Title = "LOADING...",
-        Content = "",
-        SubContent = "",
-        Duration = 10
-    })
-end
-    Fluent:Notify({
-        Title = "...",
-        Content = "",
-        SubContent = "UI: Left Alt",
-        Duration = 9.98
-    })
-wait (10)
-local p=game.Players.LocalPlayer local uis=game:GetService("UserInputService") local vim=game:GetService("VirtualInputManager") local ws=game:GetService("Workspace") local ist,l=false,false local ltt,tcd=0,0 local X=false local H,A=CFrame.new(0.283999115,4.0250001,-20.9191837),CFrame.new(0.271869421,4.0250001,20.0689564) local c=p.Character or p.CharacterAdded:Wait() p.CharacterAdded:Connect(function(char)c=char end)
+local p=game.Players.LocalPlayer local uis=game:GetService("UserInputService") local vim=game:GetService("VirtualInputManager") local ws=game:GetService("Workspace") local ist,l=false,false local ltt,tcd=0,0 local X=false local H,A=CFrame.new(21.269758224487305, -175.689208984375, 354.1692199707031),CFrame.new(20.884597778320312, -175.68923950195312, 313.1524963378906) local c=p.Character or p.CharacterAdded:Wait() p.CharacterAdded:Connect(function(char)c=char end)
 local function pressEKey() vim:SendKeyEvent(true,Enum.KeyCode.E,false,game) task.wait() vim:SendKeyEvent(false,Enum.KeyCode.E,false,game) end
 local function tpPlayer(pos) if c and c.PrimaryPart and tick()-ltt>tcd then ltt=tick() c:SetPrimaryPartCFrame(CFrame.new(pos)) end end
 local function tpFootballToPlayer(fb) if c and c.PrimaryPart then fb.CFrame=c.PrimaryPart.CFrame end end
@@ -127,6 +112,7 @@ local function tp2() local j=ws:FindFirstChild("Junk") local r=c and c:FindFirst
 local function g2() if p.Team then local pos=p.Team.Name=="Home" and Vector3.new(-14.13,4,-188.18) or Vector3.new(14.06,4,187.83) local f=getFootball() if f and f:IsA("BasePart") then f.CFrame=CFrame.new(pos) end end end
 local function lf2() while l do tp2() task.wait() k() g2() task.wait() end end
 if Tabs and Tabs.keybinds then Tabs.keybinds:AddKeybind("Keybind",{Title="Track Ball (Avoid if GK)",Mode="Toggle",Default="B",Callback=function() ist=not ist if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Avoid if GK)",Mode="Toggle",Default="F3",Callback=function() l=not l if l then task.spawn(lf) end X=not X ist=X if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Under if GK)",Mode="Toggle",Default="F2",Callback=function() l=not l if l then task.spawn(lf2) end end}) end
+
 local uis = game:GetService("UserInputService")
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
