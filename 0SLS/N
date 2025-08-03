@@ -292,6 +292,16 @@ if Tabs and Tabs.keybinds then
         end
     })
 end
+Tabs.XXX:AddButton({
+    Title = "Join  Pro Server",
+    Callback = function()
+        local id =  126195208568849
+        local p = game.Players.LocalPlayer
+        if p then
+            game:GetService("TeleportService"):Teleport(id, p)
+        end
+    end
+})
 Tabs.XXX:AddSection("Control ball ")
 local ks, vma = 80, 80
 local ce = false
