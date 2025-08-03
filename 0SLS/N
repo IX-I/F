@@ -13,49 +13,6 @@ function tryFix(func, maxTries)
     return success, result
 end
 tryFix(function()
-shared._DLoaded = false
-spawn(function()
-local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local player = Players.LocalPlayer
-pcall(function()
-	ReplicatedFirst:RemoveDefaultLoadingScreen()
-end)
-local playerGui = player:WaitForChild("PlayerGui")
-if not player.Character or not player.Character:FindFirstChild("Humanoid") then
-	player.CharacterAdded:Wait()
-end
-player.Character:WaitForChild("Humanoid")
-task.wait(2)
-local function destroyGUI()
-	local gameGui = playerGui:FindFirstChild("GameGui")
-	local guiNames = {
-		"LoadingScreen",
-		"DailyRewards",
-		"EmoteWheel",
-		"Transition",
-		"KeyHints"
-	}
-	for _, name in ipairs(guiNames) do
-		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
-		if gui then
-			gui:Destroy()
-		end
-	end
-end
-local function removeBlur()
-	for _, effect in ipairs(Lighting:GetChildren()) do
-		if effect:IsA("BlurEffect") then
-			effect:Destroy()
-		end
-	end
-end
-destroyGUI()
-removeBlur()
-    shared._DLoaded = true 
-end)
-repeat task.wait() until shared._DLoaded
 local coreGui = game:GetService("CoreGui")
 if coreGui:FindFirstChild("ScreenGui") then
     Fluent:Notify({
@@ -90,7 +47,7 @@ local Tabs = {
 }
 game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
-game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Background.BackgroundTransparency = 0.81
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Background.BackgroundTransparency = 0.9
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[5]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[4]:Destroy()
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[3]:Destroy()
@@ -1348,6 +1305,62 @@ local Dropdown = Tabs.Y:AddDropdown("ThemeDropdown", {
 Dropdown:OnChanged(function(value)
     Fluent:SetTheme(value)
 end)
+local part = game.Workspace:FindFirstChild("X")
+if not part then
+    part = Instance.new("Part")
+    part.Parent = game.Workspace
+    part.Anchored = true
+    part.Position = Vector3.new(21.009, -98, 334.528)
+    part.Size = Vector3.new(222.346, 1, 361.133)
+    part.BrickColor = BrickColor.new("Really black")
+    part.Material = Enum.Material.ForceField
+    part.Transparency = 0.95
+    part.CanCollide = true
+    part.Name = "X"
+end
+shared._DLoaded = false
+spawn(function()
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local player = Players.LocalPlayer
+pcall(function()
+	ReplicatedFirst:RemoveDefaultLoadingScreen()
+end)
+local playerGui = player:WaitForChild("PlayerGui")
+if not player.Character or not player.Character:FindFirstChild("Humanoid") then
+	player.CharacterAdded:Wait()
+end
+player.Character:WaitForChild("Humanoid")
+task.wait(2)
+local function destroyGUI()
+	local gameGui = playerGui:FindFirstChild("GameGui")
+	local guiNames = {
+		"LoadingScreen",
+		"DailyRewards",
+		"EmoteWheel",
+		"Transition",
+		"KeyHints"
+	}
+	for _, name in ipairs(guiNames) do
+		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
+		if gui then
+			gui:Destroy()
+		end
+	end
+end
+local function removeBlur()
+	for _, effect in ipairs(Lighting:GetChildren()) do
+		if effect:IsA("BlurEffect") then
+			effect:Destroy()
+		end
+	end
+end
+destroyGUI()
+removeBlur()
+    shared._DLoaded = true 
+end)
+repeat task.wait() until shared._DLoaded
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
@@ -1359,6 +1372,6 @@ SaveManager:LoadAutoloadConfig()
         Title = "NOTHING X HUB",
         Content = "Enjoy Script  :)",
         SubContent = "BY NOTHING X", 
-        Duration = 5
+        Duration = 6.6
     })
 end)
