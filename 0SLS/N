@@ -317,7 +317,6 @@ local iha = false
 local p = game.Players.LocalPlayer
 local c = p.Character or p.CharacterAdded:Wait()
 local hb = c:FindFirstChild("Hitbox")
-local lhp
 local function updRealHb()
     if hb then
         hb.Size = Vector3.new(hsx, hsy, hsz)
@@ -341,10 +340,10 @@ local function moveOldHbToNewHb()
         else
             resetHbToDefault()
         end
-    else
     end
 end
-p.CharacterAdded:Connect(function(c)
+p.CharacterAdded:Connect(function(newChar)
+    c = newChar
     hb = c:WaitForChild("Hitbox", 10)
 end)
 local tog = Tabs.hitbox:AddToggle("MyToggle", {
@@ -354,19 +353,16 @@ local tog = Tabs.hitbox:AddToggle("MyToggle", {
 tog:OnChanged(function()
     iha = tog.Value
     if iha then
-        while iha do
-            updRealHb()
-            wait(0.1)
-        end
+        updRealHb() 
     else
-        resetHbToDefault()
+        resetHbToDefault() 
     end
 end)
 tog:SetValue(false)
 local ix = Tabs.hitbox:AddInput("InputX", {
     Title = "Hitbox (X)",
     Description = "1-2048",
-    Default = 1,
+    Default = dsx, 
     Numeric = true,
     Callback = function(v)
         hsx = tonumber(v)
@@ -378,7 +374,7 @@ local ix = Tabs.hitbox:AddInput("InputX", {
 local iy = Tabs.hitbox:AddInput("InputY", {
     Title = "Hitbox (Y)",
     Description = "1-2048",
-    Default = 1,
+    Default = dsy, 
     Numeric = true,
     Callback = function(v)
         hsy = tonumber(v)
@@ -390,7 +386,7 @@ local iy = Tabs.hitbox:AddInput("InputY", {
 local iz = Tabs.hitbox:AddInput("InputZ", {
     Title = "Hitbox (Z)",
     Description = "1-2048",
-    Default = 1,
+    Default = dsz, 
     Numeric = true,
     Callback = function(v)
         hsz = tonumber(v)
@@ -402,7 +398,7 @@ local iz = Tabs.hitbox:AddInput("InputZ", {
 local ts = Tabs.hitbox:AddSlider("TransparencySlider", {
     Title = "Transparency",
     Description = "",
-    Default = 1,
+    Default = dt, 
     Min = 0,
     Max = 1,
     Rounding = 1.1,
@@ -413,15 +409,30 @@ local ts = Tabs.hitbox:AddSlider("TransparencySlider", {
         end
     end
 })
-ts:SetValue(1)
+ts:SetValue(dt)
 local cp = Tabs.hitbox:AddColorpicker("Colorpicker", {
     Title = "Hitbox Color",
-    Default = Color3.fromRGB(255, 255, 255)
+    Default = dc 
 })
 cp:OnChanged(function()
     hc = cp.Value
     if iha then
         updRealHb()
+    end
+end)
+game:GetService("RunService").Heartbeat:Connect(function()
+    if iha then
+        moveOldHbToNewHb()
+    end
+end)
+local coreGui = game:GetService("CoreGui")
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    local hasGui = coreGui:FindFirstChild("ScreenGui")
+    if not hasGui and iha then
+        iha = false
+        tog:SetValue(false)
+        resetHbToDefault()
     end
 end)
 Tabs.XXX:AddSection("Control ball ")
