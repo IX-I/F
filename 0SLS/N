@@ -1,18 +1,45 @@
-function tryFix(func, maxTries)
-    maxTries = maxTries or 3
-    local tries = 0
-    local success, result
-    repeat
-        success, result = pcall(func)
-        if not success then
-            warn("Error: " .. tostring(result) .. " | Attempt: " .. tries + 1)
-            task.wait(1) 
-        end
-        tries = tries + 1
-    until success or tries >= maxTries
-    return success, result
+shared._DLoaded = false
+spawn(function()
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local player = Players.LocalPlayer
+pcall(function()
+	ReplicatedFirst:RemoveDefaultLoadingScreen()
+end)
+local playerGui = player:WaitForChild("PlayerGui")
+if not player.Character or not player.Character:FindFirstChild("Humanoid") then
+	player.CharacterAdded:Wait()
 end
-tryFix(function()
+player.Character:WaitForChild("Humanoid")
+task.wait(2)
+local function destroyGUI()
+	local gameGui = playerGui:FindFirstChild("GameGui")
+	local guiNames = {
+		"LoadingScreen",
+		"DailyRewards",
+		"EmoteWheel",
+		"Transition",
+		"KeyHints"
+	}
+	for _, name in ipairs(guiNames) do
+		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
+		if gui then
+			gui:Destroy()
+		end
+	end
+end
+local function removeBlur()
+	for _, effect in ipairs(Lighting:GetChildren()) do
+		if effect:IsA("BlurEffect") then
+			effect:Destroy()
+		end
+	end
+end
+destroyGUI()
+removeBlur()
+    shared._DLoaded = true 
+end)
 local coreGui = game:GetService("CoreGui")
 if coreGui:FindFirstChild("ScreenGui") then
     Fluent:Notify({
@@ -28,7 +55,7 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 local Window = Fluent:CreateWindow({
     Title = "NOTHING X HUB",
-    SubTitle = " Super League Soccer V2",
+    SubTitle = " Super League Soccer V2.1",
     TabWidth = 30,
     Size = UDim2.fromOffset(455, 375),
     Acrylic = false,
@@ -53,7 +80,75 @@ game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildr
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[3]:Destroy()
 Window:SelectTab()
 Window:Minimize()
-local p=game.Players.LocalPlayer local uis=game:GetService("UserInputService") local vim=game:GetService("VirtualInputManager") local ws=game:GetService("Workspace") local ist,l=false,false local ltt,tcd=0,0.1 local X=false local H,A=CFrame.new(21.269758224487305,-175.689208984375,354.1692199707031),CFrame.new(20.884597778320312,-175.68923950195312,313.1524963378906) local c=p.Character or p.CharacterAdded:Wait() p.CharacterAdded:Connect(function(char)c=char end) local function pressEKey() vim:SendKeyEvent(true,Enum.KeyCode.E,false,game) task.wait() vim:SendKeyEvent(false,Enum.KeyCode.E,false,game) end local function tpPlayer(pos) if c and c.PrimaryPart and tick()-ltt>tcd then ltt=tick() c:SetPrimaryPartCFrame(CFrame.new(pos)) end end local function tpFootballToPlayer(fb) if c and c.PrimaryPart then fb.CFrame=c.PrimaryPart.CFrame end end local function getFootball() local m=ws:FindFirstChild("Misc") return m and m:FindFirstChildWhichIsA("BasePart") and m:FindFirstChild("Football") end local function tpToNetworkOwner() if not(p.Team==game.Teams.Home or p.Team==game.Teams.Away) then ist=false return end while ist do task.wait(tcd) local fb=getFootball() if not fb or fb.Transparency==1 then local owner=fb and fb:GetAttribute("NetworkOwner") if owner==p.Name then ist=false if X then task.spawn(function() task.wait(tcd) if X and(p.Team==game.Teams.Home or p.Team==game.Teams.Away) then ist=true tpToNetworkOwner() end end) end return end local ownerPlayer=owner and game.Players:FindFirstChild(owner) if ownerPlayer and ownerPlayer.Character and ownerPlayer.Character.PrimaryPart and ownerPlayer.Team~=p.Team and not ownerPlayer.Neutral then if p.Team and p.Team.Name~="Goalkeeper" then tpPlayer(ownerPlayer.Character.PrimaryPart.Position) tpFootballToPlayer(fb) pressEKey() end else ist=false if X then task.spawn(function() task.wait(tcd) if X and(p.Team==game.Teams.Home or p.Team==game.Teams.Away) then ist=true tpToNetworkOwner() end end) end return end end end end local function tp() local f=getFootball() local r=c and c:FindFirstChild("HumanoidRootPart") if f and r then f.Position=r.Position end end local function k() vim:SendMouseButtonEvent(0,0,0,true,game,0) vim:SendMouseButtonEvent(0,0,0,false,game,0) end local function g() local f=getFootball() if p.Team and f then f.CFrame=p.Team.Name=="Home" and CFrame.new(7.110024452209473,-175.68922424316406,519.5316772460938) or CFrame.new(35.03493118286133,-175.689208984375,149.86668395996094) end end local function r() local r=c and c:FindFirstChild("HumanoidRootPart") if r and p.Team then r.CFrame=p.Team.Name=="Away" and A or H end end local function e() vim:SendKeyEvent(true,Enum.KeyCode.E,false,game) vim:SendKeyEvent(false,Enum.KeyCode.E,false,game) end local function lf() while l do if p.Team and p.Team.Name~="Goalkeeper" then e() tp() task.wait() k() g() r() task.wait() else l=false task.wait() end end end local function tp2() local m=ws:FindFirstChild("Misc") local r=c and c:FindFirstChild("HumanoidRootPart") if m and r then local pp=r.Position for _,o in ipairs(m:GetDescendants()) do if o:IsA("BasePart") and o.Name=="Football" then pcall(function()o.Position=pp end) end end end end local function g2() if p.Team then local pos=p.Team.Name=="Home" and Vector3.new(7.110024452209473,-175.68922424316406,519.5316772460938) or Vector3.new(35.03493118286133,-175.689208984375,149.86668395996094) local f=getFootball() if f and f:IsA("BasePart") then f.CFrame=CFrame.new(pos) end end end local function lf2() while l do tp2() task.wait() k() g2() task.wait() end end if Tabs and Tabs.keybinds then Tabs.keybinds:AddKeybind("Keybind",{Title="Track Ball (Avoid if GK)",Mode="Toggle",Default="B",Callback=function() ist=not ist if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Avoid if GK)",Mode="Toggle",Default="F3",Callback=function() l=not l if l then task.spawn(lf) end X=not X ist=X if ist then tpToNetworkOwner() end end}) Tabs.keybinds:AddKeybind("Keybind",{Title="Auto Goal (Under if GK)",Mode="Toggle",Default="F2",Callback=function() l=not l if l then task.spawn(lf2) end end}) end
+local player = game.Players.LocalPlayer
+local character = player.Character
+local vim = game:GetService("VirtualInputManager")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game.Workspace
+local isRunning = false
+Tabs.keybinds:AddKeybind("Keybind", {
+    Title = "Auto gol",
+    Mode = "Toggle",
+    Default = "F1",
+    Callback = function(state)
+        isRunning = state
+        if state then
+            spawn(function()
+                while isRunning do
+                    local football = Workspace:FindFirstChild("Football")
+                    while not football and isRunning do
+                        football = Workspace:FindFirstChild("Football")
+                        task.wait(0.1)
+                    end
+                    if not isRunning then break end
+                    local character = LocalPlayer.Character
+                    if football and character and character:FindFirstChild("HumanoidRootPart") then
+                        football.Position = character.HumanoidRootPart.Position
+                        football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        local teamName
+                        repeat
+                            teamName = LocalPlayer.Team and LocalPlayer.Team.Name
+                            task.wait()
+                        until teamName == "Home" or teamName == "Away"
+                        local goalPos
+                        if teamName == "Home" then
+                            goalPos = Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
+                        else 
+                            goalPos = Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
+                        end
+                        football.Position = goalPos
+                        football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                    end
+                    local networkOwner = football and football:GetAttribute("NetworkOwner")
+                    if networkOwner and typeof(networkOwner) == "string" then
+                        local localPlayerTeamPosition = LocalPlayer:GetAttribute("TeamPosition")
+                        local targetPlayer = Players:FindFirstChild(networkOwner)
+                        if localPlayerTeamPosition ~= "GK" and targetPlayer and targetPlayer.Character and targetPlayer ~= LocalPlayer then
+                            local targetTeam = targetPlayer.Team
+                            local localTeam = LocalPlayer.Team
+                            if targetTeam ~= localTeam then
+                                local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                                if targetHRP then
+                                    LocalPlayer.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
+                                end
+                            end
+                        end
+                    end
+                    if networkOwner ~= LocalPlayer.Name then
+                        vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                        vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                    end
+                    vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                    vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
 local uis = game:GetService("UserInputService")
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
@@ -65,85 +160,26 @@ local function toggleFbEnabled(f)
     end
 end
 Tabs.keybinds:AddKeybind("Keybind", {
-    Title = "not kick ball (Under if Gk)",
+    Title = "not kick ball (GK)",
     Mode = "Toggle",
-    Default = "F1",
+    Default = "F3",
     Callback = function()
-        local junk = workspace:FindFirstChild("Junk")
-        if not junk then return end 
-        local footballs = {}
-        for _, c in ipairs(junk:GetChildren()) do
-            if c.Name == "Football" then
-                table.insert(footballs, c)
+        task.spawn(function()
+            local football = workspace:FindFirstChild("Football")
+            if not football then
+                football = workspace:WaitForChild("Football", 10)
+                if not football then return end
             end
-        end
-        if #footballs == 0 then return end 
-        for _, fb in ipairs(footballs) do
-            if fb:GetAttribute("Enabled") == nil then
-                fb:SetAttribute("Enabled", true)
+            if football:GetAttribute("Enabled") == nil then
+                football:SetAttribute("Enabled", true)
             end
-            toggleFbEnabled(fb)
-        end
+            toggleFbEnabled(football)
+        end)
     end
 })
-local function getNearestPlayer()
-    local fb = workspace.Junk:FindFirstChild("Football")
-    if not fb then
-        return nil
-    end
-    local cp, sd = nil, math.huge
-    local p = game.Players.LocalPlayer 
-    for _, op in pairs(game.Players:GetPlayers()) do
-        if op ~= p and op.Team == p.Team and op.Character and op.Character.PrimaryPart then
-            local d = (op.Character.PrimaryPart.Position - fb.Position).magnitude
-            if d < sd then
-                cp = op
-                sd = d
-            end
-        end
-    end
-    return cp
-end
-local function tpFbToNearestPlayer()
-    local fb = workspace.Junk:FindFirstChild("Football")
-    if not fb then
-        return
-    end
-    local np = getNearestPlayer()
-    if np then
-        local tp = np.Character.PrimaryPart.Position + Vector3.new(0, 0, 0)
-        fb.AssemblyLinearVelocity = Vector3.zero
-        fb.AssemblyAngularVelocity = Vector3.zero
-        fb.CFrame = CFrame.new(tp)
-    end
-end
-if Tabs and Tabs.keybinds then
-    Tabs.keybinds:AddKeybind("Keybind", {
-        Title = "tp close player your team",
-        Mode = "Toggle",
-        Default = "T",
-        Callback = function()
-            tpFbToNearestPlayer()
-        end
-    })
-end
-p.CharacterAdded:Connect(function()
-    wait(1)
-end)
-Tabs.XXX:AddButton({
-    Title = "teleported to Pro Server",
-    Callback = function()
-        local id =  126195208568849
-        local p = game.Players.LocalPlayer
-        if p then
-            game:GetService("TeleportService"):Teleport(id, p)
-        end
-    end
-}) 
 local p = game.Players.LocalPlayer
-local fb = nil
-local hPos = Vector3.new(-14.130847, 4.00001049, -188.18988)
-local aPos = Vector3.new(14.0604515, 4.00001144, 187.836166)
+local hPos = Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
+local aPos = Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
 local function tpObj(o, pos)
     if o and o:IsA("BasePart") then
         o.CFrame = CFrame.new(pos)
@@ -152,15 +188,19 @@ end
 local function checkAndTpFb()
     local t = p.Team
     if t then
-        if t.Name == "Home" then
-            tpObj(fb, hPos)
-        elseif t.Name == "Away" then
-            tpObj(fb, aPos)
+        for _, fb in ipairs(workspace:GetChildren()) do
+            if fb.Name == "Football" and fb:IsA("BasePart") then
+                if t.Name == "Home" then
+                    tpObj(fb, hPos)
+                elseif t.Name == "Away" then
+                    tpObj(fb, aPos)
+                end
+            end
         end
     end
 end
 Tabs.keybinds:AddKeybind("Keybind", {
-    Title = "gol",
+    Title = "Gol",
     Mode = "Toggle",
     Default = "G",
     Callback = function()
@@ -168,25 +208,27 @@ Tabs.keybinds:AddKeybind("Keybind", {
     end,
     debounce = false
 })
+workspace.ChildAdded:Connect(function(c)
+    if c.Name == "Football" and c:IsA("BasePart") then
+        c:GetPropertyChangedSignal("Parent"):Connect(checkAndTpFb)
+    end
+end)
+p.CharacterAdded:Connect(function()
+    checkAndTpFb()
+end)
 local function updateFbRef()
-    local j = workspace:FindFirstChild("Junk")
-    if j then
-        fb = j:FindFirstChild("Football")
-        if fb and fb:IsA("BasePart") then
+    local footballs = workspace:GetDescendants()
+    for _, fb in ipairs(footballs) do
+        if fb.Name == "Football" and fb:IsA("BasePart") then
             fb:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
         end
     end
 end
-local jf = workspace:WaitForChild("Junk", 10)
-if jf then
-    jf.ChildAdded:Connect(function(c)
-        if c.Name == "Football" and c:IsA("BasePart") then
-            fb = c
-            fb:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
-        end
-    end)
-end
-updateFbRef()
+workspace.DescendantAdded:Connect(function(c)
+    if c.Name == "Football" and c:IsA("BasePart") then
+        c:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
+    end
+end)
 p.CharacterAdded:Connect(function()
     updateFbRef()
 end)
@@ -197,7 +239,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
     Callback = function()
         local player = game.Players.LocalPlayer
         local character = player.Character
-        local football = game.Workspace.Junk.Football
+local football = game.Workspace.Football
         if character and character:FindFirstChild("HumanoidRootPart") and football then
             football.Position = character.HumanoidRootPart.Position
             football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -225,7 +267,7 @@ local function createPart()
     return cp
 end
 local function tpFootball()
-    local fb = workspace:FindFirstChild("Junk") and workspace.Junk:FindFirstChild("Football")
+local fb = workspace:FindFirstChild("Football")
     if not fb then
         return
     end
@@ -250,132 +292,6 @@ if Tabs and Tabs.keybinds then
         end
     })
 end
-local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
-local dt, dc = 1, Color3.fromRGB(255, 255, 255)
-local hsx, hsy, hsz = dsx, dsy, dsz
-local ht, hc = dt, dc
-local iha = false
-local p = game.Players.LocalPlayer
-local c = p.Character or p.CharacterAdded:Wait()
-local hb = c:FindFirstChild("Hitbox")
-local function updRealHb()
-    if hb then
-        hb.Size = Vector3.new(hsx, hsy, hsz)
-        hb.Transparency = ht
-        hb.Color = hc
-    end
-end
-local function resetHbToDefault()
-    if hb then
-        hb.Size = Vector3.new(dsx, dsy, dsz)
-        hb.Transparency = dt
-        hb.Color = dc
-    end
-end
-local function moveOldHbToNewHb()
-    local nhp = c:FindFirstChild("Hitbox")
-    if nhp and hb then
-        hb.CFrame = nhp.CFrame
-        if iha then
-            updRealHb()
-        else
-            resetHbToDefault()
-        end
-    end
-end
-p.CharacterAdded:Connect(function(newChar)
-    c = newChar
-    hb = c:WaitForChild("Hitbox", 10)
-end)
-local tog = Tabs.hitbox:AddToggle("MyToggle", {
-    Title = "ON Hitbox ",
-    Default = false
-})
-tog:OnChanged(function()
-    iha = tog.Value
-    if iha then
-        updRealHb() 
-    else
-        resetHbToDefault() 
-    end
-end)
-tog:SetValue(false)
-local ix = Tabs.hitbox:AddInput("InputX", {
-    Title = "Hitbox (X)",
-    Description = "1-2048",
-    Default = dsx, 
-    Numeric = true,
-    Callback = function(v)
-        hsx = tonumber(v)
-        if iha then
-            updRealHb()
-        end
-    end
-})
-local iy = Tabs.hitbox:AddInput("InputY", {
-    Title = "Hitbox (Y)",
-    Description = "1-2048",
-    Default = dsy, 
-    Numeric = true,
-    Callback = function(v)
-        hsy = tonumber(v)
-        if iha then
-            updRealHb()
-        end
-    end
-})
-local iz = Tabs.hitbox:AddInput("InputZ", {
-    Title = "Hitbox (Z)",
-    Description = "1-2048",
-    Default = dsz, 
-    Numeric = true,
-    Callback = function(v)
-        hsz = tonumber(v)
-        if iha then
-            updRealHb()
-        end
-    end
-})
-local ts = Tabs.hitbox:AddSlider("TransparencySlider", {
-    Title = "Transparency",
-    Description = "",
-    Default = dt, 
-    Min = 0,
-    Max = 1,
-    Rounding = 1.1,
-    Callback = function(v)
-        ht = v
-        if iha then
-            updRealHb()
-        end
-    end
-})
-ts:SetValue(dt)
-local cp = Tabs.hitbox:AddColorpicker("Colorpicker", {
-    Title = "Hitbox Color",
-    Default = dc 
-})
-cp:OnChanged(function()
-    hc = cp.Value
-    if iha then
-        updRealHb()
-    end
-end)
-game:GetService("RunService").Heartbeat:Connect(function()
-    if iha then
-        moveOldHbToNewHb()
-    end
-end)
-local coreGui = game:GetService("CoreGui")
-
-game:GetService("RunService").RenderStepped:Connect(function()
-    local hasGui = coreGui:FindFirstChild("ScreenGui")
-    if not hasGui and iha then
-        iha = false
-        tog:SetValue(false)
-        resetHbToDefault()
-    end
-end)
 Tabs.XXX:AddSection("Control ball ")
 local ks, vma = 80, 80
 local ce = false
@@ -434,15 +350,11 @@ local function togControls()
     end
 end
 local function getValidFootballs()
-    local junk = ws:FindFirstChild("Junk")
-    if not junk then return {} end
-    local footballs = {}
-    for _, obj in ipairs(junk:GetChildren()) do
-        if obj:IsA("BasePart") and obj.Name == "Football" then
-            table.insert(footballs, obj)
-        end
+    local fb = ws:FindFirstChild("Football")
+    if fb and fb:IsA("BasePart") then
+        return {fb}
     end
-    return footballs
+    return {}
 end
 local function moveFbVert(dir)
     if not hrp then warn("No HRP") return end
@@ -503,218 +415,34 @@ uis.InputBegan:Connect(function(i, gp)
         end
     end
 end)
-Tabs.XXX:AddSection("fly ")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
-local EmoteIds = {}
-for _, animation in pairs(TauntsFolder:GetChildren()) do
-    if animation:IsA("Animation") then
-        if not string.find(animation.Name:lower(), "universal") then
-            local animationId = animation.AnimationId
-            if animationId:match("rbxassetid://(%d+)") then
-                animationId = animationId:match("rbxassetid://(%d+)")
-            end
-            EmoteIds[animation.Name] = animationId
-        end
-    end
-end
-local Emotes = {}
-for name, _ in pairs(EmoteIds) do
-    table.insert(Emotes, name)
-end
-table.sort(Emotes)
-local cat, iep = nil, false
-local function togEmote(eid)
-    local p = game.Players.LocalPlayer
-    if p and p.Character then
-        local h = p.Character:FindFirstChildOfClass("Humanoid")
-        if h then
-            if iep and cat then
-                cat:Stop()
-                cat = nil
-                iep = false
-            else
-                local a = Instance.new("Animation")
-                a.AnimationId = "rbxassetid://" .. eid
-                cat = h:LoadAnimation(a)
-                cat:Play()
-                iep = true
-                cat.Stopped:Connect(function()
-                    iep = false
-                    cat = nil
-                end)
-            end
-        end
-    end
-end
-local EmoteDropdown1 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv1", {
-    Title = "Emote v1",
-    Values = Emotes,
-    Multi = false,
-    Default = "Backflip",
-})
-local EmoteDropdown2 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv2", {
-    Title = "Emote v2",
-    Values = Emotes,
-    Multi = false,
-    Default = "Backflip",
-})
-local EmoteDropdown3 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv3", {
-    Title = "Emote v3",
-    Values = Emotes,
-    Multi = false,
-    Default = "Backflip",
-})
-local function playFromDropdown(dropdown)
-    local selected = dropdown.Value or "Backflip"
-    local eid = EmoteIds[selected]
-    if eid then
-        togEmote(eid)
-    end
-end
-Tabs.FUN:AddKeybind("Keybind1", {
-    Title = "Play Emote v1",
-    Mode = "Toggle",
-    Default = "Four",
-    Callback = function()
-        playFromDropdown(EmoteDropdown1)
-    end
-})
-Tabs.FUN:AddKeybind("Keybind2", {
-    Title = "Play Emote v2",
-    Mode = "Toggle",
-    Default = "Five",
-    Callback = function()
-        playFromDropdown(EmoteDropdown2)
-    end
-})
-Tabs.FUN:AddKeybind("Keybind3", {
-    Title = "Play Emote v3",
-    Mode = "Toggle",
-    Default = "Six",
-    Callback = function()
-        playFromDropdown(EmoteDropdown3)
-    end
-})
-Tabs.all:AddSection("Spam give any player")
-local pls = game:GetService("Players")
-local lp = pls.LocalPlayer
-local sp = nil
-local pd = nil
-local vim = game:GetService("VirtualInputManager")
-local ac, tp = false, false
-local ci = 0
-local ts = true
-local function updPlayerList()
-    local pl = {}
-    for _, p in ipairs(pls:GetPlayers()) do
-        if p ~= lp then
-            table.insert(pl, p.Name)
-        end
-    end
-    table.insert(pl, "none")
-    if pd then
-        pd:SetValues(pl)
-    end
-    if sp and not pls:FindFirstChild(sp.Name) then
-        sp = nil
-        pd:SetValue("none")
-    end
-    return pl
-end
-pd = Tabs.all:AddDropdown("Dropdown", {
-    Title = "Select Player",
-    Values = updPlayerList(),
-    Multi = false,
-    Default = "none",
-    Callback = function(v)
-        if v and v ~= "none" then
-            sp = pls:FindFirstChild(v)
-        else
-            sp = nil
-        end
-    end
-})
-local function tpFbToPlayers()
-    while tp do
-        local fb = workspace:FindFirstChild("Junk") and workspace.Junk:FindFirstChild("Football")
-        if fb and lp and lp.Character and ts then
-            local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                fb.CFrame = hrp.CFrame
-            end
-        end
-        if fb and sp and sp.Character and not ts then
-            local hrp = sp.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                fb.CFrame = hrp.CFrame
-            end
-        end
-        ts = not ts
-        task.wait()
-    end
-end
-local function autoClicker()
-    while ac do
-        task.wait(ci)
-        if lp then
-            vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-        end
-    end
-end
-Tabs.all:AddKeybind("Keybind", {
-    Title = "spam ball",
-    Mode = "Toggle",
-    Default = "One",
-    Callback = function()
-        ac = not ac
-        tp = not tp
-        if ac then
-            task.spawn(autoClicker)
-        end
-        if tp then
-            task.spawn(tpFbToPlayers)
-        end
-    end
-})
-pls.PlayerAdded:Connect(updPlayerList)
-pls.PlayerRemoving:Connect(updPlayerList)
 local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK"}
 local teams = {"Home", "Away", "None"}
-
 local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
     Title = "Team",
     Values = teams,
     Multi = false,
     Default = "None"
 })
-
 local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
     Title = "Position",
     Values = positions,
     Multi = false,
     Default = "None"
 })
-
 local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
     Title = "AUTO POSITION",
     Default = false
 })
-
 local AutoAllToggle = Tabs.XXXV:AddToggle("Tog_AutoAll", {
     Title = "AUTO ALL POSITIONS & ALL TEAMs",
     Default = false
 })
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeamsService = game:GetService("Teams")
 local CoreGui = game:GetService("CoreGui")
-
 local function hasScreenGui()
     return CoreGui:FindFirstChild("ScreenGui") ~= nil
 end
-
 local function getRequestJoinEvent()
     local gamemodeComm = ReplicatedStorage:FindFirstChild("__GamemodeComm")
     if not gamemodeComm then return nil end
@@ -723,7 +451,6 @@ local function getRequestJoinEvent()
     local requestJoin = reFolder:FindFirstChild("_RequestJoin")
     return requestJoin
 end
-
 task.spawn(function()
     while true do
         task.wait(0.1)
@@ -745,7 +472,6 @@ task.spawn(function()
         end
     end
 end)
-
 task.spawn(function()
     while true do
         task.wait()
@@ -768,7 +494,6 @@ task.spawn(function()
         end
     end
 end)
-
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -899,7 +624,7 @@ local StatusParagraph
 Tabs.XXX:AddKeybind("Keybind", {
     Title = "Speed",
     Mode = "Toggle",
-    Default = "F",
+    Default = "One",
     Callback = function()
         startup = not startup
         if StatusParagraph then
@@ -1126,31 +851,22 @@ local mct = Tabs.all:AddToggle("MoveCharacterToggle", {
 local alw = Tabs.all:AddToggle("TackledToggle", { Title = "Tackled Skip Stay", Default = false })
 local ft = Tabs.all:AddToggle("FreezeToggle", { Title = "Disable Freeze", Default = false })
 local cuat = Tabs.all:AddToggle("CanUseAbilitiesToggle", { Title = "Enable Controls", Default = false })
-Tabs.all:AddSection("Ball")
-local BallThemes = {}
-for _, module in pairs(ReplicatedStorage.Assets.Items.BallThemes:GetChildren()) do
-    if module:IsA("ModuleScript") then
-        table.insert(BallThemes, module.Name)
-    end
-end
-local BallDropdown = Tabs.all:AddDropdown("BallthemesDropdown", {
-    Title = "Ball themes",
-    Values = BallThemes,
-    Multi = false,
-    Default = "Default"
-})
-local selectedTheme = "Default"
-BallDropdown:OnChanged(function(value)
-    selectedTheme = value
-    if LocalPlayer then
-        LocalPlayer:SetAttribute("EquippedBallTheme", selectedTheme)
-    end
-end)
+local fireballToggle = Tabs.all:AddToggle("FireballToggle", { Title = "Ball Theme - Fire Ball", Default = false })
+local flipToggle = Tabs.all:AddToggle("FlipToggle", { Title = "Dribble - Flip", Default = false })
 local themeLoopRunning = true
 task.spawn(function()
     while themeLoopRunning do
-        if LocalPlayer and LocalPlayer:GetAttribute("EquippedBallTheme") ~= selectedTheme then
-            LocalPlayer:SetAttribute("EquippedBallTheme", selectedTheme)
+        if LocalPlayer then
+            if fireballToggle.Value then
+                LocalPlayer:SetAttribute("EquippedBallTheme", "Fireball")
+            else
+                LocalPlayer:SetAttribute("EquippedBallTheme", "Default") 
+            end
+            if flipToggle.Value then
+                LocalPlayer:SetAttribute("EquippedDribble", "Flip") 
+            else
+                LocalPlayer:SetAttribute("EquippedDribble", "The Marseille Turn") 
+            end
         end
         task.wait()
     end
@@ -1172,7 +888,7 @@ local function mainLoop()
     end
 end
 local function checkLoop()
-    if ft.Value or cuat.Value or mct.Value or alw.Value then
+    if ft.Value or cuat.Value or alw.Value then
         if not ilr then
             ilr = true
             task.spawn(mainLoop)
@@ -1183,111 +899,237 @@ local function checkLoop()
 end
 ft:OnChanged(checkLoop)
 cuat:OnChanged(checkLoop)
-mct:OnChanged(checkLoop)
 alw:OnChanged(checkLoop)
 if screenGui then
     screenGui.Destroying:Connect(function()
         ft:SetValue(false)
         cuat:SetValue(false)
-        mct:SetValue(false)
         alw:SetValue(false)
+        fireballToggle:SetValue(false)
+        flipToggle:SetValue(false)
         themeLoopRunning = false
-        selectedTheme = "Default"
-        BallDropdown:SetValue("Default")
         if LocalPlayer then
             LocalPlayer:SetAttribute("EquippedBallTheme", "Default")
+            LocalPlayer:SetAttribute("EquippedDribble", "The Marseille Turn") 
         end
     end)
 end
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local CoreGui = game:GetService("CoreGui")
-local Player = Players.LocalPlayer
-local defaultColors = {
-    PowerLeft = Color3.fromRGB(255, 171, 0),
-    PowerRight = Color3.fromRGB(255, 85, 0),
-    StaminaLeft = Color3.fromRGB(74, 192, 255),
-    StaminaRight = Color3.fromRGB(58, 84, 255),
-}
-local customColors = {
-PowerLeft = Color3.fromRGB(0, 0, 255),
-    PowerRight = Color3.fromRGB(0, 255, 255),
-    StaminaLeft = Color3.fromRGB(0,255, 255),
-StaminaRight = Color3.fromRGB(0, 0, 0)
-}
-local function setGradient(bar, colorStart, colorEnd)
-    if not bar then return end
-    local progressBar = bar:FindFirstChild("ProgressBar")
-    if not progressBar then return end
-    local gradient = progressBar:FindFirstChildOfClass("UIGradient")
-    if not gradient then
-        gradient = Instance.new("UIGradient")
-        gradient.Rotation = 90
-        gradient.Parent = progressBar
-    end
-    gradient.Color = ColorSequence.new(colorStart, colorEnd)
-end
-local function applyColors(energyBars, colors)
-    if not energyBars then return end
-    setGradient(energyBars:FindFirstChild("Power"), colors.PowerLeft, colors.PowerRight)
-    setGradient(energyBars:FindFirstChild("Stamina"), colors.StaminaLeft, colors.StaminaRight)
-end
-task.spawn(function()
-    while true do
-        local playerGui = Player:FindFirstChild("PlayerGui")
-        local gameGui = playerGui and playerGui:FindFirstChild("GameGui")
-        local matchHUD = gameGui and gameGui:FindFirstChild("MatchHUD")
-        local energyBars = matchHUD and matchHUD:FindFirstChild("EnergyBars")
-        local screenGuiExists = CoreGui:FindFirstChild("ScreenGui") ~= nil
-        local colors = screenGuiExists and customColors or defaultColors
-        if energyBars then
-            applyColors(energyBars, colors)
-            local powerProgressBar = energyBars:FindFirstChild("Power") and energyBars.Power:FindFirstChild("ProgressBar")
-            local staminaProgressBar = energyBars:FindFirstChild("Stamina") and energyBars.Stamina:FindFirstChild("ProgressBar")
-            local powerGradient = powerProgressBar and powerProgressBar:FindFirstChildOfClass("UIGradient")
-            local staminaGradient = staminaProgressBar and staminaProgressBar:FindFirstChildOfClass("UIGradient")
-            if powerGradient then
-                powerGradient.Color = ColorSequence.new(colors.PowerLeft, colors.PowerRight)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
+local EmoteIds = {}
+for _, animation in pairs(TauntsFolder:GetChildren()) do
+    if animation:IsA("Animation") then
+        if not string.find(animation.Name:lower(), "universal") then
+            local animationId = animation.AnimationId
+            if animationId:match("rbxassetid://(%d+)") then
+                animationId = animationId:match("rbxassetid://(%d+)")
             end
-            if staminaGradient then
-                staminaGradient.Color = ColorSequence.new(colors.StaminaLeft, colors.StaminaRight)
+            EmoteIds[animation.Name] = animationId
+        end
+    end
+end
+local Emotes = {}
+for name, _ in pairs(EmoteIds) do
+    table.insert(Emotes, name)
+end
+table.sort(Emotes)
+local cat, iep = nil, false
+local function togEmote(eid)
+    local p = game.Players.LocalPlayer
+    if p and p.Character then
+        local h = p.Character:FindFirstChildOfClass("Humanoid")
+        if h then
+            if iep and cat then
+                cat:Stop()
+                cat = nil
+                iep = false
+            else
+                local a = Instance.new("Animation")
+                a.AnimationId = "rbxassetid://" .. eid
+                cat = h:LoadAnimation(a)
+                cat:Play()
+                iep = true
+                cat.Stopped:Connect(function()
+                    iep = false
+                    cat = nil
+                end)
             end
         end
-        task.wait(0.05)
+    end
+end
+local EmoteDropdown1 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv1", {
+    Title = "Emote v1",
+    Values = Emotes,
+    Multi = false,
+    Default = "Backflip",
+})
+local EmoteDropdown2 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv2", {
+    Title = "Emote v2",
+    Values = Emotes,
+    Multi = false,
+    Default = "Backflip",
+})
+local EmoteDropdown3 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv3", {
+    Title = "Emote v3",
+    Values = Emotes,
+    Multi = false,
+    Default = "Backflip",
+})
+local function playFromDropdown(dropdown)
+    local selected = dropdown.Value or "Backflip"
+    local eid = EmoteIds[selected]
+    if eid then
+        togEmote(eid)
+    end
+end
+Tabs.FUN:AddKeybind("Keybind1", {
+    Title = "Play Emote v1",
+    Mode = "Toggle",
+    Default = "Four",
+    Callback = function()
+        playFromDropdown(EmoteDropdown1)
+    end
+})
+Tabs.FUN:AddKeybind("Keybind2", {
+    Title = "Play Emote v2",
+    Mode = "Toggle",
+    Default = "Five",
+    Callback = function()
+        playFromDropdown(EmoteDropdown2)
+    end
+})
+Tabs.FUN:AddKeybind("Keybind3", {
+    Title = "Play Emote v3",
+    Mode = "Toggle",
+    Default = "Six",
+    Callback = function()
+        playFromDropdown(EmoteDropdown3)
+    end
+})
+local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
+local dt, dc = 1, Color3.fromRGB(255, 255, 255)
+local hsx, hsy, hsz = dsx, dsy, dsz
+local ht, hc = dt, dc
+local iha = false
+local p = game.Players.LocalPlayer
+local c = p.Character or p.CharacterAdded:Wait()
+local hb = c:FindFirstChild("Hitbox")
+local function updRealHb()
+    if hb then
+        hb.Size = Vector3.new(hsx, hsy, hsz)
+        hb.Transparency = ht
+        hb.Color = hc
+    end
+end
+local function resetHbToDefault()
+    if hb then
+        hb.Size = Vector3.new(dsx, dsy, dsz)
+        hb.Transparency = dt
+        hb.Color = dc
+    end
+end
+local function moveOldHbToNewHb()
+    local nhp = c:FindFirstChild("Hitbox")
+    if nhp and hb then
+        hb.CFrame = nhp.CFrame
+        if iha then
+            updRealHb()
+        else
+            resetHbToDefault()
+        end
+    end
+end
+p.CharacterAdded:Connect(function(newChar)
+    c = newChar
+    hb = c:WaitForChild("Hitbox", 10)
+end)
+local tog = Tabs.hitbox:AddToggle("MyToggle", {
+    Title = "ON Hitbox ",
+    Default = false
+})
+tog:OnChanged(function()
+    iha = tog.Value
+    if iha then
+        updRealHb() 
+    else
+        resetHbToDefault() 
     end
 end)
-function createPart0()
-    if game.Workspace:FindFirstChild("^") then
-        return 
-    end
-    local p = Instance.new("Part")
-    p.Name = "^"
-    p.Size = Vector3.new(261,  6, 414)
-    p.Position = Vector3.new(0.087, 87, 0.112)
-    p.Anchored = true
-    p.Locked = true
-    p.CastShadow = false
-    p.Color = Color3.fromRGB(0, 0, 0)
-    p.Material = Enum.Material.ForceField
-    p.Transparency = 0.8
-    p.Reflectance = 0
-    p.Parent = game.Workspace
-end
-createPart0()
-Tabs.Y:AddButton({
-    Title = "Destroy UI",
-    Callback = function()
-game:GetService("CoreGui").ScreenGui:Destroy()
+tog:SetValue(false)
+local ix = Tabs.hitbox:AddInput("InputX", {
+    Title = "Hitbox (X)",
+    Description = "1-2048",
+    Default = dsx, 
+    Numeric = true,
+    Callback = function(v)
+        hsx = tonumber(v)
+        if iha then
+            updRealHb()
+        end
     end
 })
-local Dropdown = Tabs.Y:AddDropdown("ThemeDropdown", {
-    Title = "Change Theme UI",
-    Values = {"Darker", "Dark", "Light", "Aqua", "Amethyst", "Rose"},
-    Multi = false,
-    Default = "Aqua",
+local iy = Tabs.hitbox:AddInput("InputY", {
+    Title = "Hitbox (Y)",
+    Description = "1-2048",
+    Default = dsy, 
+    Numeric = true,
+    Callback = function(v)
+        hsy = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
 })
-Dropdown:OnChanged(function(value)
-    Fluent:SetTheme(value)
+local iz = Tabs.hitbox:AddInput("InputZ", {
+    Title = "Hitbox (Z)",
+    Description = "1-2048",
+    Default = dsz, 
+    Numeric = true,
+    Callback = function(v)
+        hsz = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local ts = Tabs.hitbox:AddSlider("TransparencySlider", {
+    Title = "Transparency",
+    Description = "",
+    Default = dt, 
+    Min = 0,
+    Max = 1,
+    Rounding = 1.1,
+    Callback = function(v)
+        ht = v
+        if iha then
+            updRealHb()
+        end
+    end
+})
+ts:SetValue(dt)
+local cp = Tabs.hitbox:AddColorpicker("Colorpicker", {
+    Title = "Hitbox Color",
+    Default = dc 
+})
+cp:OnChanged(function()
+    hc = cp.Value
+    if iha then
+        updRealHb()
+    end
+end)
+game:GetService("RunService").Heartbeat:Connect(function()
+    if iha then
+        moveOldHbToNewHb()
+    end
+end)
+local coreGui = game:GetService("CoreGui")
+game:GetService("RunService").RenderStepped:Connect(function()
+    local hasGui = coreGui:FindFirstChild("ScreenGui")
+    if not hasGui and iha then
+        iha = false
+        tog:SetValue(false)
+        resetHbToDefault()
+    end
 end)
 local part = game.Workspace:FindFirstChild("X")
 if not part then
@@ -1302,49 +1144,189 @@ if not part then
     part.CanCollide = true
     part.Name = "X"
 end
-shared._DLoaded = false
-spawn(function()
 local Players = game:GetService("Players")
-local Lighting = game:GetService("Lighting")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local player = Players.LocalPlayer
-pcall(function()
-	ReplicatedFirst:RemoveDefaultLoadingScreen()
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager") 
+local localPlayer = Players.LocalPlayer
+local isRunning = false 
+Tabs.keybinds:AddKeybind("Keybind", {
+    Title = "Stel Ball",
+    Mode = "Toggle",
+    Default = "T",
+    Callback = function()
+        isRunning = not isRunning 
+        if isRunning then
+            task.spawn(function()
+                while isRunning do
+                    local football = game.Workspace.Football
+                    local networkOwner = football and football:GetAttribute("NetworkOwner")
+                    local localTeam = localPlayer.Team and localPlayer.Team.Name
+                    if localTeam ~= "Home" and localTeam ~= "Away" then
+                        isRunning = false
+                        break
+                    end
+                    if networkOwner and typeof(networkOwner) == "string" then
+                        local ownerPlayer = Players:FindFirstChild(networkOwner)
+                        if ownerPlayer and ownerPlayer ~= localPlayer then
+                            local ownerTeam = ownerPlayer.Team and ownerPlayer.Team.Name
+                            if ownerTeam ~= localTeam then
+                                if ownerPlayer.Character and ownerPlayer.Character.HumanoidRootPart then
+                                    localPlayer.Character.HumanoidRootPart.CFrame = ownerPlayer.Character.HumanoidRootPart.CFrame
+                                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                                    task.wait() 
+                                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                                    local player = game.Players.LocalPlayer
+                                    local character = player.Character
+                                    local football = game.Workspace.Football
+                                    if character and character:FindFirstChild("HumanoidRootPart") and football then
+                                        football.Position = character.HumanoidRootPart.Position
+                                        football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                                        football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                                    end
+                                end
+                            else
+                                isRunning = false
+                            end
+                        elseif ownerPlayer == localPlayer then
+                            isRunning = false
+                        end
+                    end
+                    task.wait(0.05) 
+                end
+            end)
+        end
+    end
+})
+    Tabs.Y:AddButton({
+    Title = "Destroy UI",
+    Callback = function()
+game:GetService("CoreGui").ScreenGui:Destroy()
+    end
+})
+local Dropdown = Tabs.Y:AddDropdown("ThemeDropdown", {
+    Title = "Change Theme UI",
+    Values = {"Darker", "Dark", "Light", "Aqua", "Amethyst", "Rose"},
+    Multi = false,
+    Default = "Aqua",
+})
+Dropdown:OnChanged(function(value)
+    Fluent:SetTheme(value)
 end)
-local playerGui = player:WaitForChild("PlayerGui")
-if not player.Character or not player.Character:FindFirstChild("Humanoid") then
-	player.CharacterAdded:Wait()
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local LeaderboardFrame = Player:WaitForChild("PlayerGui"):WaitForChild("GameGui"):WaitForChild("Leaderboard"):WaitForChild("Content")
+local RunService = game:GetService("RunService")
+local foundPlayers = {}
+local notifiedPlayers = {}
+local function sendNotification(title, content, subContent)
+    Fluent:Notify({
+        Title = title or "INFO - Staff Detect",
+        Content = content or "",
+        SubContent = subContent or "",
+        Duration = 65
+    })
 end
-player.Character:WaitForChild("Humanoid")
-task.wait(2)
-local function destroyGUI()
-	local gameGui = playerGui:FindFirstChild("GameGui")
-	local guiNames = {
-		"LoadingScreen",
-		"DailyRewards",
-		"EmoteWheel",
-		"Transition",
-		"KeyHints"
-	}
-	for _, name in ipairs(guiNames) do
-		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
-		if gui then
-			gui:Destroy()
-		end
-	end
+local function updateInServerNotification()
+    if #foundPlayers > 0 then
+        local playerList = table.concat(foundPlayers, ", ")
+        sendNotification("INFO - Staff Detect", playerList, "In Server")
+    end
 end
-local function removeBlur()
-	for _, effect in ipairs(Lighting:GetChildren()) do
-		if effect:IsA("BlurEffect") then
-			effect:Destroy()
-		end
-	end
+local function checkStaffStatus(player)
+    local entry = LeaderboardFrame:FindFirstChild("LeaderboardEntry["..player.Name.."]")
+    if entry and entry:FindFirstChild("Username") and entry.Username:FindFirstChild("Staff") then
+        if not table.find(foundPlayers, player.Name) then
+            table.insert(foundPlayers, player.Name)
+            if not table.find(notifiedPlayers, player.Name) then
+                table.insert(notifiedPlayers, player.Name)
+                sendNotification("INFO - Staff Detect", player.Name, "Staff Joined")
+            end
+            updateInServerNotification()
+        end
+    else
+        for i, name in ipairs(foundPlayers) do
+            if name == player.Name then
+                table.remove(foundPlayers, i)
+                if table.find(notifiedPlayers, player.Name) then
+                    for j, n in ipairs(notifiedPlayers) do
+                        if n == player.Name then
+                            table.remove(notifiedPlayers, j)
+                            sendNotification("INFO - Staff Detect", player.Name, "Left Staff")
+                            break
+                        end
+                    end
+                end
+                updateInServerNotification()
+                break
+            end
+        end
+    end
 end
-destroyGUI()
-removeBlur()
-    shared._DLoaded = true 
+local function monitorLeaderboard(player)
+    local con
+    con = LeaderboardFrame.ChildAdded:Connect(function(child)
+        if child.Name == "LeaderboardEntry["..player.Name.."]" then
+            checkStaffStatus(player)
+        end
+    end)
+    LeaderboardFrame.ChildRemoved:Connect(function(child)
+        if child.Name == "LeaderboardEntry["..player.Name.."]" then
+            for i, name in ipairs(foundPlayers) do
+                if name == player.Name then
+                    table.remove(foundPlayers, i)
+                    if table.find(notifiedPlayers, player.Name) then
+                        for j, n in ipairs(notifiedPlayers) do
+                            if n == player.Name then
+                                table.remove(notifiedPlayers, j)
+                                sendNotification("INFO - Staff Detect", player.Name, "Left Server")
+                                break
+                            end
+                        end
+                    end
+                    updateInServerNotification()
+                    break
+                end
+            end
+        end
+    end)
+end
+for _, player in ipairs(Players:GetPlayers()) do
+    checkStaffStatus(player)
+    monitorLeaderboard(player)
+end
+Players.PlayerAdded:Connect(function(player)
+    checkStaffStatus(player)
+    monitorLeaderboard(player)
 end)
-repeat task.wait() until shared._DLoaded
+Players.PlayerRemoving:Connect(function(player)
+    for i, name in ipairs(foundPlayers) do
+        if name == player.Name then
+            table.remove(foundPlayers, i)
+            if table.find(notifiedPlayers, player.Name) then
+                for j, n in ipairs(notifiedPlayers) do
+                    if n == player.Name then
+                        table.remove(notifiedPlayers, j)
+                        sendNotification("INFO - Staff Detect", player.Name, "Left Server")
+                        break
+                    end
+                end
+            end
+            updateInServerNotification()
+            break
+        end
+    end
+end)
+RunService.Heartbeat:Connect(function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        checkStaffStatus(player)
+    end
+end)
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "Enjoy Script  :)",
+        SubContent = "BY NOTHING X", 
+        Duration = 4.5
+    })
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
@@ -1352,10 +1334,3 @@ SaveManager:SetIgnoreIndexes({})
 SaveManager:SetFolder("HUB")
 SaveManager:BuildConfigSection(Tabs.save)
 SaveManager:LoadAutoloadConfig()
-    Fluent:Notify({
-        Title = "NOTHING X HUB",
-        Content = "Enjoy Script  :)",
-        SubContent = "BY NOTHING X", 
-        Duration = 6.6
-    })
-end)
