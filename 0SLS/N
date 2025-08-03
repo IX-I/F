@@ -728,30 +728,41 @@ Tabs.all:AddKeybind("Keybind", {
 })
 pls.PlayerAdded:Connect(updPlayerList)
 pls.PlayerRemoving:Connect(updPlayerList)
-local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK", "None"}
+local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK"}
 local teams = {"Home", "Away", "None"}
+
 local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
     Title = "Team",
     Values = teams,
     Multi = false,
     Default = "None"
 })
+
 local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
     Title = "Position",
     Values = positions,
     Multi = false,
     Default = "None"
 })
+
 local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
     Title = "AUTO POSITION",
     Default = false
 })
+
+local AutoAllToggle = Tabs.XXXV:AddToggle("Tog_AutoAll", {
+    Title = "AUTO ALL POSITIONS & ALL TEAMs",
+    Default = false
+})
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeamsService = game:GetService("Teams")
 local CoreGui = game:GetService("CoreGui")
+
 local function hasScreenGui()
     return CoreGui:FindFirstChild("ScreenGui") ~= nil
 end
+
 local function getRequestJoinEvent()
     local gamemodeComm = ReplicatedStorage:FindFirstChild("__GamemodeComm")
     if not gamemodeComm then return nil end
@@ -760,6 +771,7 @@ local function getRequestJoinEvent()
     local requestJoin = reFolder:FindFirstChild("_RequestJoin")
     return requestJoin
 end
+
 task.spawn(function()
     while true do
         task.wait(0.1)
@@ -781,6 +793,30 @@ task.spawn(function()
         end
     end
 end)
+
+task.spawn(function()
+    while true do
+        task.wait()
+        if not hasScreenGui() then
+            AutoAllToggle:Set(false)
+        elseif AutoAllToggle.Value then
+            local requestJoinEvent = getRequestJoinEvent()
+            if requestJoinEvent then
+                for _, teamName in ipairs({"Away", "Home"}) do
+                    local teamObj = TeamsService:FindFirstChild(teamName)
+                    if teamObj then
+                        for _, pos in ipairs(positions) do
+                            local args = {{Team = teamObj, TeamPosition = pos}}
+                            pcall(function() requestJoinEvent:FireServer(unpack(args)) end)
+                            task.wait()
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
