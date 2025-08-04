@@ -97,10 +97,8 @@ Tabs.keybinds:AddKeybind("Keybind", {
             spawn(function()
                 while isRunning do
                     local football = workspace.Misc:FindFirstChild("Football")
-
                     while not football and isRunning do
                         football = workspace.Misc:FindFirstChild("Football")
-
                         task.wait(0.1)
                     end
                     if not isRunning then break end
@@ -168,7 +166,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
     Callback = function()
         task.spawn(function()
             local football = workspace.Misc:FindFirstChild("Football")
-
             if not football then
                 football = workspace:WaitForChild("Football", 10)
                 if not football then return end
@@ -184,13 +181,11 @@ local vim = game:GetService("VirtualInputManager")
 local p = game.Players.LocalPlayer
 local hPos = Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
 local aPos = Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
-
 local function tpObj(o, pos)
     if o and o:IsA("BasePart") then
         o.CFrame = CFrame.new(pos)
     end
 end
-
 local function checkAndTpFb()
     local t = p.Team
     if t then
@@ -204,7 +199,6 @@ local function checkAndTpFb()
         end
     end
 end
-
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Gol",
     Mode = "Toggle",
@@ -212,13 +206,11 @@ Tabs.keybinds:AddKeybind("Keybind", {
     Callback = checkAndTpFb,
     debounce = false
 })
-
 workspace.Misc.ChildAdded:Connect(function(c)
     if c.Name == "Football" and c:IsA("BasePart") then
         c:GetPropertyChangedSignal("Parent"):Connect(checkAndTpFb)
     end
 end)
-
 p.CharacterAdded:Connect(checkAndTpFb)
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Tp ball",
@@ -356,7 +348,6 @@ local function getValidFootballs()
     end
     return footballs
 end
-
 local function moveFbVert(dir)
     if not hrp then warn("No HRP") return end
     local footballs = getValidFootballs()
