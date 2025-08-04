@@ -858,7 +858,7 @@ local mct = Tabs.all:AddToggle("MoveCharacterToggle", {
         end
     end
 })
-local alw = Tabs.all:AddToggle("TackledToggle", { Title = "Tackled Skip Stay", Default = false })
+local alw = Tabs.all:AddToggle("TackledToggle", { Title = "Tackled Anti Stay", Default = false })
 local ft = Tabs.all:AddToggle("FreezeToggle", { Title = "Disable Freeze", Default = false })
 local cuat = Tabs.all:AddToggle("CanUseAbilitiesToggle", { Title = "Enable Controls", Default = false })
 local fireballToggle = Tabs.all:AddToggle("FireballToggle", { Title = "Ball Theme - Fire Ball", Default = false })
