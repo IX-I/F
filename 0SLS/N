@@ -1207,6 +1207,72 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end
     end
 })
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "NOTHING X HUB",
+    SubTitle = " Super League Soccer V2.1",
+    TabWidth = 30,
+    Size = UDim2.fromOffset(455, 375),
+    Acrylic = false,
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+local Tabs = {
+    all = Window:AddTab({Title = "", Icon = "list"}),
+        hitbox = Window:AddTab({Title = "", Icon = "box"}),
+                XXX = Window:AddTab({Title = "", Icon = "code"}),
+                FUN = Window:AddTab({Title = "", Icon = "laugh"}),
+        XXXV = Window:AddTab({Title = "", Icon = "flag"}),
+    keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
+    save = Window:AddTab({Title = "", Icon = "save"}),
+        Y = Window:AddTab({Title = "", Icon = "settings"})
+}
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+local function getNearestPlayer()
+    local football = Workspace.Misc:FindFirstChild("Football")
+    if not football then return nil end
+    local closestPlayer, shortestDistance = nil, math.huge
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and 
+           player.Team == LocalPlayer.Team and 
+           player.Character and 
+           player.Character.PrimaryPart and 
+           player.Character.Humanoid.Health > 0 then
+            local distance = (player.Character.PrimaryPart.Position - football.Position).Magnitude
+            if distance < shortestDistance then
+                closestPlayer = player
+                shortestDistance = distance
+            end
+        end
+    end
+    return closestPlayer
+end
+local function tpFootballToNearestPlayer()
+    local football = Workspace.Misc:FindFirstChild("Football")
+    if not football then return end
+    local nearestPlayer = getNearestPlayer()
+    if nearestPlayer and nearestPlayer.Character and nearestPlayer.Character.PrimaryPart then
+        local targetPosition = nearestPlayer.Character.PrimaryPart.Position + Vector3.new(0, 5, 0)
+        football.AssemblyLinearVelocity = Vector3.zero
+        football.AssemblyAngularVelocity = Vector3.zero
+        football.CFrame = CFrame.new(targetPosition)
+    end
+end
+if Tabs and Tabs.keybinds then
+    Tabs.keybinds:AddKeybind("TeleportFootball", {
+        Title = "Teleport Football to Teammate",
+        Mode = "Toggle",
+        Default = "F",
+        Callback = tpFootballToNearestPlayer
+    })
+end
+LocalPlayer.CharacterAdded:Connect(function(character)
+    task.wait(1)
+end)
     Tabs.Y:AddButton({
     Title = "Destroy UI",
     Callback = function()
