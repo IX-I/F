@@ -96,9 +96,11 @@ Tabs.keybinds:AddKeybind("Keybind", {
         if state then
             spawn(function()
                 while isRunning do
-                    local football = Workspace:FindFirstChild("Football")
+                    local football = workspace.Misc:FindFirstChild("Football")
+
                     while not football and isRunning do
-                        football = Workspace:FindFirstChild("Football")
+                        football = workspace.Misc:FindFirstChild("Football")
+
                         task.wait(0.1)
                     end
                     if not isRunning then break end
@@ -165,7 +167,8 @@ Tabs.keybinds:AddKeybind("Keybind", {
     Default = "F3",
     Callback = function()
         task.spawn(function()
-            local football = workspace:FindFirstChild("Football")
+            local football = workspace.Misc:FindFirstChild("Football")
+
             if not football then
                 football = workspace:WaitForChild("Football", 10)
                 if not football then return end
@@ -177,61 +180,46 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end)
     end
 })
+local vim = game:GetService("VirtualInputManager")
 local p = game.Players.LocalPlayer
 local hPos = Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
 local aPos = Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
+
 local function tpObj(o, pos)
     if o and o:IsA("BasePart") then
         o.CFrame = CFrame.new(pos)
     end
 end
+
 local function checkAndTpFb()
     local t = p.Team
     if t then
-        for _, fb in ipairs(workspace:GetChildren()) do
-            if fb.Name == "Football" and fb:IsA("BasePart") then
-                if t.Name == "Home" then
-                    tpObj(fb, hPos)
-                elseif t.Name == "Away" then
-                    tpObj(fb, aPos)
-                end
+        local fb = workspace.Misc.Football
+        if fb and fb:IsA("BasePart") then
+            if t.Name == "Home" then
+                tpObj(fb, hPos)
+            elseif t.Name == "Away" then
+                tpObj(fb, aPos)
             end
         end
     end
 end
+
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Gol",
     Mode = "Toggle",
     Default = "G",
-    Callback = function()
-        checkAndTpFb()
-    end,
+    Callback = checkAndTpFb,
     debounce = false
 })
-workspace.ChildAdded:Connect(function(c)
+
+workspace.Misc.ChildAdded:Connect(function(c)
     if c.Name == "Football" and c:IsA("BasePart") then
         c:GetPropertyChangedSignal("Parent"):Connect(checkAndTpFb)
     end
 end)
-p.CharacterAdded:Connect(function()
-    checkAndTpFb()
-end)
-local function updateFbRef()
-    local footballs = workspace:GetDescendants()
-    for _, fb in ipairs(footballs) do
-        if fb.Name == "Football" and fb:IsA("BasePart") then
-            fb:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
-        end
-    end
-end
-workspace.DescendantAdded:Connect(function(c)
-    if c.Name == "Football" and c:IsA("BasePart") then
-        c:GetPropertyChangedSignal("Parent"):Connect(updateFbRef)
-    end
-end)
-p.CharacterAdded:Connect(function()
-    updateFbRef()
-end)
+
+p.CharacterAdded:Connect(checkAndTpFb)
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Tp ball",
     Mode = "Toggle",
@@ -239,7 +227,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
     Callback = function()
         local player = game.Players.LocalPlayer
         local character = player.Character
-local football = game.Workspace.Football
+local football = game.workspace.Misc.Football
         if character and character:FindFirstChild("HumanoidRootPart") and football then
             football.Position = character.HumanoidRootPart.Position
             football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -267,7 +255,7 @@ local function createPart()
     return cp
 end
 local function tpFootball()
-local fb = workspace:FindFirstChild("Football")
+local fb = workspace.Misc:FindFirstChild("Football")
     if not fb then
         return
     end
@@ -360,12 +348,15 @@ local function togControls()
     end
 end
 local function getValidFootballs()
-    local fb = ws:FindFirstChild("Football")
-    if fb and fb:IsA("BasePart") then
-        return {fb}
+    local footballs = {}
+    for _, obj in ipairs(ws.Misc:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name:lower():find("football") then
+            table.insert(footballs, obj)
+        end
     end
-    return {}
+    return footballs
 end
+
 local function moveFbVert(dir)
     if not hrp then warn("No HRP") return end
     local footballs = getValidFootballs()
@@ -1168,7 +1159,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
         if isRunning then
             task.spawn(function()
                 while isRunning do
-                    local football = game.Workspace.Football
+                    local football = game.workspace.Misc.Football
                     local networkOwner = football and football:GetAttribute("NetworkOwner")
                     local localTeam = localPlayer.Team and localPlayer.Team.Name
                     if localTeam ~= "Home" and localTeam ~= "Away" then
@@ -1187,7 +1178,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
                                     VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                                     local player = game.Players.LocalPlayer
                                     local character = player.Character
-                                    local football = game.Workspace.Football
+                                    local football = game.workspace.Misc.Football
                                     if character and character:FindFirstChild("HumanoidRootPart") and football then
                                         football.Position = character.HumanoidRootPart.Position
                                         football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
