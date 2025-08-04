@@ -615,13 +615,31 @@ setupFlyAnimation()
 local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local User = game:GetService("UserInputService")
-local holdingWKey = false
-local holdingSKey = false
-local holdingAKey = false
-local holdingDKey = false
+local RunService = game:GetService("RunService")
+local holdingWKey, holdingSKey, holdingAKey, holdingDKey = false, false, false, false
 local Speed = 1.0
 local startup = false
-local StatusParagraph 
+local StatusParagraph
+local stepConnection
+local function disconnectOldConnection()
+    if stepConnection then
+        stepConnection:Disconnect()
+        stepConnection = nil
+    end
+end
+local function startStepping()
+    disconnectOldConnection()
+    stepConnection = RunService.Stepped:Connect(function()
+        if startup and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local moveVector = Vector3.zero
+            if holdingWKey then moveVector += Vector3.new(0, 0, -Speed) end
+            if holdingSKey then moveVector += Vector3.new(0, 0, Speed) end
+            if holdingAKey then moveVector += Vector3.new(-Speed, 0, 0) end
+            if holdingDKey then moveVector += Vector3.new(Speed, 0, 0) end
+            player.Character.HumanoidRootPart.CFrame *= CFrame.new(moveVector)
+        end
+    end)
+end
 Tabs.XXX:AddKeybind("Keybind", {
     Title = "Speed",
     Mode = "Toggle",
@@ -631,15 +649,17 @@ Tabs.XXX:AddKeybind("Keybind", {
         if StatusParagraph then
             StatusParagraph:SetTitle(startup and "ON" or "OFF")
         end
+        if startup then
+            startStepping()
+        end
     end,
 })
 Tabs.XXX:AddSlider("SliderSpeedV", {
     Title = "Speed +/-",
-    Description = "",
     Default = 1,
     Min = 0.1,
     Max = 3.5,
-    Rounding = 1.1, 
+    Rounding = 1.1,
     Callback = function(Value)
         Speed = Value
     end,
@@ -648,46 +668,18 @@ StatusParagraph = Tabs.XXX:AddParagraph({
     Title = "OFF",
     Content = ""
 })
-game:GetService("RunService").Stepped:Connect(function()
-    if startup and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        local moveVector = Vector3.zero
-        if holdingWKey then
-            moveVector = moveVector + Vector3.new(0, 0, -Speed)
-        end
-        if holdingSKey then
-            moveVector = moveVector + Vector3.new(0, 0, Speed)
-        end
-        if holdingAKey then
-            moveVector = moveVector + Vector3.new(-Speed, 0, 0)
-        end
-        if holdingDKey then
-            moveVector = moveVector + Vector3.new(Speed, 0, 0)
-        end
-        player.Character.HumanoidRootPart.CFrame *= CFrame.new(moveVector)
-    end
-end)
 User.InputBegan:Connect(function(input, processed)
     if processed then return end
-    if input.KeyCode == Enum.KeyCode.W then
-        holdingWKey = true
-    elseif input.KeyCode == Enum.KeyCode.S then
-        holdingSKey = true
-    elseif input.KeyCode == Enum.KeyCode.A then
-        holdingAKey = true
-    elseif input.KeyCode == Enum.KeyCode.D then
-        holdingDKey = true
-    end
+    if input.KeyCode == Enum.KeyCode.W then holdingWKey = true
+    elseif input.KeyCode == Enum.KeyCode.S then holdingSKey = true
+    elseif input.KeyCode == Enum.KeyCode.A then holdingAKey = true
+    elseif input.KeyCode == Enum.KeyCode.D then holdingDKey = true end
 end)
 User.InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.W then
-        holdingWKey = false
-    elseif input.KeyCode == Enum.KeyCode.S then
-        holdingSKey = false
-    elseif input.KeyCode == Enum.KeyCode.A then
-        holdingAKey = false
-    elseif input.KeyCode == Enum.KeyCode.D then
-        holdingDKey = false
-    end
+    if input.KeyCode == Enum.KeyCode.W then holdingWKey = false
+    elseif input.KeyCode == Enum.KeyCode.S then holdingSKey = false
+    elseif input.KeyCode == Enum.KeyCode.A then holdingAKey = false
+    elseif input.KeyCode == Enum.KeyCode.D then holdingDKey = false end
 end)
 Tabs.all:AddSection("Jump")
 local coreGui = game:GetService("CoreGui")
