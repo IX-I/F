@@ -1233,7 +1233,7 @@ local function tpFootballToNearestPlayer()
 end
 if Tabs and Tabs.keybinds then
     Tabs.keybinds:AddKeybind("TeleportFootball", {
-        Title = "Teleport Football to Teammate",
+        Title = "Tp ball close Teammate",
         Mode = "Toggle",
         Default = "F",
         Callback = tpFootballToNearestPlayer
