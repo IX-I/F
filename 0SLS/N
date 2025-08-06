@@ -108,13 +108,9 @@ task.spawn(function()
         local playerTeam = game.Players.LocalPlayer.Team 
         local hasTeam = teamService:FindFirstChild("Home") or teamService:FindFirstChild("Away")
         local isInValidTeam = playerTeam and (playerTeam == teamService:FindFirstChild("Home") or playerTeam == teamService:FindFirstChild("Away"))
-
         if hasTeam and isInValidTeam then
             break
         end
-
-
-
         task.wait(0.5)
     end
 end)
@@ -442,8 +438,11 @@ uis.InputBegan:Connect(function(i, gp)
         end
     end
 end)
-local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK"}
-local teams = {"Home", "Away", "None"}
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TeamsService = game:GetService("Teams")
+local CoreGui = game:GetService("CoreGui")
+local positions = {"None", "CF", "LF", "RF", "CM", "LB", "RB", "GK"}
+local teams = {"None", "Home", "Away"}
 local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
     Title = "Team",
     Values = teams,
@@ -456,17 +455,6 @@ local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
     Multi = false,
     Default = "None"
 })
-local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
-    Title = "AUTO POSITION",
-    Default = false
-})
-local AutoAllToggle = Tabs.XXXV:AddToggle("Tog_AutoAll", {
-    Title = "AUTO ALL POSITIONS & ALL TEAMs",
-    Default = false
-})
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TeamsService = game:GetService("Teams")
-local CoreGui = game:GetService("CoreGui")
 local function hasScreenGui()
     return CoreGui:FindFirstChild("ScreenGui") ~= nil
 end
@@ -475,27 +463,42 @@ local function getRequestJoinEvent()
     if not gamemodeComm then return nil end
     local reFolder = gamemodeComm:FindFirstChild("RE")
     if not reFolder then return nil end
-    local requestJoin = reFolder:FindFirstChild("_RequestJoin")
-    return requestJoin
+    return reFolder:FindFirstChild("_RequestJoin")
 end
+local function joinTeam(teamName, position)
+    if teamName == "None" or position == "None" then return end
+    local requestJoinEvent = getRequestJoinEvent()
+    if requestJoinEvent then
+        local teamObj = TeamsService:FindFirstChild(teamName)
+        if teamObj then
+            local args = {{Team = teamObj, TeamPosition = position}}
+            pcall(function()
+                requestJoinEvent:FireServer(unpack(args))
+            end)
+        end
+    end
+end
+local JoinButton = Tabs.XXXV:AddButton({
+    Title = "Join",
+    Callback = function()
+        joinTeam(TeamDropdown.Value, PositionDropdown.Value)
+    end
+})
+local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
+    Title = "AUTO Join",
+    Default = false
+})
+local AutoAllToggle = Tabs.XXXV:AddToggle("Tog_AutoAll", {
+    Title = "AUTO Join ALL POSITIONS & ALL TEAMS",
+    Default = false
+})
 task.spawn(function()
     while true do
-        task.wait(0.1)
+        task.wait()
         if not hasScreenGui() then
             AutoToggle:Set(false)
         elseif AutoToggle.Value then
-            local requestJoinEvent = getRequestJoinEvent()
-            if requestJoinEvent then
-                local selectedTeamName = TeamDropdown.Value
-                local selectedPosition = PositionDropdown.Value
-                if selectedTeamName ~= "None" and selectedPosition ~= "None" then
-                    local teamObj = TeamsService:FindFirstChild(selectedTeamName)
-                    if teamObj then
-                        local args = {{Team = teamObj, TeamPosition = selectedPosition}}
-                        pcall(function() requestJoinEvent:FireServer(unpack(args)) end)
-                    end
-                end
-            end
+            joinTeam(TeamDropdown.Value, PositionDropdown.Value)
         end
     end
 end)
@@ -505,16 +508,11 @@ task.spawn(function()
         if not hasScreenGui() then
             AutoAllToggle:Set(false)
         elseif AutoAllToggle.Value then
-            local requestJoinEvent = getRequestJoinEvent()
-            if requestJoinEvent then
-                for _, teamName in ipairs({"Away", "Home"}) do
-                    local teamObj = TeamsService:FindFirstChild(teamName)
-                    if teamObj then
-                        for _, pos in ipairs(positions) do
-                            local args = {{Team = teamObj, TeamPosition = pos}}
-                            pcall(function() requestJoinEvent:FireServer(unpack(args)) end)
-                            task.wait()
-                        end
+            for _, teamName in ipairs({"Home", "Away"}) do
+                for _, pos in ipairs(positions) do
+                    if pos ~= "None" then
+                        joinTeam(teamName, pos)
+                        task.wait()
                     end
                 end
             end
@@ -638,92 +636,96 @@ Tabs.XXX:AddKeybind("Keybind", {
     end
 })
 setupFlyAnimation()
-local player = game.Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
-local User = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-pcall(function() if stepConnection then stepConnection:Disconnect() end end)
-holdingWKey, holdingSKey, holdingAKey, holdingDKey = false, false, false, false
-Speed = 1.0
-startup = false
-pcall(function()
-    if StatusParagraph then
-        StatusParagraph:SetTitle("OFF")
-        StatusParagraph = nil
+local CoreGui = game:GetService("CoreGui")
+local player = Players.LocalPlayer
+if _G.VeloxSpeed then
+    _G.VeloxSpeed.cleanup()
+end
+_G.VeloxSpeed = {}
+local state = _G.VeloxSpeed
+state.speed = 1.0
+state.active = false
+state.holding = {W = false, A = false, S = false, D = false}
+state.connection = nil
+state.heartbeat = nil
+state.statusParagraph = nil
+local function updateMovement()
+    local char = player.Character
+    if not (char and char:FindFirstChild("Humanoid") and char:FindFirstChild("HumanoidRootPart")) then return end
+    local moveVec = Vector3.zero
+    if state.holding.W then moveVec += Vector3.new(0, 0, -1) end
+    if state.holding.S then moveVec += Vector3.new(0, 0, 1) end
+    if state.holding.A then moveVec += Vector3.new(-1, 0, 0) end
+    if state.holding.D then moveVec += Vector3.new(1, 0, 0) end
+    if moveVec.Magnitude > 0 then
+        moveVec = moveVec.Unit * state.speed
+        char.Humanoid:Move(moveVec, true)
     end
+end
+UserInputService.InputBegan:Connect(function(input, processed)
+    if processed then return end
+    local key = input.KeyCode
+    if key == Enum.KeyCode.W then state.holding.W = true end
+    if key == Enum.KeyCode.A then state.holding.A = true end
+    if key == Enum.KeyCode.S then state.holding.S = true end
+    if key == Enum.KeyCode.D then state.holding.D = true end
 end)
-local StatusParagraph
-local stepConnection
-local function disconnectOldConnection()
-    if stepConnection then
-        stepConnection:Disconnect()
-        stepConnection = nil
+UserInputService.InputEnded:Connect(function(input)
+    local key = input.KeyCode
+    if key == Enum.KeyCode.W then state.holding.W = false end
+    if key == Enum.KeyCode.A then state.holding.A = false end
+    if key == Enum.KeyCode.S then state.holding.S = false end
+    if key == Enum.KeyCode.D then state.holding.D = false end
+end)
+state.toggle = function()
+    state.active = not state.active
+    if state.statusParagraph then
+        state.statusParagraph:SetTitle(state.active and "ON" or "OFF")
+    end
+    if state.active then
+        if state.heartbeat then state.heartbeat:Disconnect() end
+        state.heartbeat = RunService.Heartbeat:Connect(updateMovement)
+    else
+        if state.heartbeat then
+            state.heartbeat:Disconnect()
+            state.heartbeat = nil
+        end
     end
 end
-local function startStepping()
-    disconnectOldConnection()
-    stepConnection = RunService.Stepped:Connect(function()
-        if startup and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            local moveVector = Vector3.zero
-            if holdingWKey then moveVector += Vector3.new(0, 0, -Speed) end
-            if holdingSKey then moveVector += Vector3.new(0, 0, Speed) end
-            if holdingAKey then moveVector += Vector3.new(-Speed, 0, 0) end
-            if holdingDKey then moveVector += Vector3.new(Speed, 0, 0) end
-            player.Character.HumanoidRootPart.CFrame *= CFrame.new(moveVector)
-        end
-    end)
+state.cleanup = function()
+    if state.heartbeat then state.heartbeat:Disconnect() end
+    if state.statusParagraph then state.statusParagraph:Destroy() end
+    _G.VeloxSpeed = nil
 end
-Tabs.XXX:AddKeybind("Keybind", {
+state.statusParagraph = Tabs.XXX:AddParagraph({
+    Title = "OFF",
+    Content = ""
+})
+Tabs.XXX:AddKeybind("SpeedToggle", {
     Title = "Speed",
     Mode = "Toggle",
     Default = "F",
     Callback = function()
-        startup = not startup
-        if StatusParagraph then
-            StatusParagraph:SetTitle(startup and "ON" or "OFF")
-        end
-        if startup then
-            startStepping()
-        else
-            disconnectOldConnection()
-        end
+        state.toggle()
     end,
 })
-Tabs.XXX:AddSlider("SliderSpeedV", {
+Tabs.XXX:AddSlider("SpeedSlider", {
     Title = "Speed +/-",
     Default = 1,
     Min = 0.1,
-    Max = 3.5,
-    Rounding = 1.1,
-    Callback = function(Value)
-        Speed = Value
-    end,
-})
-StatusParagraph = Tabs.XXX:AddParagraph({
-    Title = "OFF",
-    Content = ""
-})
-local coreGui = game:GetService("CoreGui")
-game:GetService("RunService").Heartbeat:Connect(function()
-    if not coreGui:FindFirstChild("ScreenGui") then
-        pcall(function()
-            if stepConnection then stepConnection:Disconnect() end
-            if StatusParagraph then StatusParagraph:Destroy() end
-        end)
+    Max = 5,
+    Rounding = 0.1,
+    Callback = function(val)
+        state.speed = val
     end
-end)
-User.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    if input.KeyCode == Enum.KeyCode.W then holdingWKey = true
-    elseif input.KeyCode == Enum.KeyCode.S then holdingSKey = true
-    elseif input.KeyCode == Enum.KeyCode.A then holdingAKey = true
-    elseif input.KeyCode == Enum.KeyCode.D then holdingDKey = true end
-end)
-User.InputEnded:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.W then holdingWKey = false
-    elseif input.KeyCode == Enum.KeyCode.S then holdingSKey = false
-    elseif input.KeyCode == Enum.KeyCode.A then holdingAKey = false
-    elseif input.KeyCode == Enum.KeyCode.D then holdingDKey = false end
+})
+RunService.Heartbeat:Connect(function()
+    if not CoreGui:FindFirstChild("ScreenGui") then
+        state.cleanup()
+    end
 end)
 Tabs.all:AddSection("Jump")
 local coreGui = game:GetService("CoreGui")
