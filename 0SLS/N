@@ -86,42 +86,59 @@ local vim = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game.Workspace
+
 local isRunning = false
+local threads = {}
+
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Auto gol",
     Mode = "Toggle",
     Default = "F1",
     Callback = function(state)
         isRunning = state
-        if state then
-            spawn(function()
+
+        if not state then
+            -- Stop all threads
+            for _, conn in ipairs(threads) do
+                if typeof(conn) == "thread" and coroutine.status(conn) == "suspended" then
+                    coroutine.resume(conn)
+                end
+            end
+            threads = {}
+            return
+        end
+
+        for i = 1, 45 do
+            local thread = coroutine.create(function()
                 while isRunning do
                     local football = workspace.Misc:FindFirstChild("Football")
                     while not football and isRunning do
                         football = workspace.Misc:FindFirstChild("Football")
-                        task.wait(0.1)
+                        task.wait()
                     end
                     if not isRunning then break end
+
                     local character = LocalPlayer.Character
                     if football and character and character:FindFirstChild("HumanoidRootPart") then
                         football.Position = character.HumanoidRootPart.Position
                         football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+
                         local teamName
                         repeat
                             teamName = LocalPlayer.Team and LocalPlayer.Team.Name
                             task.wait()
                         until teamName == "Home" or teamName == "Away"
-                        local goalPos
-                        if teamName == "Home" then
-                            goalPos = Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
-                        else 
-                            goalPos = Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
-                        end
+
+                        local goalPos = teamName == "Home" 
+                            and Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
+                            or  Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
+
                         football.Position = goalPos
                         football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
                         football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                     end
+
                     local networkOwner = football and football:GetAttribute("NetworkOwner")
                     if networkOwner and typeof(networkOwner) == "string" then
                         local localPlayerTeamPosition = LocalPlayer:GetAttribute("TeamPosition")
@@ -137,18 +154,23 @@ Tabs.keybinds:AddKeybind("Keybind", {
                             end
                         end
                     end
+
                     if networkOwner ~= LocalPlayer.Name then
                         vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
                         vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                     end
+
                     vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                     vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                     task.wait()
                 end
             end)
+            coroutine.resume(thread)
+            table.insert(threads, thread)
         end
     end
 })
+
 local uis = game:GetService("UserInputService")
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
