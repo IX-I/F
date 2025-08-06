@@ -43,7 +43,6 @@ end)
 repeat task.wait() until shared._DLoaded
 local P, S, U, R, W = game:GetService("Players"), game:GetService("StarterGui"), game:GetService("UserInputService"), game:GetService("RunService"), game:GetService("Workspace")
 local p = P.LocalPlayer
-local g = p:WaitForChild("PlayerGui")
 local m = false
 local z = Vector3.new(6, 6, 8)
 local t = 1
@@ -73,13 +72,34 @@ local function startTackledLoop()
         end
     end)
 end
+p.CharacterAdded:Connect(function(char)
+    task.defer(function()
+        local hb = nil
+        repeat
+            hb = char:FindFirstChild("Hitbox")
+            task.wait(0.1)
+        until hb
+        if m then
+            hb.Size = z
+            hb.Transparency = t
+        else
+            hb.Size = Vector3.new(4.521276473999023, 5.7297587394714355, 2.397878408432007)
+            hb.Transparency = 1
+        end
+    end)
+end)
 startTackledLoop()
 table.insert(c, U.InputBegan:Connect(function(i, e)
     if e then return end
     if i.KeyCode == Enum.KeyCode.One then
         m = not m
         pcall(function()
-            S:SetCore("SendNotification", {Title = "Safe Mode", Text = m and "ON" or "OFF", Duration = 0.5, Icon = "rbxassetid://140690318962088"})
+            S:SetCore("SendNotification", {
+                Title = "Safe Mode",
+                Text = m and "ON" or "OFF",
+                Duration = 0.5,
+                Icon = "rbxassetid://140690318962088"
+            })
         end)
         local h = p.Character
         local x = h and h:FindFirstChild("Hitbox")
@@ -90,7 +110,12 @@ table.insert(c, U.InputBegan:Connect(function(i, e)
     elseif i.KeyCode == Enum.KeyCode.L then
         m = false
         pcall(function()
-            S:SetCore("SendNotification", {Title = "Safe Mode", Text = "Destroyed Fully", Duration = 0.5, Icon = "rbxassetid://140690318962088"})
+            S:SetCore("SendNotification", {
+                Title = "Safe Mode",
+                Text = "Destroyed Fully",
+                Duration = 0.5,
+                Icon = "rbxassetid://140690318962088"
+            })
         end)
         local h = p.Character
         local x = h and h:FindFirstChild("Hitbox")
@@ -101,13 +126,13 @@ table.insert(c, U.InputBegan:Connect(function(i, e)
         tackledLoopRunning = false
         q()
         script:Destroy()
-elseif i.KeyCode == Enum.KeyCode.LeftControl and m and (p.Team == game.Teams.Home or p.Team == game.Teams.Away) then
-    local f = W:WaitForChild("Misc"):WaitForChild("Football")
-    local h = p.Character
-    local r = h and h:FindFirstChild("HumanoidRootPart")
-    if f and r then
-        f.Position = r.Position
-    end
+    elseif i.KeyCode == Enum.KeyCode.LeftControl and m and (p.Team == game.Teams.Home or p.Team == game.Teams.Away) then
+        local f = W:WaitForChild("Misc"):WaitForChild("Football")
+        local h = p.Character
+        local r = h and h:FindFirstChild("HumanoidRootPart")
+        if f and r then
+            f.Position = r.Position
+        end
     elseif i.KeyCode == Enum.KeyCode.P then
         game:GetService("TeleportService"):Teleport(126195208568849, p)
     end
@@ -135,4 +160,9 @@ table.insert(c, U.InputEnded:Connect(function(i)
     elseif i.KeyCode == Enum.KeyCode.A then a = false
     elseif i.KeyCode == Enum.KeyCode.D then d = false end
 end))
-S:SetCore("SendNotification", {Title = "LOAD Safe Mode", Text = "", Duration = 0.5, Icon = "rbxassetid://140690318962088"})
+S:SetCore("SendNotification", {
+    Title = "LOAD Safe Mode",
+    Text = "",
+    Duration = 0.5,
+    Icon = "rbxassetid://140690318962088"
+})
