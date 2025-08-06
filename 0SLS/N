@@ -103,7 +103,22 @@ Tabs.keybinds:AddKeybind("Keybind", {
             threads = {}
             return
         end
-        for i = 1, 45 do
+task.spawn(function()
+    while isRunning do
+        local playerTeam = game.Players.LocalPlayer.Team 
+        local hasTeam = teamService:FindFirstChild("Home") or teamService:FindFirstChild("Away")
+        local isInValidTeam = playerTeam and (playerTeam == teamService:FindFirstChild("Home") or playerTeam == teamService:FindFirstChild("Away"))
+
+        if hasTeam and isInValidTeam then
+            break
+        end
+
+
+
+        task.wait(0.5)
+    end
+end)
+        for i = 1, 400 do
             local thread = coroutine.create(function()
                 while isRunning do
                     local football = workspace.Misc:FindFirstChild("Football")
@@ -114,42 +129,53 @@ Tabs.keybinds:AddKeybind("Keybind", {
                     if not isRunning then break end
                     local character = LocalPlayer.Character
                     if football and character and character:FindFirstChild("HumanoidRootPart") then
-                        football.Position = character.HumanoidRootPart.Position
-                        football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                         local teamName
                         repeat
                             teamName = LocalPlayer.Team and LocalPlayer.Team.Name
                             task.wait()
                         until teamName == "Home" or teamName == "Away"
-                        local goalPos = teamName == "Home" 
+                        local goalPos = teamName == "Home"
                             and Vector3.new(7.110024452209473, -175.68922424316406, 519.5316772460938)
                             or  Vector3.new(35.03493118286133, -175.689208984375, 149.86668395996094)
-                        football.Position = goalPos
-                        football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                        football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                    end
-                    local networkOwner = football and football:GetAttribute("NetworkOwner")
-                    if networkOwner and typeof(networkOwner) == "string" then
-                        local localPlayerTeamPosition = LocalPlayer:GetAttribute("TeamPosition")
-                        local targetPlayer = Players:FindFirstChild(networkOwner)
-                        if localPlayerTeamPosition ~= "GK" and targetPlayer and targetPlayer.Character and targetPlayer ~= LocalPlayer then
-                            local targetTeam = targetPlayer.Team
-                            local localTeam = LocalPlayer.Team
-                            if targetTeam ~= localTeam then
-                                local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                                if targetHRP then
-                                    LocalPlayer.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
+                        local networkOwner = football:GetAttribute("NetworkOwner")
+                        local teamPos = LocalPlayer:GetAttribute("TeamPosition")
+                        if networkOwner ~= LocalPlayer.Name then
+                            if teamPos ~= "GK" then
+                        loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/0SLS/TP_AUTO_GXOL"))()
+                        end
+                            football.Position = character.HumanoidRootPart.Position
+                            football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        end
+                        if networkOwner == LocalPlayer.Name then
+                             vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            football.Position = goalPos
+                            football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        end
+                        if networkOwner and typeof(networkOwner) == "string" then
+                            local localPlayerTeamPosition = LocalPlayer:GetAttribute("TeamPosition")
+                            local targetPlayer = Players:FindFirstChild(networkOwner)
+                            if localPlayerTeamPosition ~= "GK" and targetPlayer and targetPlayer.Character and targetPlayer ~= LocalPlayer then
+                                local targetTeam = targetPlayer.Team
+                                local localTeam = LocalPlayer.Team
+                                if targetTeam ~= localTeam then
+                                    local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                                    if targetHRP then
+                                        LocalPlayer.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
+                                    end
+                                end
+                            end
+                            if networkOwner ~= LocalPlayer.Name then
+                                local target = Players:FindFirstChild(networkOwner)
+                                if target and target.Team ~= LocalPlayer.Team then
+                                    vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                                    vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                                 end
                             end
                         end
                     end
-                    if networkOwner ~= LocalPlayer.Name then
-                        vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                        vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                    end
-                    vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                    vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                     task.wait()
                 end
             end)
@@ -616,9 +642,16 @@ local player = game.Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 local User = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
-local holdingWKey, holdingSKey, holdingAKey, holdingDKey = false, false, false, false
-local Speed = 1.0
-local startup = false
+pcall(function() if stepConnection then stepConnection:Disconnect() end end)
+holdingWKey, holdingSKey, holdingAKey, holdingDKey = false, false, false, false
+Speed = 1.0
+startup = false
+pcall(function()
+    if StatusParagraph then
+        StatusParagraph:SetTitle("OFF")
+        StatusParagraph = nil
+    end
+end)
 local StatusParagraph
 local stepConnection
 local function disconnectOldConnection()
@@ -643,7 +676,7 @@ end
 Tabs.XXX:AddKeybind("Keybind", {
     Title = "Speed",
     Mode = "Toggle",
-    Default = "One",
+    Default = "F",
     Callback = function()
         startup = not startup
         if StatusParagraph then
@@ -651,6 +684,8 @@ Tabs.XXX:AddKeybind("Keybind", {
         end
         if startup then
             startStepping()
+        else
+            disconnectOldConnection()
         end
     end,
 })
@@ -1227,7 +1262,7 @@ if Tabs and Tabs.keybinds then
     Tabs.keybinds:AddKeybind("TeleportFootball", {
         Title = "Tp ball close Teammate",
         Mode = "Toggle",
-        Default = "F",
+        Default = "One",
         Callback = tpFootballToNearestPlayer
     })
 end
