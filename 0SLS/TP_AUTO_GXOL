@@ -1,0 +1,4 @@
+local player = game.Players.LocalPlayer
+local workspace = game.Workspace
+local fieldLines = workspace.Stadium.Field.FieldLines.Lines
+		player.Character.HumanoidRootPart.CFrame = fieldLines.CFrame + Vector3.new(0, 3, 0)
