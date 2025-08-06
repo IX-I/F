@@ -1,4 +1,1 @@
-local player = game.Players.LocalPlayer
-local workspace = game.Workspace
-local fieldLines = workspace.Stadium.Field.FieldLines.Lines
-		player.Character.HumanoidRootPart.CFrame = fieldLines.CFrame + Vector3.new(0, 3, 0)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=game.Players.LocalPlayer.Team.Name=="Home"and CFrame.new(21.269224166870117,-175.68923950195312,354.16998291015625)or CFrame.new(20.88295555114746,-175.689208984375,313.1452941894531)
