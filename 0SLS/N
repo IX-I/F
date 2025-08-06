@@ -703,6 +703,15 @@ StatusParagraph = Tabs.XXX:AddParagraph({
     Title = "OFF",
     Content = ""
 })
+local coreGui = game:GetService("CoreGui")
+game:GetService("RunService").Heartbeat:Connect(function()
+    if not coreGui:FindFirstChild("ScreenGui") then
+        pcall(function()
+            if stepConnection then stepConnection:Disconnect() end
+            if StatusParagraph then StatusParagraph:Destroy() end
+        end)
+    end
+end)
 User.InputBegan:Connect(function(input, processed)
     if processed then return end
     if input.KeyCode == Enum.KeyCode.W then holdingWKey = true
