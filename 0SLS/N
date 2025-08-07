@@ -736,6 +736,90 @@ UserInputService.InputEnded:Connect(function(input)
     elseif key == Enum.KeyCode.D then holdingDKey = false
     end
 end)
+Tabs.all:AddSection("Spam give any player")
+local pls = game:GetService("Players")
+local lp = pls.LocalPlayer
+local sp = nil
+local pd = nil
+local vim = game:GetService("VirtualInputManager")
+local ac, tp = false, false
+local ci = 0
+local ts = true
+local function updPlayerList()
+    local pl = {}
+    for _, p in ipairs(pls:GetPlayers()) do
+        if p ~= lp then
+            table.insert(pl, p.Name)
+        end
+    end
+    table.insert(pl, "none")
+    if pd then
+        pd:SetValues(pl)
+    end
+    if sp and not pls:FindFirstChild(sp.Name) then
+        sp = nil
+        pd:SetValue("none")
+    end
+    return pl
+end
+pd = Tabs.all:AddDropdown("Dropdown", {
+    Title = "Select Player",
+    Values = updPlayerList(),
+    Multi = false,
+    Default = "none",
+    Callback = function(v)
+        if v and v ~= "none" then
+            sp = pls:FindFirstChild(v)
+        else
+            sp = nil
+        end
+    end
+})
+local function tpFbToPlayers()
+    while tp do
+        local fb = workspace:FindFirstChild("Junk") and workspace.Junk:FindFirstChild("Football")
+        if fb and lp and lp.Character and ts then
+            local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                fb.CFrame = hrp.CFrame
+            end
+        end
+        if fb and sp and sp.Character and not ts then
+            local hrp = sp.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                fb.CFrame = hrp.CFrame
+            end
+        end
+        ts = not ts
+        task.wait()
+    end
+end
+local function autoClicker()
+    while ac do
+        task.wait(ci)
+        if lp then
+            vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+        end
+    end
+end
+Tabs.all:AddKeybind("Keybind", {
+    Title = "spam ball",
+    Mode = "Toggle",
+    Default = "B",
+    Callback = function()
+        ac = not ac
+        tp = not tp
+        if ac then
+            task.spawn(autoClicker)
+        end
+        if tp then
+            task.spawn(tpFbToPlayers)
+        end
+    end
+})
+pls.PlayerAdded:Connect(updPlayerList)
+pls.PlayerRemoving:Connect(updPlayerList)
 Tabs.all:AddSection("Pass")
 local coreGui = game:GetService("CoreGui")
 local pls = game:GetService("Players") 
