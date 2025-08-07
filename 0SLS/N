@@ -726,7 +726,8 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 Tabs.all:AddSection("Pass")
-local pls = game:GetService("Players")
+local coreGui = game:GetService("CoreGui")
+local pls = game:GetService("Players") 
 local lp = pls.LocalPlayer
 local sp = nil
 local pd = nil
@@ -755,44 +756,53 @@ pd = Tabs.all:AddDropdown("Dropdown", {
     Multi = false,
     Default = "none",
     Callback = function(v)
-        if v and v ~= "none" then
-            sp = pls:FindFirstChild(v)
+        if v == nil or v == "none" then
+            sp = nil
+            return
+        end
+        local playerFound = pls:FindFirstChild(v)
+        if playerFound then
+            sp = playerFound
         else
             sp = nil
         end
     end
 })
+
 local function tpFbToPlayers()
     while tp do
         local fb = workspace.Misc:FindFirstChild("Football")
         if fb and lp and lp.Character then
             local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
             local networkOwner = fb:GetAttribute("NetworkOwner")
-if networkOwner and typeof(networkOwner) == "string" then
-    local localPlayerTeamPosition = lp:GetAttribute("TeamPosition")
-    local targetPlayer = pls:FindFirstChild(networkOwner)
-    if targetPlayer and targetPlayer.Character and targetPlayer ~= lp then
-        local targetTeamPosition = targetPlayer:GetAttribute("TeamPosition")
-        local targetTeam = targetPlayer.Team
-        local localTeam = lp.Team
-        if targetTeamPosition ~= "GK" and targetTeam ~= localTeam and (not sp or networkOwner ~= sp.Name) then
-            local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if targetHRP then
-                lp.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
+            if networkOwner and typeof(networkOwner) == "string" then
+                local localPlayerTeamPosition = lp:GetAttribute("TeamPosition")
+                local targetPlayer = pls:FindFirstChild(networkOwner)
+                if targetPlayer and targetPlayer.Character and targetPlayer ~= lp then
+                    local targetTeamPosition = targetPlayer:GetAttribute("TeamPosition")
+                    local targetTeam = targetPlayer.Team
+                    local localTeam = lp.Team
+                    if targetTeamPosition ~= "GK" and targetTeam ~= localTeam and (not sp or networkOwner ~= sp.Name) then
+                        local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if targetHRP then
+                            lp.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
+                        end
+                    end
+                    if networkOwner ~= lp.Name 
+                       and targetTeamPosition ~= "GK" 
+                       and (not sp or networkOwner ~= sp.Name) 
+                       and targetTeam ~= localTeam then
+                        vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                        vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                    end
+                end
             end
-        end
-        if networkOwner ~= lp.Name and targetTeamPosition ~= "GK" and (not sp or networkOwner ~= sp.Name) then
-            vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-            vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-        end
-    end
-end
             if hrp then
                 if sp and sp.Character then
                     local spHrp = sp.Character:FindFirstChild("HumanoidRootPart")
                     if spHrp then
                         if networkOwner == lp.Name then
-                             vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
                             vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             fb.Position = spHrp.Position
                             fb.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -812,7 +822,7 @@ end
                 end
             end
         end
-        task.wait(0.15) 
+        task.wait(0.05) 
     end
 end
 Tabs.all:AddKeybind("Keybind", {
@@ -828,6 +838,19 @@ Tabs.all:AddKeybind("Keybind", {
 })
 pls.PlayerAdded:Connect(updPlayerList)
 pls.PlayerRemoving:Connect(updPlayerList)
+task.spawn(function()
+    while true do
+        task.wait(1)  
+        local screenGui = coreGui:FindFirstChild("ScreenGui")
+        if not screenGui then
+            tp = false
+            sp = nil
+            if pd then
+                pd:SetValue("none")
+            end
+        end
+    end
+end)
 Tabs.all:AddSection("Emote")
 
 local HttpService = game:GetService("HttpService")
