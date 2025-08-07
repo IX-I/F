@@ -725,6 +725,111 @@ RunService.Heartbeat:Connect(function()
         state.cleanup()
     end
 end)
+Tabs.all:AddSection("Pass")
+local pls = game:GetService("Players")
+local lp = pls.LocalPlayer
+local sp = nil
+local pd = nil
+local vim = game:GetService("VirtualInputManager")
+local tp = false
+local function updPlayerList()
+    local pl = {}
+    for _, p in ipairs(pls:GetPlayers()) do
+        if p ~= lp then
+            table.insert(pl, p.Name)
+        end
+    end
+    table.insert(pl, "none")
+    if pd then
+        pd:SetValues(pl)
+    end
+    if sp and not pls:FindFirstChild(sp.Name) then
+        sp = nil
+        pd:SetValue("none")
+    end
+    return pl
+end
+pd = Tabs.all:AddDropdown("Dropdown", {
+    Title = "Select Player",
+    Values = updPlayerList(),
+    Multi = false,
+    Default = "none",
+    Callback = function(v)
+        if v and v ~= "none" then
+            sp = pls:FindFirstChild(v)
+        else
+            sp = nil
+        end
+    end
+})
+local function tpFbToPlayers()
+    while tp do
+        local fb = workspace.Misc:FindFirstChild("Football")
+        if fb and lp and lp.Character then
+            local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
+            local networkOwner = fb:GetAttribute("NetworkOwner")
+if networkOwner and typeof(networkOwner) == "string" then
+    local localPlayerTeamPosition = lp:GetAttribute("TeamPosition")
+    local targetPlayer = pls:FindFirstChild(networkOwner)
+    if targetPlayer and targetPlayer.Character and targetPlayer ~= lp then
+        local targetTeamPosition = targetPlayer:GetAttribute("TeamPosition")
+        local targetTeam = targetPlayer.Team
+        local localTeam = lp.Team
+        if targetTeamPosition ~= "GK" and targetTeam ~= localTeam and (not sp or networkOwner ~= sp.Name) then
+            local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if targetHRP then
+                lp.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
+            end
+        end
+        if networkOwner ~= lp.Name and targetTeamPosition ~= "GK" and (not sp or networkOwner ~= sp.Name) then
+            vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        end
+    end
+end
+            if hrp then
+                if sp and sp.Character then
+                    local spHrp = sp.Character:FindFirstChild("HumanoidRootPart")
+                    if spHrp then
+                        if networkOwner == lp.Name then
+                             vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                            fb.Position = spHrp.Position
+                            fb.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            fb.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        elseif networkOwner ~= sp.Name then
+                            fb.Position = hrp.Position
+                            fb.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                            fb.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                        end
+                    end
+                elseif networkOwner ~= lp.Name then
+                    vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                    vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+                    fb.Position = hrp.Position
+                    fb.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                    fb.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                end
+            end
+        end
+        task.wait(0.15) 
+    end
+end
+Tabs.all:AddKeybind("Keybind", {
+    Title = "Auto Pass Ball",
+    Mode = "Toggle",
+    Default = "V", 
+    Callback = function()
+        tp = not tp
+        if tp then
+            task.spawn(tpFbToPlayers)
+        end
+    end
+})
+pls.PlayerAdded:Connect(updPlayerList)
+pls.PlayerRemoving:Connect(updPlayerList)
+Tabs.all:AddSection("Emote")
+
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
