@@ -777,7 +777,7 @@ pd = Tabs.all:AddDropdown("Dropdown", {
 })
 local function tpFbToPlayers()
     while tp do
-        local fb = workspace:FindFirstChild("Junk") and workspace.Junk:FindFirstChild("Football")
+        local fb = workspace:FindFirstChild("Misc") and workspace.Misc:FindFirstChild("Football")
         if fb and lp and lp.Character and ts then
             local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
             if hrp then
@@ -791,7 +791,7 @@ local function tpFbToPlayers()
             end
         end
         ts = not ts
-        task.wait()
+        task.wait(0.05)
     end
 end
 local function autoClicker()
