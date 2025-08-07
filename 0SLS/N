@@ -18,7 +18,6 @@ local function destroyGUI()
 	local guiNames = {
 		"LoadingScreen",
 		"DailyRewards",
-		"EmoteWheel",
 		"Transition",
 		"KeyHints"
 	}
@@ -57,7 +56,7 @@ local Window = Fluent:CreateWindow({
     Title = "NOTHING X HUB",
     SubTitle = " Super League Soccer V2.1",
     TabWidth = 30,
-    Size = UDim2.fromOffset(455, 375),
+    Size = UDim2.fromOffset(455, 328),
     Acrylic = false,
     Theme = "Aqua",
     MinimizeKey = Enum.KeyCode.LeftAlt
@@ -66,7 +65,6 @@ local Tabs = {
     all = Window:AddTab({Title = "", Icon = "list"}),
         hitbox = Window:AddTab({Title = "", Icon = "box"}),
                 XXX = Window:AddTab({Title = "", Icon = "code"}),
-                FUN = Window:AddTab({Title = "", Icon = "laugh"}),
         XXXV = Window:AddTab({Title = "", Icon = "flag"}),
     keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
     save = Window:AddTab({Title = "", Icon = "save"}),
@@ -415,7 +413,7 @@ end
 Tabs.XXX:AddKeybind("Keybind", {
     Title = "control",
     Mode = "Toggle",
-    Default = "Two",
+    Default = "One",
     Callback = function()
         togControls()
     end
@@ -630,7 +628,7 @@ UserInputService.InputEnded:Connect(updateMovement)
 Tabs.XXX:AddKeybind("Keybind", {
     Title = "Fly",
     Mode = "Toggle",
-    Default = "Three",
+    Default = "Two",
     Callback = function()
         toggleFlight()
     end
@@ -725,6 +723,80 @@ Tabs.XXX:AddSlider("SpeedSlider", {
 RunService.Heartbeat:Connect(function()
     if not CoreGui:FindFirstChild("ScreenGui") then
         state.cleanup()
+    end
+end)
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
+local AllTauntNames = {}
+for _, taunt in pairs(TauntsFolder:GetChildren()) do
+    table.insert(AllTauntNames, taunt.Name)
+end
+local SelectedTaunts = {}
+local Active = false
+local SavedBeforeToggle = {}
+local function GetCurrentEquipped()
+    local equippedRaw = LocalPlayer:GetAttribute("EquippedTaunts")
+    if equippedRaw and equippedRaw ~= "" then
+        local success, result = pcall(function()
+            return HttpService:JSONDecode(equippedRaw)
+        end)
+        if success and typeof(result) == "table" then
+            return result
+        end
+    end
+    return {} 
+end
+local function ConvertSelection(input)
+    local result = {}
+    for k, v in pairs(input) do
+        if typeof(k) == "string" and v == true then
+            table.insert(result, k)
+        elseif typeof(k) == "number" and typeof(v) == "string" then
+            table.insert(result, v)
+        end
+    end
+    return result
+end
+Tabs.all:AddToggle("EnableTauntEquip", {
+    Title = "Enable Emote",
+    Description = "",
+    Default = false,
+    Callback = function(state)
+        Active = state
+        if state then
+            SavedBeforeToggle = GetCurrentEquipped()
+            SelectedTaunts = {}
+            LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode({}))
+        else
+            local toRestore = SavedBeforeToggle or {}
+            LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(toRestore))
+        end
+    end
+})
+local DropdownRef = Tabs.all:AddDropdown("MultiDropdown", {
+    Title = "Emote - (Max 4)",
+    Description = "",
+    Values = AllTauntNames,
+    Multi = true,
+    Default = GetCurrentEquipped(),
+    Callback = function() end 
+})
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if Active and DropdownRef and DropdownRef.Value then
+            local selectedList = ConvertSelection(DropdownRef.Value)
+            if #selectedList <= 4 then
+                local encoded = HttpService:JSONEncode(selectedList)
+                if HttpService:JSONEncode(SelectedTaunts) ~= encoded then
+                    SelectedTaunts = selectedList
+                    LocalPlayer:SetAttribute("EquippedTaunts", encoded)
+                end
+            end
+        end
     end
 end)
 Tabs.all:AddSection("Jump")
@@ -953,98 +1025,8 @@ if screenGui then
         end
     end)
 end
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
-local EmoteIds = {}
-for _, animation in pairs(TauntsFolder:GetChildren()) do
-    if animation:IsA("Animation") then
-        if not string.find(animation.Name:lower(), "universal") then
-            local animationId = animation.AnimationId
-            if animationId:match("rbxassetid://(%d+)") then
-                animationId = animationId:match("rbxassetid://(%d+)")
-            end
-            EmoteIds[animation.Name] = animationId
-        end
-    end
-end
-local Emotes = {}
-for name, _ in pairs(EmoteIds) do
-    table.insert(Emotes, name)
-end
-table.sort(Emotes)
-local cat, iep = nil, false
-local function togEmote(eid)
-    local p = game.Players.LocalPlayer
-    if p and p.Character then
-        local h = p.Character:FindFirstChildOfClass("Humanoid")
-        if h then
-            if iep and cat then
-                cat:Stop()
-                cat = nil
-                iep = false
-            else
-                local a = Instance.new("Animation")
-                a.AnimationId = "rbxassetid://" .. eid
-                cat = h:LoadAnimation(a)
-                cat:Play()
-                iep = true
-                cat.Stopped:Connect(function()
-                    iep = false
-                    cat = nil
-                end)
-            end
-        end
-    end
-end
-local EmoteDropdown1 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv1", {
-    Title = "Emote v1",
-    Values = Emotes,
-    Multi = false,
-    Default = "Backflip",
-})
-local EmoteDropdown2 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv2", {
-    Title = "Emote v2",
-    Values = Emotes,
-    Multi = false,
-    Default = "Backflip",
-})
-local EmoteDropdown3 = Tabs.FUN:AddDropdown("EquippedEmoteDropdownv3", {
-    Title = "Emote v3",
-    Values = Emotes,
-    Multi = false,
-    Default = "Backflip",
-})
-local function playFromDropdown(dropdown)
-    local selected = dropdown.Value or "Backflip"
-    local eid = EmoteIds[selected]
-    if eid then
-        togEmote(eid)
-    end
-end
-Tabs.FUN:AddKeybind("Keybind1", {
-    Title = "Play Emote v1",
-    Mode = "Toggle",
-    Default = "Four",
-    Callback = function()
-        playFromDropdown(EmoteDropdown1)
-    end
-})
-Tabs.FUN:AddKeybind("Keybind2", {
-    Title = "Play Emote v2",
-    Mode = "Toggle",
-    Default = "Five",
-    Callback = function()
-        playFromDropdown(EmoteDropdown2)
-    end
-})
-Tabs.FUN:AddKeybind("Keybind3", {
-    Title = "Play Emote v3",
-    Mode = "Toggle",
-    Default = "Six",
-    Callback = function()
-        playFromDropdown(EmoteDropdown3)
-    end
-})
+
+
 local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
 local dt, dc = 1, Color3.fromRGB(255, 255, 255)
 local hsx, hsy, hsz = dsx, dsy, dsz
@@ -1191,7 +1173,7 @@ local isRunning = false
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Stel Ball",
     Mode = "Toggle",
-    Default = "T",
+    Default = "Three",
     Callback = function()
         isRunning = not isRunning 
         if isRunning then
@@ -1273,7 +1255,7 @@ if Tabs and Tabs.keybinds then
     Tabs.keybinds:AddKeybind("TeleportFootball", {
         Title = "Tp ball close Teammate",
         Mode = "Toggle",
-        Default = "One",
+        Default = "Four",
         Callback = tpFootballToNearestPlayer
     })
 end
