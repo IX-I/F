@@ -707,12 +707,8 @@ state.cleanup = function()
     end
     state.active = false
 end
-if not state.statusParagraph then
-    state.statusParagraph = Tabs.XXX:AddParagraph({
-        Title = "OFF",
-        Content = ""
-    })
-end
+
+
 Tabs.XXX:AddKeybind("SpeedToggle", {
     Title = "Speed",
     Mode = "Toggle",
@@ -724,13 +720,19 @@ Tabs.XXX:AddKeybind("SpeedToggle", {
 Tabs.XXX:AddSlider("SpeedSlider", {
     Title = "Speed +/-",
     Default = Speed,
-    Min = 0.1,
+    Min = 0.065,
     Max = 3,
     Rounding = 1.1,
     Callback = function(value)
         Speed = value
     end
 })
+if not state.statusParagraph then
+    state.statusParagraph = Tabs.XXX:AddParagraph({
+        Title = "OFF",
+        Content = ""
+    })
+end
 state.inputBeganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     local key = input.KeyCode
