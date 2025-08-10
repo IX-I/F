@@ -925,17 +925,19 @@ Tabs.all:AddKeybind("KeybindPass", {
         if tp_pass then task.spawn(tpFbToPlayersPass) end
     end
 })
-task.spawn(function()
-    while true do
-        task.wait()
-        if not coreGui:FindFirstChild("ScreenGui") then
-            tp_spam = false
-            tp_pass = false
-            sp = nil
-            if pd then pd:SetValue("none") end
-        end
+coreGui.ChildRemoved:Connect(function(child)
+    if child.Name == "ScreenGui" then
+        tp_spam = false
+        tp_pass = false
+        sp = nil
+        if pd then pd:SetValue("none") end
+
+        local screenGui = Instance.new("ScreenGui")
+        screenGui.Name = "ScreenGui"
+        screenGui.Parent = coreGui
     end
 end)
+
 Tabs.all:AddSection("Emote")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
