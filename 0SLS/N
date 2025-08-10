@@ -638,7 +638,6 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-
 local holdingWKey = false
 local holdingSKey = false
 local holdingAKey = false
@@ -651,7 +650,6 @@ local state = {
     inputBeganConnection = nil,
     inputEndedConnection = nil
 }
-
 local function updateMovement()
     if not state.active then return end
     local moveVector = Vector3.new(0, 0, 0)
@@ -674,7 +672,6 @@ local function updateMovement()
         end
     end
 end
-
 state.toggle = function()
     state.active = not state.active
     if state.statusParagraph then
@@ -691,7 +688,6 @@ state.toggle = function()
         end
     end
 end
-
 state.cleanup = function()
     if state.heartbeat then
         state.heartbeat:Disconnect()
@@ -711,14 +707,12 @@ state.cleanup = function()
     end
     state.active = false
 end
-
 if not state.statusParagraph then
     state.statusParagraph = Tabs.XXX:AddParagraph({
         Title = "OFF",
         Content = ""
     })
 end
-
 Tabs.XXX:AddKeybind("SpeedToggle", {
     Title = "Speed",
     Mode = "Toggle",
@@ -727,7 +721,6 @@ Tabs.XXX:AddKeybind("SpeedToggle", {
         state.toggle()
     end
 })
-
 Tabs.XXX:AddSlider("SpeedSlider", {
     Title = "Speed +/-",
     Default = Speed,
@@ -738,7 +731,6 @@ Tabs.XXX:AddSlider("SpeedSlider", {
         Speed = value
     end
 })
-
 state.inputBeganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     local key = input.KeyCode
@@ -748,7 +740,6 @@ state.inputBeganConnection = UserInputService.InputBegan:Connect(function(input,
     elseif key == Enum.KeyCode.D then holdingDKey = true
     end
 end)
-
 state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     local key = input.KeyCode
     if key == Enum.KeyCode.W then holdingWKey = false
@@ -757,29 +748,35 @@ state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     elseif key == Enum.KeyCode.D then holdingDKey = false
     end
 end)
-Tabs.all:AddSection("Spam give any player")
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
+local vim = game:GetService("VirtualInputManager")
+local coreGui = game:GetService("CoreGui")
 local sp = nil
 local pd = nil
-local vim = game:GetService("VirtualInputManager")
-local ac, tp = false, false
-local ci = 0
+local ac, tp_spam, tp_pass = false, false, false
 local ts = true
+local ci = 0
+local hasUpdatedForTeam = false
 local function updPlayerList()
     local pl = {}
+    local validTeams = {game:GetService("Teams"):FindFirstChild("Home"), game:GetService("Teams"):FindFirstChild("Away")}
     for _, p in ipairs(pls:GetPlayers()) do
         if p ~= lp then
-            table.insert(pl, p.Name)
+            local teamIndicator = (p.Team == lp.Team and lp.Team and table.find(validTeams, lp.Team)) and " (*)" or ""
+            table.insert(pl, p.Name .. teamIndicator)
         end
     end
     table.insert(pl, "none")
     if pd then
         pd:SetValues(pl)
-    end
-    if sp and not pls:FindFirstChild(sp.Name) then
-        sp = nil
-        pd:SetValue("none")
+        if sp and pls:FindFirstChild(sp.Name) then
+            local teamIndicator = (sp.Team == lp.Team and lp.Team and table.find(validTeams, lp.Team)) and " (*)" or ""
+            pd:SetValue(sp.Name .. teamIndicator)
+        else
+            sp = nil
+            pd:SetValue("none")
+        end
     end
     return pl
 end
@@ -790,104 +787,80 @@ pd = Tabs.all:AddDropdown("Dropdown", {
     Default = "none",
     Callback = function(v)
         if v and v ~= "none" then
-            sp = pls:FindFirstChild(v)
+            local cleanName = v:gsub(" %(%*%)$", "")
+            sp = pls:FindFirstChild(cleanName) or nil
         else
             sp = nil
         end
     end
 })
+task.spawn(function()
+    local lastTeam = lp.Team
+    while true do
+        if lp.Team ~= lastTeam then
+            lastTeam = lp.Team
+            local validTeams = {game:GetService("Teams"):FindFirstChild("Home"), game:GetService("Teams"):FindFirstChild("Away")}
+            if table.find(validTeams, lp.Team) and not hasUpdatedForTeam then
+                updPlayerList()
+                hasUpdatedForTeam = true
+            elseif not table.find(validTeams, lp.Team) then
+                hasUpdatedForTeam = false
+            end
+        end
+        task.wait(1)
+    end
+end)
+pls.PlayerAdded:Connect(function(player)
+    if player ~= lp then
+        local validTeams = {game:GetService("Teams"):FindFirstChild("Home"), game:GetService("Teams"):FindFirstChild("Away")}
+        if player.Team == lp.Team and lp.Team and table.find(validTeams, lp.Team) then
+            updPlayerList()
+        end
+    end
+end)
+pls.PlayerRemoving:Connect(updPlayerList)
 local function tpFbToPlayers()
-    while tp do
+    while tp_spam do
         local fb = workspace:FindFirstChild("Misc") and workspace.Misc:FindFirstChild("Football")
-        if fb and lp and lp.Character and ts then
+        if fb and lp and lp.Character then
             local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
             if hrp then
-                fb.CFrame = hrp.CFrame
+                if ts then
+                    fb.CFrame = hrp.CFrame
+                elseif sp and sp.Character then
+                    local spHrp = sp.Character:FindFirstChild("HumanoidRootPart")
+                    if spHrp then
+                        fb.CFrame = spHrp.CFrame
+                    end
+                end
             end
+            ts = not ts
+            task.wait(0.04)
         end
-        if fb and sp and sp.Character and not ts then
-            local hrp = sp.Character:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                fb.CFrame = hrp.CFrame
-            end
-        end
-        ts = not ts
-        task.wait(0.05)
     end
 end
 local function autoClicker()
     while ac do
         task.wait(ci)
-        if lp then
-            vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-        end
+        vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+        task.wait()
+        vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
     end
 end
-Tabs.all:AddKeybind("Keybind", {
-    Title = "spam ball",
+Tabs.all:AddKeybind("KeybindSpam", {
+    Title = "Spam Ball",
     Mode = "Toggle",
     Default = "B",
     Callback = function()
         ac = not ac
-        tp = not tp
-        if ac then
-            task.spawn(autoClicker)
-        end
-        if tp then
-            task.spawn(tpFbToPlayers)
-        end
+        tp_spam = not tp_spam
+        if ac then task.spawn(autoClicker) end
+        if tp_spam then task.spawn(tpFbToPlayers) end
     end
 })
-pls.PlayerAdded:Connect(updPlayerList)
-pls.PlayerRemoving:Connect(updPlayerList)
-Tabs.all:AddSection("Pass")
-local coreGui = game:GetService("CoreGui")
-local pls = game:GetService("Players") 
-local lp = pls.LocalPlayer
-local sp = nil
-local pd = nil
-local vim = game:GetService("VirtualInputManager")
-local tp = false
-local function updPlayerList()
-    local pl = {}
-    for _, p in ipairs(pls:GetPlayers()) do
-        if p ~= lp then
-            table.insert(pl, p.Name)
-        end
-    end
-    table.insert(pl, "none")
-    if pd then
-        pd:SetValues(pl)
-    end
-    if sp and not pls:FindFirstChild(sp.Name) then
-        sp = nil
-        pd:SetValue("none")
-    end
-    return pl
-end
-pd = Tabs.all:AddDropdown("Dropdown", {
-    Title = "Select Player",
-    Values = updPlayerList(),
-    Multi = false,
-    Default = "none",
-    Callback = function(v)
-        if v == nil or v == "none" then
-            sp = nil
-            return
-        end
-        local playerFound = pls:FindFirstChild(v)
-        if playerFound then
-            sp = playerFound
-        else
-            sp = nil
-        end
-    end
-})
-
-local function tpFbToPlayers()
-    while tp do
-        local fb = workspace.Misc:FindFirstChild("Football")
+local function tpFbToPlayersPass()
+    while tp_pass do
+        local fb = workspace:FindFirstChild("Misc") and workspace.Misc:FindFirstChild("Football")
         if fb and lp and lp.Character then
             local hrp = lp.Character:FindFirstChild("HumanoidRootPart")
             local networkOwner = fb:GetAttribute("NetworkOwner")
@@ -904,11 +877,9 @@ local function tpFbToPlayers()
                             lp.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
                         end
                     end
-                    if networkOwner ~= lp.Name 
-                       and targetTeamPosition ~= "GK" 
-                       and (not sp or networkOwner ~= sp.Name) 
-                       and targetTeam ~= localTeam then
+                    if networkOwner ~= lp.Name and targetTeamPosition ~= "GK" and (not sp or networkOwner ~= sp.Name) and targetTeam ~= localTeam then
                         vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                        task.wait()
                         vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                     end
                 end
@@ -919,6 +890,7 @@ local function tpFbToPlayers()
                     if spHrp then
                         if networkOwner == lp.Name then
                             vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                            task.wait()
                             vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                             fb.Position = spHrp.Position
                             fb.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -931,6 +903,7 @@ local function tpFbToPlayers()
                     end
                 elseif networkOwner ~= lp.Name then
                     vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+                    task.wait()
                     vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
                     fb.Position = hrp.Position
                     fb.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
@@ -938,37 +911,30 @@ local function tpFbToPlayers()
                 end
             end
         end
-        task.wait(0.1) 
+        task.wait(0.04)
     end
 end
-Tabs.all:AddKeybind("Keybind", {
+Tabs.all:AddKeybind("KeybindPass", {
     Title = "Auto Pass Ball",
     Mode = "Toggle",
-    Default = "V", 
+    Default = "V",
     Callback = function()
-        tp = not tp
-        if tp then
-            task.spawn(tpFbToPlayers)
-        end
+        tp_pass = not tp_pass
+        if tp_pass then task.spawn(tpFbToPlayersPass) end
     end
 })
-pls.PlayerAdded:Connect(updPlayerList)
-pls.PlayerRemoving:Connect(updPlayerList)
 task.spawn(function()
     while true do
-        task.wait(1)  
-        local screenGui = coreGui:FindFirstChild("ScreenGui")
-        if not screenGui then
-            tp = false
+        task.wait()
+        if not coreGui:FindFirstChild("ScreenGui") then
+            tp_spam = false
+            tp_pass = false
             sp = nil
-            if pd then
-                pd:SetValue("none")
-            end
+            if pd then pd:SetValue("none") end
         end
     end
 end)
 Tabs.all:AddSection("Emote")
-
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -1269,8 +1235,6 @@ if screenGui then
         end
     end)
 end
-
-
 local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
 local dt, dc = 1, Color3.fromRGB(255, 255, 255)
 local hsx, hsy, hsz = dsx, dsy, dsz
