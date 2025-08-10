@@ -638,6 +638,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+
 local holdingWKey = false
 local holdingSKey = false
 local holdingAKey = false
@@ -646,9 +647,13 @@ local Speed = 1
 local state = {
     active = false,
     heartbeat = nil,
-    statusParagraph = nil
+    statusParagraph = nil,
+    inputBeganConnection = nil,
+    inputEndedConnection = nil
 }
+
 local function updateMovement()
+    if not state.active then return end
     local moveVector = Vector3.new(0, 0, 0)
     if holdingWKey then
         moveVector = moveVector + Vector3.new(0, 0, -Speed)
@@ -669,6 +674,7 @@ local function updateMovement()
         end
     end
 end
+
 state.toggle = function()
     state.active = not state.active
     if state.statusParagraph then
@@ -685,22 +691,34 @@ state.toggle = function()
         end
     end
 end
+
 state.cleanup = function()
     if state.heartbeat then
         state.heartbeat:Disconnect()
         state.heartbeat = nil
     end
+    if state.inputBeganConnection then
+        state.inputBeganConnection:Disconnect()
+        state.inputBeganConnection = nil
+    end
+    if state.inputEndedConnection then
+        state.inputEndedConnection:Disconnect()
+        state.inputEndedConnection = nil
+    end
     if state.statusParagraph then
         state.statusParagraph:Destroy()
         state.statusParagraph = nil
     end
+    state.active = false
 end
+
 if not state.statusParagraph then
     state.statusParagraph = Tabs.XXX:AddParagraph({
         Title = "OFF",
         Content = ""
     })
 end
+
 Tabs.XXX:AddKeybind("SpeedToggle", {
     Title = "Speed",
     Mode = "Toggle",
@@ -709,6 +727,7 @@ Tabs.XXX:AddKeybind("SpeedToggle", {
         state.toggle()
     end
 })
+
 Tabs.XXX:AddSlider("SpeedSlider", {
     Title = "Speed +/-",
     Default = Speed,
@@ -719,7 +738,8 @@ Tabs.XXX:AddSlider("SpeedSlider", {
         Speed = value
     end
 })
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
+
+state.inputBeganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     local key = input.KeyCode
     if key == Enum.KeyCode.W then holdingWKey = true
@@ -728,7 +748,8 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     elseif key == Enum.KeyCode.D then holdingDKey = true
     end
 end)
-UserInputService.InputEnded:Connect(function(input)
+
+state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     local key = input.KeyCode
     if key == Enum.KeyCode.W then holdingWKey = false
     elseif key == Enum.KeyCode.S then holdingSKey = false
@@ -1488,6 +1509,7 @@ end)
     Tabs.Y:AddButton({
     Title = "Destroy UI",
     Callback = function()
+state.cleanup()
 game:GetService("CoreGui").ScreenGui:Destroy()
     end
 })
