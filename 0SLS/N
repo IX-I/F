@@ -652,25 +652,19 @@ local state = {
 }
 local function updateMovement()
     if not state.active then return end
-    local currentSpeed = Speed
-    if currentSpeed == 0 then
-        currentSpeed = 0.66
-    end
-
     local moveVector = Vector3.new(0, 0, 0)
     if holdingWKey then
-        moveVector = moveVector + Vector3.new(0, 0, -currentSpeed)
+        moveVector = moveVector + Vector3.new(0, 0, -Speed)
     end
     if holdingSKey then
-        moveVector = moveVector + Vector3.new(0, 0, currentSpeed)
+        moveVector = moveVector + Vector3.new(0, 0, Speed)
     end
     if holdingAKey then
-        moveVector = moveVector + Vector3.new(-currentSpeed, 0, 0)
+        moveVector = moveVector + Vector3.new(-Speed, 0, 0)
     end
     if holdingDKey then
-        moveVector = moveVector + Vector3.new(currentSpeed, 0, 0)
+        moveVector = moveVector + Vector3.new(Speed, 0, 0)
     end
-
     if moveVector.Magnitude > 0 then
         local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
         if hrp then
@@ -694,6 +688,25 @@ state.toggle = function()
         end
     end
 end
+state.cleanup = function()
+    if state.heartbeat then
+        state.heartbeat:Disconnect()
+        state.heartbeat = nil
+    end
+    if state.inputBeganConnection then
+        state.inputBeganConnection:Disconnect()
+        state.inputBeganConnection = nil
+    end
+    if state.inputEndedConnection then
+        state.inputEndedConnection:Disconnect()
+        state.inputEndedConnection = nil
+    end
+    if state.statusParagraph then
+        state.statusParagraph:Destroy()
+        state.statusParagraph = nil
+    end
+    state.active = false
+end
 
 
 Tabs.XXX:AddKeybind("SpeedToggle", {
@@ -707,7 +720,7 @@ Tabs.XXX:AddKeybind("SpeedToggle", {
 Tabs.XXX:AddSlider("SpeedSlider", {
     Title = "Speed +/-",
     Default = Speed,
-    Min = 0,
+    Min = 0.1,
     Max = 3,
     Rounding = 1.1,
     Callback = function(value)
@@ -737,13 +750,6 @@ state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     elseif key == Enum.KeyCode.D then holdingDKey = false
     end
 end)
-local function setSpeed(value)
-    if value == 0 then
-        Speed = 0.66
-    else
-        Speed = value
-    end
-end
 
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
