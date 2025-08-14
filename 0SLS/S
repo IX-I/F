@@ -47,7 +47,7 @@ local m = false
 local z = Vector3.new(6, 6, 8)
 local t = 1
 local w, s, a, d = false, false, false, false
-local v = 0.065
+local v = 0.04
 local c = {}
 local tackledLoopRunning = false
 local tackledLoopThread
