@@ -18,7 +18,6 @@ spawn(function()
         local guiNames = {
             "LoadingScreen",
             "DailyRewards",
-            "EmoteWheel",
             "Transition",
             "KeyHints"
         }
@@ -47,7 +46,7 @@ local m = false
 local z = Vector3.new(6, 6, 8)
 local t = 1
 local w, s, a, d = false, false, false, false
-local v = 0.044
+local v = 0.041
 local c = {}
 local tackledLoopRunning = false
 local tackledLoopThread
