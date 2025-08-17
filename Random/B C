@@ -1,0 +1,43 @@
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local VIM = game:GetService("VirtualInputManager")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local running = false 
+local drivePos = game:GetService("Players").LocalPlayer.PlayerGui.Main.Drive.Position
+local stopPos = game:GetService("Players").LocalPlayer.PlayerGui.Main.Stop.Position
+local function hasTrueDriver()
+    local attributes = player:GetAttributes()
+    return attributes["Driving"] == true
+end
+local function clickSimulator(xScale, xOffset, yScale, yOffset)
+    local viewport = workspace.CurrentCamera.ViewportSize
+    local x = viewport.X * xScale + xOffset
+    local y = viewport.Y * yScale + yOffset
+    VIM:SendMouseButtonEvent(x, y, 0, true, game, 0)
+    VIM:SendMouseButtonEvent(x, y, 0, false, game, 0)
+end
+local function teleportToCoords()
+    if humanoidRootPart then
+        humanoidRootPart.CFrame = CFrame.new(Vector3.new(-25237479424, 88788099072, -491405672448))
+    end
+end
+local function sequence()
+    while running do
+            task.wait() 
+            clickSimulator(drivePos.X.Scale, drivePos.X.Offset, drivePos.Y.Scale, drivePos.Y.Offset)
+        if hasTrueDriver() then
+            teleportToCoords()
+            clickSimulator(stopPos.X.Scale, stopPos.X.Offset, stopPos.Y.Scale, stopPos.Y.Offset)
+        end
+    end
+end
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.V then
+        running = not running 
+        if running then
+            task.spawn(sequence) 
+        end
+    end
+end)
