@@ -33,128 +33,725 @@ local function removeBlur()
 end
 destroyGUI()
 removeBlur()
-local P, S, U, R, W = game:GetService("Players"), game:GetService("StarterGui"), game:GetService("UserInputService"), game:GetService("RunService"), game:GetService("Workspace")
-local p = P.LocalPlayer
-local m = false
-local z = Vector3.new(6, 6, 8)
-local t = 1
-local w, s, a, d = false, false, false, false
-local v = 0.04
-local c = {}
-local tackledLoopRunning = false
-local tackledLoopThread
-local function q()
-    for _, o in pairs(c) do
-        if o then o:Disconnect() end
-    end
-    c = {}
+local coreGui = game:GetService("CoreGui")
+if coreGui:FindFirstChild("ScreenGui") then
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "UI RUNING",
+        SubContent = "", 
+        Duration = 5
+    })
+    return
 end
-local function k()
-    return p:GetAttribute("DisableControls") == true
-end
-local function startTackledLoop()
-    if tackledLoopRunning then return end
-    tackledLoopRunning = true
-    tackledLoopThread = task.spawn(function()
-        while tackledLoopRunning do
-            if m and p then
-                p:SetAttribute("Tackled", false)
-            end
-            task.wait()
-        end
-    end)
-end
-p.CharacterAdded:Connect(function(char)
-    task.defer(function()
-        local hb = nil
-        repeat
-            hb = char:FindFirstChild("Hitbox")
-            task.wait(0.1)
-        until hb
-        if m then
-            hb.Size = z
-            hb.Transparency = t
-        else
-            hb.Size = Vector3.new(4.521276473999023, 5.7297587394714355, 2.397878408432007)
-            hb.Transparency = 1
-        end
-    end)
-end)
-startTackledLoop()
-table.insert(c, U.InputBegan:Connect(function(i, e)
-    if e then return end
-    if i.KeyCode == Enum.KeyCode.One then
-        m = not m
-        pcall(function()
-            S:SetCore("SendNotification", {
-                Title = "Safe Mode",
-                Text = m and "ON" or "OFF",
-                Duration = 0.5,
-                Icon = "rbxassetid://140690318962088"
-            })
-        end)
-        local h = p.Character
-        local x = h and h:FindFirstChild("Hitbox")
-        if x then
-            x.Size = m and z or Vector3.new(4.521276473999023, 5.7297587394714355, 2.397878408432007)
-            x.Transparency = m and t or 1
-        end
-    elseif i.KeyCode == Enum.KeyCode.L then
-        m = false
-        pcall(function()
-            S:SetCore("SendNotification", {
-                Title = "Safe Mode",
-                Text = "Destroyed Fully",
-                Duration = 0.5,
-                Icon = "rbxassetid://140690318962088"
-            })
-        end)
-        local h = p.Character
-        local x = h and h:FindFirstChild("Hitbox")
-        if x then
-            x.Size = Vector3.new(4.521276473999023, 5.7297587394714355, 2.397878408432007)
-            x.Transparency = 1
-        end
-        tackledLoopRunning = false
-        q()
-        script:Destroy()
-    elseif i.KeyCode == Enum.KeyCode.LeftControl and m and (p.Team == game.Teams.Home or p.Team == game.Teams.Away) then
-        local f = W:WaitForChild("Misc"):WaitForChild("Football")
-        local h = p.Character
-        local r = h and h:FindFirstChild("HumanoidRootPart")
-        if f and r then
-            f.Position = r.Position
-        end
-    elseif i.KeyCode == Enum.KeyCode.P then
-        game:GetService("TeleportService"):Teleport(126195208568849, p)
-    end
-end))
-table.insert(c, R.Stepped:Connect(function()
-    if m and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and not k() then
-        local n = Vector3.zero
-        if w then n += Vector3.new(0, 0, -v) end
-        if s then n += Vector3.new(0, 0, v) end
-        if a then n += Vector3.new(-v, 0, 0) end
-        if d then n += Vector3.new(v, 0, 0) end
-        p.Character.HumanoidRootPart.CFrame *= CFrame.new(n)
-    end
-end))
-table.insert(c, U.InputBegan:Connect(function(i, e)
-    if e then return end
-    if i.KeyCode == Enum.KeyCode.W then w = true
-    elseif i.KeyCode == Enum.KeyCode.S then s = true
-    elseif i.KeyCode == Enum.KeyCode.A then a = true
-    elseif i.KeyCode == Enum.KeyCode.D then d = true end
-end))
-table.insert(c, U.InputEnded:Connect(function(i)
-    if i.KeyCode == Enum.KeyCode.W then w = false
-    elseif i.KeyCode == Enum.KeyCode.S then s = false
-    elseif i.KeyCode == Enum.KeyCode.A then a = false
-    elseif i.KeyCode == Enum.KeyCode.D then d = false end
-end))
-S:SetCore("SendNotification", {
-    Title = "LOAD Safe Mode",
-    Text = "",
-    Duration = 0.5,
-    Icon = "rbxassetid://140690318962088"
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local Window = Fluent:CreateWindow({
+    Title = "NOTHING X HUB",
+    SubTitle = " Super League Soccer - Safe Mode",
+    TabWidth = 30,
+    Size = UDim2.fromOffset(400, 333),
+    Acrylic = false,
+    Theme = "Aqua",
+    MinimizeKey = Enum.KeyCode.LeftAlt
 })
+local Tabs = {
+    all = Window:AddTab({Title = "", Icon = "list"}),
+            hitbox = Window:AddTab({Title = "", Icon = "box"}),
+                    XXXV = Window:AddTab({Title = "", Icon = "flag"}),
+    save = Window:AddTab({Title = "", Icon = "save"}),
+        Y = Window:AddTab({Title = "", Icon = "settings"})
+}
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Frame.BackgroundTransparency = 1
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame.Background.BackgroundTransparency = 0.9
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[5]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[4]:Destroy()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[5]:GetChildren()[3]:Destroy()
+Window:SelectTab()
+Window:Minimize()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TeamsService = game:GetService("Teams")
+local CoreGui = game:GetService("CoreGui")
+local positions = {"None", "CF", "LF", "RF", "CM", "LB", "RB", "GK"}
+local teams = {"None", "Home", "Away"}
+local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
+    Title = "Team",
+    Values = teams,
+    Multi = false,
+    Default = "None"
+})
+local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
+    Title = "Position",
+    Values = positions,
+    Multi = false,
+    Default = "None"
+})
+local function hasScreenGui()
+    return CoreGui:FindFirstChild("ScreenGui") ~= nil
+end
+local function getRequestJoinEvent()
+    local gamemodeComm = ReplicatedStorage:FindFirstChild("__GamemodeComm")
+    if not gamemodeComm then return nil end
+    local reFolder = gamemodeComm:FindFirstChild("RE")
+    if not reFolder then return nil end
+    return reFolder:FindFirstChild("_RequestJoin")
+end
+local function joinTeam(teamName, position)
+    if teamName == "None" or position == "None" then return end
+    local requestJoinEvent = getRequestJoinEvent()
+    if requestJoinEvent then
+        local teamObj = TeamsService:FindFirstChild(teamName)
+        if teamObj then
+            local args = {{Team = teamObj, TeamPosition = position}}
+            pcall(function()
+                requestJoinEvent:FireServer(unpack(args))
+            end)
+        end
+    end
+end
+local JoinButton = Tabs.XXXV:AddButton({
+    Title = "Join",
+    Callback = function()
+        joinTeam(TeamDropdown.Value, PositionDropdown.Value)
+    end
+})
+local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
+    Title = "AUTO Join",
+    Default = false
+})
+task.spawn(function()
+    while true do
+        task.wait()
+        if not hasScreenGui() then
+            AutoToggle:Set(false)
+        elseif AutoToggle.Value then
+            joinTeam(TeamDropdown.Value, PositionDropdown.Value)
+        end
+    end
+end)
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local CoreGui = game:GetService("CoreGui")
+local antiTackleRunning = false
+local shouldPressQ = false
+local tk = Tabs.all:AddToggle("XXTackledToggle", {
+    Title = "Anti Tackled (Q)",
+    Default = false,
+    Callback = function(value)
+        antiTackleRunning = value
+        if value then
+            task.spawn(function()
+                while antiTackleRunning do
+                    if not CoreGui:FindFirstChild("ScreenGui") then
+                        tk:Set(false)
+                        break
+                    end
+                    if not LocalPlayer:GetAttribute("HasBall") then
+                        shouldPressQ = false
+                        task.wait()
+                        continue
+                    end
+                    local char = LocalPlayer.Character
+                    if not char or not char:FindFirstChild("HumanoidRootPart") then
+                        shouldPressQ = false
+                        task.wait()
+                        continue
+                    end
+                    local myTeam = LocalPlayer.Team
+                    local myRootPart = char.HumanoidRootPart
+                    local threatDetected = false
+                    for _, plr in ipairs(Players:GetPlayers()) do
+                        if plr == LocalPlayer or plr.Team == myTeam then
+                            continue
+                        end
+                        if plr:GetAttribute("TeamPosition") == "GK" then
+                            continue
+                        end
+                        if plr:GetAttribute("_ACTackling") then
+                            local enemyChar = plr.Character
+                            if enemyChar and enemyChar:FindFirstChild("HumanoidRootPart") then
+                                local enemyRootPart = enemyChar.HumanoidRootPart
+                                local distance = (myRootPart.Position - enemyRootPart.Position).Magnitude
+                                if distance <= 21 then
+                                    threatDetected = true
+                                    break
+                                end
+                            end
+                        end
+                    end
+                    shouldPressQ = threatDetected
+                    task.wait()
+                end
+            end)
+            task.spawn(function()
+                while antiTackleRunning do
+                    if shouldPressQ then
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Q, false, game)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Q, false, game)
+                        shouldPressQ = false 
+                    end
+                    task.wait()
+                end
+            end)
+        end
+    end
+})
+local alw = Tabs.all:AddToggle("TackledToggle", { Title = "Tackled Anti Stay", Default = false })
+local flipToggle = Tabs.all:AddToggle("FlipToggle", { Title = "Dribble - Flip", Default = false })
+local themeLoopRunning = true
+task.spawn(function()
+    while themeLoopRunning do
+        if LocalPlayer then
+            if flipToggle.Value then
+                LocalPlayer:SetAttribute("EquippedDribble", "Flip")
+            else
+                LocalPlayer:SetAttribute("EquippedDribble", "The Marseille Turn")
+            end
+        end
+        task.wait()
+    end
+end)
+local ilr = false
+local function mainLoop()
+    while ilr do
+        if alw.Value then
+            LocalPlayer:SetAttribute("Tackled", false)
+        end
+        task.wait()
+    end
+end
+local function checkLoop()
+    if alw.Value then
+        if not ilr then
+            ilr = true
+            task.spawn(mainLoop)
+        end
+    else
+        ilr = false
+    end
+end
+alw:OnChanged(checkLoop)
+if screenGui then
+    screenGui.Destroying:Connect(function()
+        alw:SetValue(false)
+        flipToggle:SetValue(false)
+        themeLoopRunning = false
+        if LocalPlayer then
+            LocalPlayer:SetAttribute("EquippedDribble", "The Marseille Turn")
+        end
+    end)
+end
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local function initializeTauntData()
+    local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
+    local AllTauntNames = {}
+    for _, taunt in pairs(TauntsFolder:GetChildren()) do
+        table.insert(AllTauntNames, taunt.Name)
+    end
+    return AllTauntNames
+end
+local function getCurrentEquipped()
+    local equippedRaw = LocalPlayer:GetAttribute("EquippedTaunts")
+    if equippedRaw and equippedRaw ~= "" then
+        local success, result = pcall(function()
+            return HttpService:JSONDecode(equippedRaw)
+        end)
+        if success and typeof(result) == "table" then
+            return result
+        end
+    end
+    return {} 
+end
+local function convertSelection(input)
+    local result = {}
+    for k, v in pairs(input) do
+        if typeof(k) == "string" and v == true then
+            table.insert(result, k)
+        elseif typeof(k) == "number" and typeof(v) == "string" then
+            table.insert(result, v)
+        end
+    end
+    return result
+end
+local function main()
+    local AllTauntNames = initializeTauntData()
+    local SelectedTaunts = {}
+    local Active = false
+    local SavedBeforeToggle = {}
+    local initialEquipped = getCurrentEquipped()
+    Active = #initialEquipped > 0
+    SavedBeforeToggle = initialEquipped
+    local initialSavedState = getCurrentEquipped()
+    local DropdownRef = Tabs.all:AddDropdown("MultiDropdown", {
+        Title = "Emote - (Max 4)",
+        Description = "",
+        Values = AllTauntNames,
+        Multi = true,
+        Default = initialEquipped,
+        Callback = function() end 
+    })
+    Tabs.all:AddToggle("EnableTauntEquip", {
+        Title = "Enable Emote",
+        Description = "",
+        Default = Active,
+        Callback = function(state)
+            Active = state
+            if state then
+                SavedBeforeToggle = getCurrentEquipped()
+                if DropdownRef and DropdownRef.Value then
+                    local selectedList = convertSelection(DropdownRef.Value)
+                    if #selectedList <= 4 then
+                        SelectedTaunts = selectedList
+                        LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(selectedList))
+                    end
+                end
+            else
+                local toRestore = initialSavedState or {}
+                LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(toRestore))
+                SelectedTaunts = {}
+                if DropdownRef then
+                    DropdownRef:SetValue(toRestore)
+                end
+            end
+        end
+    })
+    task.spawn(function()
+        while true do
+            task.wait(0.1)
+            if Active and DropdownRef and DropdownRef.Value then
+                local selectedList = convertSelection(DropdownRef.Value)
+                if #selectedList <= 4 then
+                    local encoded = HttpService:JSONEncode(selectedList)
+                    if HttpService:JSONEncode(SelectedTaunts) ~= encoded then
+                        SelectedTaunts = selectedList
+                        LocalPlayer:SetAttribute("EquippedTaunts", encoded)
+                    end
+                end
+            end
+        end
+    end)
+    local function onCharacterAdded(character)
+        task.wait(1) 
+        if Active then
+            if DropdownRef and DropdownRef.Value then
+                local selectedList = convertSelection(DropdownRef.Value)
+                if #selectedList <= 4 then
+                    LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(selectedList))
+                end
+            end
+        else
+            LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(initialSavedState))
+        end
+    end
+    LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+    if LocalPlayer.Character then
+        onCharacterAdded(LocalPlayer.Character)
+    end
+end
+main()
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local holdingWKey = false
+local holdingSKey = false
+local holdingAKey = false
+local holdingDKey = false
+local Speed = 0.1
+local state = {
+    active = false,
+    heartbeat = nil,
+    statusParagraph = nil,
+    inputBeganConnection = nil,
+    inputEndedConnection = nil
+}
+local function updateMovement()
+    if not state.active then return end
+    local moveVector = Vector3.new(0, 0, 0)
+    if holdingWKey then
+        moveVector = moveVector + Vector3.new(0, 0, -Speed)
+    end
+    if holdingSKey then
+        moveVector = moveVector + Vector3.new(0, 0, Speed)
+    end
+    if holdingAKey then
+        moveVector = moveVector + Vector3.new(-Speed, 0, 0)
+    end
+    if holdingDKey then
+        moveVector = moveVector + Vector3.new(Speed, 0, 0)
+    end
+    if moveVector.Magnitude > 0 then
+        local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            hrp.CFrame = hrp.CFrame * CFrame.new(moveVector)
+        end
+    end
+end
+state.toggle = function()
+    state.active = not state.active
+    if state.statusParagraph then
+        state.statusParagraph:SetTitle(state.active and "ON" or "OFF")
+    end
+    if state.active then
+        if not state.heartbeat then
+            state.heartbeat = RunService.Heartbeat:Connect(updateMovement)
+        end
+    else
+        if state.heartbeat then
+            state.heartbeat:Disconnect()
+            state.heartbeat = nil
+        end
+    end
+end
+state.cleanup = function()
+    if state.heartbeat then
+        state.heartbeat:Disconnect()
+        state.heartbeat = nil
+    end
+    if state.inputBeganConnection then
+        state.inputBeganConnection:Disconnect()
+        state.inputBeganConnection = nil
+    end
+    if state.inputEndedConnection then
+        state.inputEndedConnection:Disconnect()
+        state.inputEndedConnection = nil
+    end
+    if state.statusParagraph then
+        state.statusParagraph:Destroy()
+        state.statusParagraph = nil
+    end
+    state.active = false
+end
+Tabs.all:AddKeybind("SpeedToggle", {
+    Title = "Speed",
+    Mode = "Toggle",
+    Default = "F",
+    Callback = function()
+        state.toggle()
+    end
+})
+Tabs.all:AddInput("SpeedInput", {
+    Title = "Speed",
+    Default = tostring(Speed),
+    Finished = false,
+    Numeric = false,
+    Callback = function(value)
+        Speed = tonumber(value) or Speed
+    end
+})
+if not state.statusParagraph then
+    state.statusParagraph = Tabs.all:AddParagraph({
+        Title = "OFF",
+        Content = ""
+    })
+end
+state.inputBeganConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    local key = input.KeyCode
+    if key == Enum.KeyCode.W then holdingWKey = true
+    elseif key == Enum.KeyCode.S then holdingSKey = true
+    elseif key == Enum.KeyCode.A then holdingAKey = true
+    elseif key == Enum.KeyCode.D then holdingDKey = true
+    end
+end)
+state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
+    local key = input.KeyCode
+    if key == Enum.KeyCode.W then holdingWKey = false
+    elseif key == Enum.KeyCode.S then holdingSKey = false
+    elseif key == Enum.KeyCode.A then holdingAKey = false
+    elseif key == Enum.KeyCode.D then holdingDKey = false
+    end
+end)
+Tabs.all:AddKeybind("Keybind", {
+    Title = "Tp ball",
+    Mode = "Toggle",
+    Default = "LeftControl",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+local football = game.workspace.Misc.Football
+        if character and character:FindFirstChild("HumanoidRootPart") and football then
+            football.Position = character.HumanoidRootPart.Position
+            football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+        end
+    end
+})
+Tabs.all:AddButton({
+    Title = "Join  Pro Server",
+    Callback = function()
+        local id =  126195208568849
+        local p = game.Players.LocalPlayer
+        if p then
+            game:GetService("TeleportService"):Teleport(id, p)
+        end
+    end
+})
+local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
+local dt, dc = 1, Color3.fromRGB(255, 255, 255)
+local hsx, hsy, hsz = dsx, dsy, dsz
+local ht, hc = dt, dc
+local iha = false
+local p = game.Players.LocalPlayer
+local c = p.Character or p.CharacterAdded:Wait()
+local hb = c:FindFirstChild("Hitbox")
+local function updRealHb()
+    if hb then
+        hb.Size = Vector3.new(hsx, hsy, hsz)
+        hb.Transparency = ht
+        hb.Color = hc
+    end
+end
+local function resetHbToDefault()
+    if hb then
+        hb.Size = Vector3.new(dsx, dsy, dsz)
+        hb.Transparency = dt
+        hb.Color = dc
+    end
+end
+local function moveOldHbToNewHb()
+    local nhp = c:FindFirstChild("Hitbox")
+    if nhp and hb then
+        hb.CFrame = nhp.CFrame
+        if iha then
+            updRealHb()
+        else
+            resetHbToDefault()
+        end
+    end
+end
+p.CharacterAdded:Connect(function(newChar)
+    c = newChar
+    hb = c:WaitForChild("Hitbox", 10)
+end)
+local tog = Tabs.hitbox:AddToggle("MyToggle", {
+    Title = "ON Hitbox ",
+    Default = false
+})
+tog:OnChanged(function()
+    iha = tog.Value
+    if iha then
+        updRealHb() 
+    else
+        resetHbToDefault() 
+    end
+end)
+tog:SetValue(false)
+local ix = Tabs.hitbox:AddInput("InputX", {
+    Title = "Hitbox (X)",
+    Description = "1-2048",
+    Default = dsx, 
+    Numeric = true,
+    Callback = function(v)
+        hsx = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local iy = Tabs.hitbox:AddInput("InputY", {
+    Title = "Hitbox (Y)",
+    Description = "1-2048",
+    Default = dsy, 
+    Numeric = true,
+    Callback = function(v)
+        hsy = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local iz = Tabs.hitbox:AddInput("InputZ", {
+    Title = "Hitbox (Z)",
+    Description = "1-2048",
+    Default = dsz, 
+    Numeric = true,
+    Callback = function(v)
+        hsz = tonumber(v)
+        if iha then
+            updRealHb()
+        end
+    end
+})
+local ts = Tabs.hitbox:AddSlider("TransparencySlider", {
+    Title = "Transparency",
+    Description = "",
+    Default = dt, 
+    Min = 0,
+    Max = 1,
+    Rounding = 1.1,
+    Callback = function(v)
+        ht = v
+        if iha then
+            updRealHb()
+        end
+    end
+})
+ts:SetValue(dt)
+local cp = Tabs.hitbox:AddColorpicker("Colorpicker", {
+    Title = "Hitbox Color",
+    Default = dc 
+})
+cp:OnChanged(function()
+    hc = cp.Value
+    if iha then
+        updRealHb()
+    end
+end)
+game:GetService("RunService").Heartbeat:Connect(function()
+    if iha then
+        moveOldHbToNewHb()
+    end
+end)
+local coreGui = game:GetService("CoreGui")
+game:GetService("RunService").RenderStepped:Connect(function()
+    local hasGui = coreGui:FindFirstChild("ScreenGui")
+    if not hasGui and iha then
+        iha = false
+        tog:SetValue(false)
+        resetHbToDefault()
+    end
+end)
+    Tabs.Y:AddButton({
+    Title = "Destroy UI",
+    Callback = function()
+game:GetService("CoreGui").ScreenGui:Destroy()
+    end
+})
+local Dropdown = Tabs.Y:AddDropdown("ThemeDropdown", {
+    Title = "Change Theme UI",
+    Values = {"Darker", "Dark", "Light", "Aqua", "Amethyst", "Rose"},
+    Multi = false,
+    Default = "Aqua",
+})
+Dropdown:OnChanged(function(value)
+    Fluent:SetTheme(value)
+end)
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local LeaderboardFrame = Player:WaitForChild("PlayerGui"):WaitForChild("GameGui"):WaitForChild("Leaderboard"):WaitForChild("Content")
+local RunService = game:GetService("RunService")
+local foundPlayers = {}
+local notifiedPlayers = {}
+local function sendNotification(title, content, subContent)
+    Fluent:Notify({
+        Title = title or "INFO - Staff Detect",
+        Content = content or "",
+        SubContent = subContent or "",
+        Duration = 65
+    })
+end
+local function updateInServerNotification()
+    if #foundPlayers > 0 then
+        local playerList = table.concat(foundPlayers, ", ")
+        sendNotification("INFO - Staff Detect", playerList, "In Server")
+    end
+end
+local function checkStaffStatus(player)
+    local entry = LeaderboardFrame:FindFirstChild("LeaderboardEntry["..player.Name.."]")
+    if entry and entry:FindFirstChild("Username") and entry.Username:FindFirstChild("Staff") then
+        if not table.find(foundPlayers, player.Name) then
+            table.insert(foundPlayers, player.Name)
+            if not table.find(notifiedPlayers, player.Name) then
+                table.insert(notifiedPlayers, player.Name)
+                sendNotification("INFO - Staff Detect", player.Name, "Staff Joined")
+            end
+            updateInServerNotification()
+        end
+    else
+        for i, name in ipairs(foundPlayers) do
+            if name == player.Name then
+                table.remove(foundPlayers, i)
+                if table.find(notifiedPlayers, player.Name) then
+                    for j, n in ipairs(notifiedPlayers) do
+                        if n == player.Name then
+                            table.remove(notifiedPlayers, j)
+                            sendNotification("INFO - Staff Detect", player.Name, "Left Staff")
+                            break
+                        end
+                    end
+                end
+                updateInServerNotification()
+                break
+            end
+        end
+    end
+end
+local function monitorLeaderboard(player)
+    local con
+    con = LeaderboardFrame.ChildAdded:Connect(function(child)
+        if child.Name == "LeaderboardEntry["..player.Name.."]" then
+            checkStaffStatus(player)
+        end
+    end)
+    LeaderboardFrame.ChildRemoved:Connect(function(child)
+        if child.Name == "LeaderboardEntry["..player.Name.."]" then
+            for i, name in ipairs(foundPlayers) do
+                if name == player.Name then
+                    table.remove(foundPlayers, i)
+                    if table.find(notifiedPlayers, player.Name) then
+                        for j, n in ipairs(notifiedPlayers) do
+                            if n == player.Name then
+                                table.remove(notifiedPlayers, j)
+                                sendNotification("INFO - Staff Detect", player.Name, "Left Server")
+                                break
+                            end
+                        end
+                    end
+                    updateInServerNotification()
+                    break
+                end
+            end
+        end
+    end)
+end
+for _, player in ipairs(Players:GetPlayers()) do
+    checkStaffStatus(player)
+    monitorLeaderboard(player)
+end
+Players.PlayerAdded:Connect(function(player)
+    checkStaffStatus(player)
+    monitorLeaderboard(player)
+end)
+Players.PlayerRemoving:Connect(function(player)
+    for i, name in ipairs(foundPlayers) do
+        if name == player.Name then
+            table.remove(foundPlayers, i)
+            if table.find(notifiedPlayers, player.Name) then
+                for j, n in ipairs(notifiedPlayers) do
+                    if n == player.Name then
+                        table.remove(notifiedPlayers, j)
+                        sendNotification("INFO - Staff Detect", player.Name, "Left Server")
+                        break
+                    end
+                end
+            end
+            updateInServerNotification()
+            break
+        end
+    end
+end)
+RunService.Heartbeat:Connect(function()
+    for _, player in ipairs(Players:GetPlayers()) do
+        checkStaffStatus(player)
+    end
+end)
+    Fluent:Notify({
+        Title = "NOTHING X HUB",
+        Content = "Enjoy Script  :)",
+        SubContent = "BY NOTHING X", 
+        Duration = 4.5
+    })
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+SaveManager:SetFolder("HHUB")
+SaveManager:BuildConfigSection(Tabs.save)
+SaveManager:LoadAutoloadConfig()
