@@ -701,8 +701,6 @@ state.cleanup = function()
     end
     state.active = false
 end
-
-
 Tabs.XXX:AddKeybind("SpeedToggle", {
     Title = "Speed",
     Mode = "Toggle",
@@ -744,7 +742,6 @@ state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     elseif key == Enum.KeyCode.D then holdingDKey = false
     end
 end)
-
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
 local vim = game:GetService("VirtualInputManager")
@@ -926,27 +923,25 @@ coreGui.ChildRemoved:Connect(function(child)
         tp_pass = false
         sp = nil
         if pd then pd:SetValue("none") end
-
         local screenGui = Instance.new("ScreenGui")
         screenGui.Name = "ScreenGui"
         screenGui.Parent = coreGui
     end
 end)
-
 Tabs.all:AddSection("Emote")
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
-local AllTauntNames = {}
-for _, taunt in pairs(TauntsFolder:GetChildren()) do
-    table.insert(AllTauntNames, taunt.Name)
+local function initializeTauntData()
+    local TauntsFolder = ReplicatedStorage.Assets.Items.Taunts
+    local AllTauntNames = {}
+    for _, taunt in pairs(TauntsFolder:GetChildren()) do
+        table.insert(AllTauntNames, taunt.Name)
+    end
+    return AllTauntNames
 end
-local SelectedTaunts = {}
-local Active = false
-local SavedBeforeToggle = {}
-local function GetCurrentEquipped()
+local function getCurrentEquipped()
     local equippedRaw = LocalPlayer:GetAttribute("EquippedTaunts")
     if equippedRaw and equippedRaw ~= "" then
         local success, result = pcall(function()
@@ -958,7 +953,7 @@ local function GetCurrentEquipped()
     end
     return {} 
 end
-local function ConvertSelection(input)
+local function convertSelection(input)
     local result = {}
     for k, v in pairs(input) do
         if typeof(k) == "string" and v == true then
@@ -969,45 +964,82 @@ local function ConvertSelection(input)
     end
     return result
 end
-Tabs.all:AddToggle("EnableTauntEquip", {
-    Title = "Enable Emote",
-    Description = "",
-    Default = false,
-    Callback = function(state)
-        Active = state
-        if state then
-            SavedBeforeToggle = GetCurrentEquipped()
-            SelectedTaunts = {}
-            LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode({}))
-        else
-            local toRestore = SavedBeforeToggle or {}
-            LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(toRestore))
-        end
-    end
-})
-local DropdownRef = Tabs.all:AddDropdown("MultiDropdown", {
-    Title = "Emote - (Max 4)",
-    Description = "",
-    Values = AllTauntNames,
-    Multi = true,
-    Default = GetCurrentEquipped(),
-    Callback = function() end 
-})
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-        if Active and DropdownRef and DropdownRef.Value then
-            local selectedList = ConvertSelection(DropdownRef.Value)
-            if #selectedList <= 4 then
-                local encoded = HttpService:JSONEncode(selectedList)
-                if HttpService:JSONEncode(SelectedTaunts) ~= encoded then
-                    SelectedTaunts = selectedList
-                    LocalPlayer:SetAttribute("EquippedTaunts", encoded)
+local function main()
+    local AllTauntNames = initializeTauntData()
+    local SelectedTaunts = {}
+    local Active = false
+    local SavedBeforeToggle = {}
+    local initialEquipped = getCurrentEquipped()
+    Active = #initialEquipped > 0
+    SavedBeforeToggle = initialEquipped
+    local initialSavedState = getCurrentEquipped()
+    local DropdownRef = Tabs.all:AddDropdown("MultiDropdown", {
+        Title = "Emote - (Max 4)",
+        Description = "",
+        Values = AllTauntNames,
+        Multi = true,
+        Default = initialEquipped,
+        Callback = function() end 
+    })
+    Tabs.all:AddToggle("EnableTauntEquip", {
+        Title = "Enable Emote",
+        Description = "",
+        Default = Active,
+        Callback = function(state)
+            Active = state
+            if state then
+                SavedBeforeToggle = getCurrentEquipped()
+                if DropdownRef and DropdownRef.Value then
+                    local selectedList = convertSelection(DropdownRef.Value)
+                    if #selectedList <= 4 then
+                        SelectedTaunts = selectedList
+                        LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(selectedList))
+                    end
+                end
+            else
+                local toRestore = initialSavedState or {}
+                LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(toRestore))
+                SelectedTaunts = {}
+                if DropdownRef then
+                    DropdownRef:SetValue(toRestore)
                 end
             end
         end
+    })
+    task.spawn(function()
+        while true do
+            task.wait(0.1)
+            if Active and DropdownRef and DropdownRef.Value then
+                local selectedList = convertSelection(DropdownRef.Value)
+                if #selectedList <= 4 then
+                    local encoded = HttpService:JSONEncode(selectedList)
+                    if HttpService:JSONEncode(SelectedTaunts) ~= encoded then
+                        SelectedTaunts = selectedList
+                        LocalPlayer:SetAttribute("EquippedTaunts", encoded)
+                    end
+                end
+            end
+        end
+    end)
+    local function onCharacterAdded(character)
+        task.wait(1) 
+        if Active then
+            if DropdownRef and DropdownRef.Value then
+                local selectedList = convertSelection(DropdownRef.Value)
+                if #selectedList <= 4 then
+                    LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(selectedList))
+                end
+            end
+        else
+            LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(initialSavedState))
+        end
     end
-end)
+    LocalPlayer.CharacterAdded:Connect(onCharacterAdded)
+    if LocalPlayer.Character then
+        onCharacterAdded(LocalPlayer.Character)
+    end
+end
+main()
 Tabs.all:AddSection("Jump")
 local coreGui = game:GetService("CoreGui")
 local sjp = 50
