@@ -1,45 +1,38 @@
-shared._DLoaded = false
-spawn(function()
-    local Players = game:GetService("Players")
-    local Lighting = game:GetService("Lighting")
-    local ReplicatedFirst = game:GetService("ReplicatedFirst")
-    local player = Players.LocalPlayer
-    pcall(function()
-        ReplicatedFirst:RemoveDefaultLoadingScreen()
-    end)
-    local playerGui = player:WaitForChild("PlayerGui")
-    if not player.Character or not player.Character:FindFirstChild("Humanoid") then
-        player.CharacterAdded:Wait()
-    end
-    player.Character:WaitForChild("Humanoid")
-    task.wait(2)
-    local function destroyGUI()
-        local gameGui = playerGui:FindFirstChild("GameGui")
-        local guiNames = {
-            "LoadingScreen",
-            "DailyRewards",
-            "Transition",
-            "KeyHints"
-        }
-        for _, name in ipairs(guiNames) do
-            local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
-            if gui then
-                gui:Destroy()
-            end
-        end
-    end
-    local function removeBlur()
-        for _, effect in ipairs(Lighting:GetChildren()) do
-            if effect:IsA("BlurEffect") then
-                effect:Destroy()
-            end
-        end
-    end
-    destroyGUI()
-    removeBlur()
-    shared._DLoaded = true 
+local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local player = Players.LocalPlayer
+pcall(function()
+	ReplicatedFirst:RemoveDefaultLoadingScreen()
 end)
-repeat task.wait() until shared._DLoaded
+local playerGui = player:WaitForChild("PlayerGui")
+if not player.Character or not player.Character:FindFirstChild("Humanoid") then
+	player.CharacterAdded:Wait()
+end
+local function destroyGUI()
+	local gameGui = playerGui:FindFirstChild("GameGui")
+	local guiNames = {
+		"LoadingScreen",
+		"DailyRewards",
+		"Transition",
+		"KeyHints"
+	}
+	for _, name in ipairs(guiNames) do
+		local gui = playerGui:FindFirstChild(name) or (gameGui and gameGui:FindFirstChild(name))
+		if gui then
+			gui:Destroy()
+		end
+	end
+end
+local function removeBlur()
+	for _, effect in ipairs(Lighting:GetChildren()) do
+		if effect:IsA("BlurEffect") then
+			effect:Destroy()
+		end
+	end
+end
+destroyGUI()
+removeBlur()
 local P, S, U, R, W = game:GetService("Players"), game:GetService("StarterGui"), game:GetService("UserInputService"), game:GetService("RunService"), game:GetService("Workspace")
 local p = P.LocalPlayer
 local m = false
