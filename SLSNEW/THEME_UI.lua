@@ -47,5 +47,5 @@ game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6].Frame.Tex
 game:GetService("CoreGui").ScreenGui:GetChildren()[2]:GetChildren()[6].Frame.TextLabel.TextSize = 18
 game:GetService("CoreGui").ScreenGui:GetChildren()[2].Frame:GetChildren()[7].UIStroke.Color = Color3.fromRGB(255, 0, 0)
     setColors()
-    wait(0.5)
+    wait(0.01)
 end
