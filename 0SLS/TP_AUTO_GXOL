@@ -1,1 +1,4 @@
-game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame=game.Players.LocalPlayer.Team.Name=="Home"and CFrame.new(21.269224166870117,-175.68923950195312,354.16998291015625)or CFrame.new(20.88295555114746,-175.689208984375,313.1452941894531)
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =
+    game.Players.LocalPlayer.Team.Name == "Home"
+    and CFrame.new(-16, 11, -214)
+    or CFrame.new(-17, 11, -255)
