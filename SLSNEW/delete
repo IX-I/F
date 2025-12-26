@@ -1,3 +1,4 @@
+
 local player = game:GetService("Players").LocalPlayer
 local gui = player:WaitForChild("PlayerGui"):WaitForChild("GameGui"):WaitForChild("MatchHUD"):WaitForChild("EnergyBars")
 for _, bar in pairs(gui:GetChildren()) do
@@ -73,4 +74,4 @@ while true do
         scoreboard.Size = UDim2.new(0.2, 0, 0.11, 0)
     end
     wait(2.2)
-end
+end 
