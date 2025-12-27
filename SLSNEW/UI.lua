@@ -1209,7 +1209,6 @@ LocalPlayer.CharacterAdded:Connect(function(character)
 end)
 
 
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeamsService = game:GetService("Teams")
 local CoreGui = game:GetService("CoreGui")
@@ -1248,7 +1247,7 @@ local function getRequestJoinEvent()
     if not reFolder then return nil end
     return reFolder:FindFirstChild("_RequestJoin")
 end
-local function joinTeam(teamName, position)
+local function joinTeam(teamName, position, force)
     if teamName == "None" or position == "None" then return end
     if teamName == "Random" then
         if not preChosenTeam then
@@ -1256,7 +1255,7 @@ local function joinTeam(teamName, position)
         end
         teamName = preChosenTeam
     end
-    if LocalPlayer.Team and (LocalPlayer.Team.Name == "Home" or LocalPlayer.Team.Name == "Away") then
+    if not force and LocalPlayer.Team and (LocalPlayer.Team.Name == "Home" or LocalPlayer.Team.Name == "Away") then
         return
     end
     local requestJoinEvent = getRequestJoinEvent()
@@ -1291,7 +1290,7 @@ end
 local JoinButton = Tabs.XXXV:AddButton({
     Title = "Join",
     Callback = function()
-        joinTeam(TeamDropdown.Value, PositionDropdown.Value)
+        joinTeam(TeamDropdown.Value, PositionDropdown.Value, true)
     end
 })
 task.spawn(function()
@@ -1303,7 +1302,7 @@ task.spawn(function()
         end
         if AutoToggle.Value then
             if not LocalPlayer.Team or LocalPlayer.Team.Name == "None" then
-                joinTeam(TeamDropdown.Value, PositionDropdown.Value)
+                joinTeam(TeamDropdown.Value, PositionDropdown.Value, false)
             else
                 preChosenTeam = nil
             end
@@ -1317,7 +1316,7 @@ task.spawn(function()
                     if awayScore > homeScore then
                         targetTeam = "Away"
                     end
-                    joinTeam(targetTeam, getRandomPosition())
+                    joinTeam(targetTeam, getRandomPosition(), false)
                 end
             end
         end
