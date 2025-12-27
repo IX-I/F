@@ -754,6 +754,24 @@ Tabs.XXX:AddButton({
         end
     end
 })
+Tabs.XXX:AddButton({
+    Title = "Join  7v7 Server",
+    Callback = function()
+        local iid =  127060568647054
+        local pp = game.Players.LocalPlayer
+        if pp then
+            game:GetService("TeleportService"):Teleport(iid, pp)
+        end
+    end
+})
+
+Tabs.XXX:AddButton({
+    Title = "Respawn",
+    Callback = function()
+        game.Players.LocalPlayer.Character:BreakJoints()
+    end
+})
+
 
 local ks, vma = 80, 80
 local ce = false
