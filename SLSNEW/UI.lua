@@ -659,6 +659,24 @@ if screenGui then
     end)
 end
 
+local moveFieldToggle = Tabs.all:AddToggle("MoveFieldToggle", {
+    Title = "Field",
+    Default = false,
+    Callback = function(value)
+        local starterPack = game:GetService("StarterPack")
+        local workspaceField = workspace.Stadium.Field.Bounds:FindFirstChild("Field")
+        local starterField = starterPack:FindFirstChild("Field")
+        if value then
+            if workspaceField then
+                workspaceField.Parent = starterPack
+            end
+        else
+            if starterField then
+                starterField.Parent = workspace.Stadium.Field.Bounds
+            end
+        end
+    end
+})
 
 
 Tabs.keybinds:AddKeybind("Keybind", {
