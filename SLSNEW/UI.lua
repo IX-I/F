@@ -29,7 +29,7 @@ Window:Minimize()
 local Players = game:GetService("Players")
 local Teams = game:GetService("Teams")
 local Workspace = game:GetService("Workspace")
-local VIM = game:GetService("VirtualInputManager")
+local XVIM = game:GetService("VirtualInputManager")
 
 local LocalPlayer = Players.LocalPlayer
 local isRunning = false
@@ -56,11 +56,11 @@ Tabs.keybinds:AddKeybind("Keybind", {
                 if team and (team.Name == "Home" or team.Name == "Away") then
                     break
                 end
-                task.wait(0.1)
+                task.wait()
             end
         end)
 
-        for i = 1, 155 do
+        for i = 1, 198 do
             local co = coroutine.create(function()
                 while isRunning do
                     local football = Workspace:WaitForChild("Misc"):FindFirstChild("Football")
@@ -90,8 +90,8 @@ Tabs.keybinds:AddKeybind("Keybind", {
                         football.AssemblyLinearVelocity = Vector3.zero
                         football.AssemblyAngularVelocity = Vector3.zero
                     else
-                        VIM:SendMouseButtonEvent(0,0,0,true,game,0)
-                        VIM:SendMouseButtonEvent(0,0,0,false,game,0)
+                        XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
+                        XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
                         football.Position = goalPos
                         football.AssemblyLinearVelocity = Vector3.zero
                         football.AssemblyAngularVelocity = Vector3.zero
@@ -103,8 +103,8 @@ Tabs.keybinds:AddKeybind("Keybind", {
                             if teamPos ~= "GK" and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
                                 hrp.CFrame = target.Character.HumanoidRootPart.CFrame
                             end
-                            VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                            XVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                            XVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                         end
                     end
 
