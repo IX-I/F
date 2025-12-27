@@ -23,11 +23,7 @@ local Tabs = {
 
 Window:SelectTab()
 Window:Minimize()
-
-
-
 local Players = game:GetService("Players")
-local Teams = game:GetService("Teams")
 local Workspace = game:GetService("Workspace")
 local XVIM = game:GetService("VirtualInputManager")
 
@@ -37,6 +33,39 @@ local threads = {}
 
 local function getChar()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+end
+
+local function pressE()
+    XVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    XVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+local function getEnemyPlayerWithBall(owner)
+    local plr = Players:FindFirstChild(owner)
+    if plr and plr ~= LocalPlayer and plr.Team ~= LocalPlayer.Team then
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            return plr.Character.HumanoidRootPart
+        end
+    end
+end
+
+local function getEnemyAgentWithBall()
+    local agentsFolder = Workspace:FindFirstChild("Systems") and Workspace.Systems:FindFirstChild("Agents")
+    if not agentsFolder then return end
+
+    local myTeam = LocalPlayer.Team and LocalPlayer.Team.Name
+    if not myTeam then return end
+
+    for _, model in ipairs(agentsFolder:GetChildren()) do
+        if model:IsA("Model") then
+            local hasBall = model:GetAttribute("HasBall")
+            local side = model:GetAttribute("IsHomeOrAway")
+
+            if hasBall == true and side and side ~= myTeam then
+                return model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
+            end
+        end
+    end
 end
 
 Tabs.keybinds:AddKeybind("Keybind", {
@@ -60,7 +89,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
             end
         end)
 
-        for i = 1, 198 do
+        for i = 1, 111 do
             local co = coroutine.create(function()
                 while isRunning do
                     local football = Workspace:WaitForChild("Misc"):FindFirstChild("Football")
@@ -97,14 +126,14 @@ Tabs.keybinds:AddKeybind("Keybind", {
                         football.AssemblyAngularVelocity = Vector3.zero
                     end
 
-                    if typeof(owner) == "string" and owner ~= LocalPlayer.Name then
-                        local target = Players:FindFirstChild(owner)
-                        if target and target.Team ~= LocalPlayer.Team then
-                            if teamPos ~= "GK" and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
-                                hrp.CFrame = target.Character.HumanoidRootPart.CFrame
-                            end
-                            XVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                            XVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+                    if teamPos ~= "GK" then
+                        local target =
+                            (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
+                            or getEnemyAgentWithBall()
+
+                        if target then
+                            hrp.CFrame = target.CFrame
+                            pressE()
                         end
                     end
 
@@ -116,6 +145,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end
     end
 })
+
 
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "not kick ball (GK)",
