@@ -24,14 +24,45 @@ local Tabs = {
 Window:SelectTab()
 Window:Minimize()
 
-local player = game.Players.LocalPlayer
-local character = player.Character
-local vim = game:GetService("VirtualInputManager")
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "NOTHING X",
+    SubTitle = "",
+    TabWidth = 30,
+    Size = UDim2.fromOffset(455, 415),
+    Acrylic = false,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+local Tabs = {
+    all = Window:AddTab({Title = "", Icon = "list"}),
+        hitbox = Window:AddTab({Title = "", Icon = "box"}),
+                XXX = Window:AddTab({Title = "", Icon = "code"}),
+        XXXV = Window:AddTab({Title = "", Icon = "flag"}),
+    keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
+    save = Window:AddTab({Title = "", Icon = "save"})
+}
+
+Window:SelectTab()
+Window:Minimize()
+
 local Players = game:GetService("Players")
+local Teams = game:GetService("Teams")
+local Workspace = game:GetService("Workspace")
+local VIM = game:GetService("VirtualInputManager")
+
 local LocalPlayer = Players.LocalPlayer
-local Workspace = game.Workspace
 local isRunning = false
 local threads = {}
+
+local function getChar()
+    return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+end
+
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Auto gol",
     Mode = "Toggle",
@@ -39,91 +70,77 @@ Tabs.keybinds:AddKeybind("Keybind", {
     Callback = function(state)
         isRunning = state
         if not state then
-            for _, conn in ipairs(threads) do
-                if typeof(conn) == "thread" and coroutine.status(conn) == "suspended" then
-                    coroutine.resume(conn)
-                end
-            end
             threads = {}
             return
         end
-task.spawn(function()
-    while isRunning do
-        local playerTeam = game.Players.LocalPlayer.Team 
-        local hasTeam = teamService:FindFirstChild("Home") or teamService:FindFirstChild("Away")
-        local isInValidTeam = playerTeam and (playerTeam == teamService:FindFirstChild("Home") or playerTeam == teamService:FindFirstChild("Away"))
-        if hasTeam and isInValidTeam then
-            break
-        end
-        task.wait()
-    end
-end)
-        for i = 1, 1000 do
-            local thread = coroutine.create(function()
+
+        task.spawn(function()
+            while isRunning do
+                local team = LocalPlayer.Team
+                if team and (team.Name == "Home" or team.Name == "Away") then
+                    break
+                end
+                task.wait(0.1)
+            end
+        end)
+
+        for i = 1, 155 do
+            local co = coroutine.create(function()
                 while isRunning do
-                    local football = workspace.Misc:FindFirstChild("Football")
-                    while not football and isRunning do
-                        football = workspace.Misc:FindFirstChild("Football")
-                        task.wait()
+                    local football = Workspace:WaitForChild("Misc"):FindFirstChild("Football")
+                    if not football then task.wait() continue end
+
+                    local char = getChar()
+                    local hrp = char:FindFirstChild("HumanoidRootPart")
+                    if not hrp then task.wait() continue end
+
+                    local team = LocalPlayer.Team
+                    if not team then task.wait() continue end
+
+                    local goalPos = team.Name == "Home"
+                        and Vector3.new(-6,11,-48)
+                        or Vector3.new(-30,11,-422)
+
+                    local owner = football:GetAttribute("NetworkOwner")
+                    local teamPos = LocalPlayer:GetAttribute("TeamPosition")
+
+                    if owner ~= LocalPlayer.Name then
+                        if teamPos ~= "GK" then
+                            pcall(function()
+                                loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/0SLS/TP_AUTO_GXOL"))()
+                            end)
+                        end
+                        football.Position = hrp.Position
+                        football.AssemblyLinearVelocity = Vector3.zero
+                        football.AssemblyAngularVelocity = Vector3.zero
+                    else
+                        VIM:SendMouseButtonEvent(0,0,0,true,game,0)
+                        VIM:SendMouseButtonEvent(0,0,0,false,game,0)
+                        football.Position = goalPos
+                        football.AssemblyLinearVelocity = Vector3.zero
+                        football.AssemblyAngularVelocity = Vector3.zero
                     end
-                    if not isRunning then break end
-                    local character = LocalPlayer.Character
-                    if football and character and character:FindFirstChild("HumanoidRootPart") then
-                        local teamName
-                        repeat
-                            teamName = LocalPlayer.Team and LocalPlayer.Team.Name
-                            task.wait()
-                        until teamName == "Home" or teamName == "Away"
-                        local goalPos = teamName == "Home"
-                            and Vector3.new(-6, 11, -48)
-                            or  Vector3.new(-30, 11, -422)
-                        local networkOwner = football:GetAttribute("NetworkOwner")
-                        local teamPos = LocalPlayer:GetAttribute("TeamPosition")
-                        if networkOwner ~= LocalPlayer.Name then
-                            if teamPos ~= "GK" then
-                        loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/0SLS/TP_AUTO_GXOL"))()
-                        end
-                            football.Position = character.HumanoidRootPart.Position
-                            football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                        end
-                        if networkOwner == LocalPlayer.Name then
-                             vim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
-                            vim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-                            football.Position = goalPos
-                            football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                            football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                        end
-                        if networkOwner and typeof(networkOwner) == "string" then
-                            local localPlayerTeamPosition = LocalPlayer:GetAttribute("TeamPosition")
-                            local targetPlayer = Players:FindFirstChild(networkOwner)
-                            if localPlayerTeamPosition ~= "GK" and targetPlayer and targetPlayer.Character and targetPlayer ~= LocalPlayer then
-                                local targetTeam = targetPlayer.Team
-                                local localTeam = LocalPlayer.Team
-                                if targetTeam ~= localTeam then
-                                    local targetHRP = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                                    if targetHRP then
-                                        LocalPlayer.Character.HumanoidRootPart.CFrame = targetHRP.CFrame
-                                    end
-                                end
+
+                    if typeof(owner) == "string" and owner ~= LocalPlayer.Name then
+                        local target = Players:FindFirstChild(owner)
+                        if target and target.Team ~= LocalPlayer.Team then
+                            if teamPos ~= "GK" and target.Character and target.Character:FindFirstChild("HumanoidRootPart") then
+                                hrp.CFrame = target.Character.HumanoidRootPart.CFrame
                             end
-                            if networkOwner ~= LocalPlayer.Name then
-                                local target = Players:FindFirstChild(networkOwner)
-                                if target and target.Team ~= LocalPlayer.Team then
-                                    vim:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                                    vim:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                                end
-                            end
+                            VIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+                            VIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
                         end
                     end
+
                     task.wait()
                 end
             end)
-            coroutine.resume(thread)
-            table.insert(threads, thread)
+            coroutine.resume(co)
+            table.insert(threads, co)
         end
     end
 })
+
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "not kick ball (GK)",
     Mode = "Toggle",
@@ -133,7 +150,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
             local misc = workspace:FindFirstChild("Misc")
             if not misc then return end
 
-            -- Pobranie wszystkich piłek
             local footballs = {}
             for _, obj in pairs(misc:GetChildren()) do
                 if obj.Name == "Football" then
@@ -141,7 +157,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
                 end
             end
 
-            -- Jeśli nie ma żadnej piłki, poczekaj aż się pojawi
             if #footballs == 0 then
                 misc.ChildAdded:Wait()
                 for _, obj in pairs(misc:GetChildren()) do
@@ -151,7 +166,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
                 end
             end
 
-            -- Przełączanie stanu każdej piłki
             for _, football in pairs(footballs) do
                 if football:GetAttribute("Enabled") == nil then
                     football:SetAttribute("Enabled", false)
