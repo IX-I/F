@@ -267,7 +267,7 @@ LocalPlayer.CharacterAdded:Connect(function()
         LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(OldTauntsBackup))
     end
 end)
-Tabs.all:AddSection("Jump")
+Tabs.all:AddSection("Jump / Hip Height")
 local coreGui = game:GetService("CoreGui")
 local sjp = 50
 local Loop = true
@@ -299,6 +299,33 @@ task.spawn(function()
         end
     end
 end)
+local P = game.Players.LocalPlayer
+local def, hsx = 2, 2
+local iha = false
+
+local function upd()
+    local h = P.Character and P.Character:FindFirstChild("Humanoid")
+    if h then h.HipHeight = iha and hsx or def end
+end
+
+local function check() iha = P.Team and (P.Team.Name=="Home" or P.Team.Name=="Away") end
+
+P.CharacterAdded:Connect(function() check() upd() end)
+P:GetPropertyChangedSignal("Team"):Connect(function() check() upd() end)
+if P.Character then check() upd() end
+
+Tabs.all:AddInput("InputHipHeight", {
+    Title="Hip Height | on match",
+    Description="-3-55",
+    Default=def,
+    Numeric=true,
+    Callback=function(v)
+        hsx = math.clamp(tonumber(v) or def, -3, 55)
+        if iha then upd() end
+    end
+})
+
+
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
 local vim = game:GetService("VirtualInputManager")
