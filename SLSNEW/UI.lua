@@ -658,25 +658,23 @@ if screenGui then
         alw:SetValue(false)
     end)
 end
-
 local moveFieldToggle = Tabs.all:AddToggle("MoveFieldToggle", {
     Title = "Field",
     Default = false,
     Callback = function(value)
-        local starterPack = game:GetService("StarterPack")
-        local workspaceField = workspace.Stadium.Field.Bounds:FindFirstChild("Field")
-        local starterField = starterPack:FindFirstChild("Field")
+        local field = workspace.Stadium.Field.Bounds:FindFirstChild("Field")
+        if not field then return end
+
+        local currentSize = field.Size
+
         if value then
-            if workspaceField then
-                workspaceField.Parent = starterPack
-            end
+            field.Size = Vector3.new(currentSize.X, 0, currentSize.Z)
         else
-            if starterField then
-                starterField.Parent = workspace.Stadium.Field.Bounds
-            end
+            field.Size = Vector3.new(currentSize.X, 81.67, currentSize.Z)
         end
     end
 })
+
 
 
 Tabs.keybinds:AddKeybind("Keybind", {
@@ -1517,19 +1515,34 @@ end)
 
 
 
-    local part = game.Workspace:FindFirstChild("X")
-if not part then
-    part = Instance.new("Part")
-    part.Parent = game.Workspace
+local workspace = game.Workspace
+
+if not workspace:FindFirstChild("XYX") then
+    local part = Instance.new("Part")
+    part.Parent = workspace
     part.Anchored = true
-    part.Position = Vector3.new(-16.684574127197266, 88, -233.94476318359375)
-    part.Size = Vector3.new(222.346, 2, 361.133)
+    part.Position = Vector3.new(-16.684574127197266, 106.80000305175781, -233.94476318359375)
+    part.Size = Vector3.new(223, 35, 362)
     part.BrickColor = BrickColor.new("Really black")
     part.Material = Enum.Material.ForceField
-    part.Transparency = 0.95
+    part.Transparency = 1
     part.CanCollide = true
-    part.Name = "X"
+    part.Name = "XYX"
 end
+
+if not workspace:FindFirstChild("XVX") then
+    local Xpart = Instance.new("Part")
+    Xpart.Parent = workspace
+    Xpart.Anchored = true
+    Xpart.Position = Vector3.new(-16.684574127197266, -9.5, -233.94476318359375)
+    Xpart.Size = Vector3.new(250, 35, 390)
+    Xpart.BrickColor = BrickColor.new("Really black")
+    Xpart.Material = Enum.Material.ForceField
+    Xpart.Transparency = 1
+    Xpart.CanCollide = true
+    Xpart.Name = "XVX"
+end
+
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
