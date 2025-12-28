@@ -267,7 +267,7 @@ LocalPlayer.CharacterAdded:Connect(function()
         LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(OldTauntsBackup))
     end
 end)
-Tabs.all:AddSection("Jump / Hip Height")
+Tabs.all:AddSection("Jump / Hip Height / Spam / Pass")
 local coreGui = game:GetService("CoreGui")
 local sjp = 50
 local Loop = true
@@ -316,7 +316,7 @@ if P.Character then check() upd() end
 
 Tabs.all:AddInput("InputHipHeight", {
     Title="Hip Height | on match",
-    Description="-3-55",
+    Description="-3-55 | Deffult 2",
     Default=def,
     Numeric=true,
     Callback=function(v)
