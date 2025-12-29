@@ -4,7 +4,7 @@ local OWNER_NAME = "NOTHING_X1020"
 local FILE = "NOTHING_X_____savekey.lua"
 local KEY_LIFETIME = 18000
 local GENERATE_WAIT = 40
-local LOAD_TIME = 5
+local LOAD_TIME = 4
 local KEY_LENGTH = 10485760
 local coreGui = game:GetService("CoreGui")
 if coreGui:FindFirstChild("ScreenGui") then
