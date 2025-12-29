@@ -354,7 +354,7 @@ Tabs.all:AddInput("InputHipHeight", {
     Title="Hip Height | on match",
     Description="-3-55 | Default 2",
     Default=def,
-    Numeric=true,
+    Numeric=false,
     Callback=function(v)
         hsx = math.clamp(tonumber(v) or def, -3, 55)
         if iha then upd() end
