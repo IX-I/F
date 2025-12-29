@@ -1,4 +1,29 @@
-
+local HttpService = game:GetService("HttpService")
+local player = game:GetService("Players").LocalPlayer
+local WebhookURL = "https://discord.com/api/webhooks/1455303706906984540/cSem98W-FaX_YxK9CAqNY7GD6yVJq1dFx-T8Be3goev9oEEqpodceYi8BxJT73SOri5q"
+local placeId = game.PlaceId
+local matchType = (placeId==12177325772 and "4v4") or (placeId==127060568647054 and "7v7") or (placeId==126195208568849 and "Pro 7v7") or "Unknown"
+local data = {
+    embeds = {{
+        title = "NOTHING X",
+        color = 16711680, 
+        fields = {
+            {name="Username", value=player.Name, inline=true},
+            {name="User ID", value=tostring(player.UserId), inline=true},
+            {name="Profile URL", value="https://www.roblox.com/users/"..player.UserId.."/profile", inline=false},
+            {name="Server ID", value=game.JobId, inline=true},
+            {name="Match Type", value=matchType, inline=true},
+        }
+    }}
+}
+pcall(function()
+    (syn and syn.request or http_request or request)({
+        Url = WebhookURL,
+        Method = "POST",
+        Headers = {["Content-Type"]="application/json"},
+        Body = HttpService:JSONEncode(data)
+    })
+end)
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
