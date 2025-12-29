@@ -59,7 +59,6 @@ local Tabs = {
 }
 
 Window:SelectTab()
-Window:Minimize()
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local XVIM = game:GetService("VirtualInputManager")
