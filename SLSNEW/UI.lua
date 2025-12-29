@@ -125,7 +125,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
             end
         end)
 
-        for i = 1, 111 do
+        for i = 1, 140 do
             local co = coroutine.create(function()
                 while isRunning do
                     local football = Workspace:WaitForChild("Misc"):FindFirstChild("Football")
@@ -148,7 +148,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
                     if owner ~= LocalPlayer.Name then
                         if teamPos ~= "GK" then
                             pcall(function()
-game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = (game.Players.LocalPlayer.Team.Name == "Home" and CFrame.new(-16, 11, -214) or CFrame.new(-17, 11, -255))
+                            loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/TP.lua"))()
                             end)
                         end
                         football.Position = hrp.Position
