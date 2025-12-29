@@ -112,7 +112,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
                     if owner ~= LocalPlayer.Name then
                         if teamPos ~= "GK" then
                             pcall(function()
-                                loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/0SLS/TP_AUTO_GXOL"))()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = (game.Players.LocalPlayer.Team.Name == "Home" and CFrame.new(-16, 11, -214) or CFrame.new(-17, 11, -255))
                             end)
                         end
                         football.Position = hrp.Position
@@ -316,7 +316,7 @@ if P.Character then check() upd() end
 
 Tabs.all:AddInput("InputHipHeight", {
     Title="Hip Height | on match",
-    Description="-3-55 | Deffult 2",
+    Description="-3-55 | Default 2",
     Default=def,
     Numeric=true,
     Callback=function(v)
