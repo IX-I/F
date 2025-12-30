@@ -1315,6 +1315,7 @@ Tabs.keybinds:AddKeybind("AltBind", {
                 end
 
                 local owner = ball:GetAttribute("NetworkOwner")
+
                 if owner == LP.Name then
                     active = false
                     break
@@ -1332,16 +1333,20 @@ Tabs.keybinds:AddKeybind("AltBind", {
                 if tgt then
                     hrp.CFrame = tgt.CFrame
                     tapE()
-                    ball.Position = hrp.Position
+                end
+
+                if owner ~= LP.Name then
+                    ball.CFrame = hrp.CFrame
                     ball.AssemblyLinearVelocity = Vector3.new()
                     ball.AssemblyAngularVelocity = Vector3.new()
                 end
 
-                task.wait(0.05)
+                task.wait(0.08)
             end
         end)
     end
 })
+
 
 
 local Players = game:GetService("Players")
