@@ -22,23 +22,60 @@ local Tabs = {
 }
 
 Window:SelectTab()
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "NOTHING X",
+    SubTitle = "",
+    TabWidth = 30,
+    Size = UDim2.fromOffset(455, 415),
+    Acrylic = false,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.LeftAlt
+})
+local Tabs = {
+    all = Window:AddTab({Title = "", Icon = "list"}),
+        hitbox = Window:AddTab({Title = "", Icon = "box"}),
+                XXX = Window:AddTab({Title = "", Icon = "code"}),
+        XXXV = Window:AddTab({Title = "", Icon = "flag"}),
+    keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
+    save = Window:AddTab({Title = "", Icon = "save"})
+}
+
+Window:SelectTab()
+
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local XVIM = game:GetService("VirtualInputManager")
-
 local LocalPlayer = Players.LocalPlayer
 local isRunning = false
 local threads = {}
-
+local PLACE_ID = game.PlaceId
+local goalPositions = {
+    ["4v4"] = {Away = Vector3.new(-8, 11, -96), Home = Vector3.new(-32, 11, -372)},
+    ["7v7"] = {Away = Vector3.new(-6, 11, -48), Home = Vector3.new(-30, 11, -422)},
+    ["pro7v7"] = {Away = Vector3.new(-6, 11, -48), Home = Vector3.new(-30, 11, -422)}
+}
+local function getGoalPos(teamName)
+    if PLACE_ID == 12177325772 then
+        return teamName == "Home" and goalPositions["4v4"].Home or goalPositions["4v4"].Away
+    elseif PLACE_ID == 127060568647054 or PLACE_ID == 126195208568849 then
+        return teamName == "Home" and goalPositions["7v7"].Home or goalPositions["7v7"].Away
+    else
+        return teamName == "Home" and goalPositions["7v7"].Home or goalPositions["7v7"].Away
+    end
+end
 local function getChar()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
-
 local function pressE()
     XVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
     XVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
 end
-
 local function getEnemyPlayerWithBall(owner)
     local plr = Players:FindFirstChild(owner)
     if plr and plr ~= LocalPlayer and plr.Team ~= LocalPlayer.Team then
@@ -47,26 +84,21 @@ local function getEnemyPlayerWithBall(owner)
         end
     end
 end
-
 local function getEnemyAgentWithBall()
     local agentsFolder = Workspace:FindFirstChild("Systems") and Workspace.Systems:FindFirstChild("Agents")
     if not agentsFolder then return end
-
     local myTeam = LocalPlayer.Team and LocalPlayer.Team.Name
     if not myTeam then return end
-
     for _, model in ipairs(agentsFolder:GetChildren()) do
         if model:IsA("Model") then
             local hasBall = model:GetAttribute("HasBall")
             local side = model:GetAttribute("IsHomeOrAway")
-
             if hasBall == true and side and side ~= myTeam then
                 return model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
             end
         end
     end
 end
-
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Auto gol",
     Mode = "Toggle",
@@ -77,7 +109,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
             threads = {}
             return
         end
-
         task.spawn(function()
             while isRunning do
                 local team = LocalPlayer.Team
@@ -87,31 +118,23 @@ Tabs.keybinds:AddKeybind("Keybind", {
                 task.wait()
             end
         end)
-
         for i = 1, 140 do
             local co = coroutine.create(function()
                 while isRunning do
                     local football = Workspace:WaitForChild("Misc"):FindFirstChild("Football")
                     if not football then task.wait() continue end
-
                     local char = getChar()
                     local hrp = char:FindFirstChild("HumanoidRootPart")
                     if not hrp then task.wait() continue end
-
                     local team = LocalPlayer.Team
                     if not team then task.wait() continue end
-
-                    local goalPos = team.Name == "Home"
-                        and Vector3.new(-6,11,-48)
-                        or Vector3.new(-30,11,-422)
-
+                    local goalPos = getGoalPos(team.Name)
                     local owner = football:GetAttribute("NetworkOwner")
                     local teamPos = LocalPlayer:GetAttribute("TeamPosition")
-
                     if owner ~= LocalPlayer.Name then
                         if teamPos ~= "GK" then
                             pcall(function()
-                            loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/TP.lua"))()
+                                loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/TP.lua"))()
                             end)
                         end
                         football.Position = hrp.Position
@@ -124,18 +147,15 @@ Tabs.keybinds:AddKeybind("Keybind", {
                         football.AssemblyLinearVelocity = Vector3.zero
                         football.AssemblyAngularVelocity = Vector3.zero
                     end
-
                     if teamPos ~= "GK" then
                         local target =
                             (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
                             or getEnemyAgentWithBall()
-
                         if target then
                             hrp.CFrame = target.CFrame
                             pressE()
                         end
                     end
-
                     task.wait()
                 end
             end)
