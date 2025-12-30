@@ -1638,32 +1638,59 @@ end)
 
 
 local workspace = game.Workspace
+local placeId = game.PlaceId
 
-if not workspace:FindFirstChild("XYX") then
-    local part = Instance.new("Part")
-    part.Parent = workspace
-    part.Anchored = true
-    part.Position = Vector3.new(-16.684574127197266, 106.80000305175781, -233.94476318359375)
-    part.Size = Vector3.new(223, 35, 362)
-    part.BrickColor = BrickColor.new("Really black")
-    part.Material = Enum.Material.ForceField
-    part.Transparency = 1
-    part.CanCollide = true
-    part.Name = "XYX"
+local sevenVSeven = {
+    XYX = {
+        Position = Vector3.new(-16.684574127197266, 106.80000305175781, -233.94476318359375),
+        Size = Vector3.new(223, 35, 362)
+    },
+    XVX = {
+        Position = Vector3.new(-16.684574127197266, -9.5, -233.94476318359375),
+        Size = Vector3.new(250, 35, 390)
+    }
+}
+
+local fourVFour = {
+    XYX = {
+        Position = Vector3.new(-16.684574127197266, 106.30000305175781, -233.94476318359375),
+        Size = Vector3.new(223, 35, 362)
+    },
+    XVX = {
+        Position = Vector3.new(-16.684574127197266, -10.050000190734863, -233.94476318359375),
+        Size = Vector3.new(250, 35, 390)
+    }
+}
+
+local config = {
+    [12177325772] = fourVFour,
+    [127060568647054] = sevenVSeven,
+    [126195208568849] = sevenVSeven
+}
+
+local data = config[placeId]
+local isUnknown = false
+
+if not data then
+    data = sevenVSeven
+    isUnknown = true
 end
 
-if not workspace:FindFirstChild("XVX") then
-    local Xpart = Instance.new("Part")
-    Xpart.Parent = workspace
-    Xpart.Anchored = true
-    Xpart.Position = Vector3.new(-16.684574127197266, -9.5, -233.94476318359375)
-    Xpart.Size = Vector3.new(250, 35, 390)
-    Xpart.BrickColor = BrickColor.new("Really black")
-    Xpart.Material = Enum.Material.ForceField
-    Xpart.Transparency = 1
-    Xpart.CanCollide = true
-    Xpart.Name = "XVX"
+for name, info in pairs(data) do
+    if not workspace:FindFirstChild(name) then
+        local part = Instance.new("Part")
+        part.Parent = workspace
+        part.Anchored = true
+        part.Position = info.Position
+        part.Size = info.Size
+        part.BrickColor = BrickColor.new("Really black")
+        part.Material = Enum.Material.ForceField
+        part.Transparency = 1
+        part.CanCollide = true
+        part.Name = name
+    end
 end
+
 
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
