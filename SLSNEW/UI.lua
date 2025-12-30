@@ -1637,8 +1637,8 @@ end)
 
 
 
-local workspace = game.Workspace
-local placeId = game.PlaceId
+local VXZworkspace = game.Workspace
+local VVplaceId = game.PlaceId
 
 local sevenVSeven = {
     XYX = {
@@ -1668,7 +1668,7 @@ local config = {
     [126195208568849] = sevenVSeven
 }
 
-local data = config[placeId]
+local data = config[VVplaceId]
 local isUnknown = false
 
 if not data then
@@ -1677,9 +1677,9 @@ if not data then
 end
 
 for name, info in pairs(data) do
-    if not workspace:FindFirstChild(name) then
+    if not VXZworkspace:FindFirstChild(name) then
         local part = Instance.new("Part")
-        part.Parent = workspace
+        part.Parent = VXZworkspace
         part.Anchored = true
         part.Position = info.Position
         part.Size = info.Size
@@ -1690,6 +1690,10 @@ for name, info in pairs(data) do
         part.Name = name
     end
 end
+
+if isUnknown then
+end
+
 
 
 SaveManager:SetLibrary(Fluent)
