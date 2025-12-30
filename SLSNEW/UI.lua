@@ -718,10 +718,35 @@ local football = game.workspace.Misc.Football
         end
     end
 })
+
+
 local XVXvim = game:GetService("VirtualInputManager")
-local p = game.Players.LocalPlayer
-local aPos = Vector3.new(-30, 11, -422)
-local hPos = Vector3.new(-6, 11, -48)
+local Players = game:GetService("Players")
+local workspace = game:GetService("Workspace")
+local p = Players.LocalPlayer
+local gameModes = {
+    ["4v4"] = {
+        Home = Vector3.new(-8, 11, -96),
+        Away = Vector3.new(-32, 11, -372)
+    },
+    ["7v7"] = {
+        Home = Vector3.new(-6, 11, -48),
+        Away = Vector3.new(-30, 11, -422)
+    }
+}
+local function getGameMode()
+    local XVZXplaceId = game.PlaceId
+    if XVZXplaceId == 12177325772 then
+        return "4v4"
+    elseif XVZXplaceId == 127060568647054 or XVZXplaceId == 126195208568849 then
+        return "7v7"
+    else
+        return "7v7" 
+    end
+end
+local currentMode = getGameMode()
+local aPos = gameModes[currentMode].Away
+local hPos = gameModes[currentMode].Home
 local function tpObj(o, pos)
     if o and o:IsA("BasePart") then
         o.CFrame = CFrame.new(pos)
@@ -734,27 +759,16 @@ local function checkAndTpFb()
         XVXvim:SendMouseButtonEvent(0, 0, 0, true, game, 0)
         task.wait()
         XVXvim:SendMouseButtonEvent(0, 0, 0, false, game, 0)
-        local t = p.Team
-        if t then
-            if t.Name == "Home" then
-                tpObj(fb, hPos)
-            elseif t.Name == "Away" then
-                tpObj(fb, aPos)
-            end
+        task.wait(0.4)
+        if p.Team then
+            tpObj(fb, p.Team.Name == "Home" and hPos or aPos)
         end
         return
     end
     local owner = fb:GetAttribute("NetworkOwner")
-    if owner ~= p.Name then
-        return 
-    end
-    local t = p.Team
-    if t then
-        if t.Name == "Home" then
-            tpObj(fb, hPos)
-        elseif t.Name == "Away" then
-            tpObj(fb, aPos)
-        end
+    if owner ~= p.Name then return end
+    if p.Team then
+        tpObj(fb, p.Team.Name == "Home" and hPos or aPos)
     end
 end
 Tabs.keybinds:AddKeybind("Keybind", {
@@ -766,10 +780,10 @@ Tabs.keybinds:AddKeybind("Keybind", {
 })
 workspace.Misc.ChildAdded:Connect(function(c)
     if c.Name == "Football" and c:IsA("BasePart") then
-        c:GetPropertyChangedSignal("Parent"):Connect(checkAndTpFb)
+        c:GetPropertyChangedSignal("Parent"):Connect()
     end
 end)
-p.CharacterAdded:Connect(checkAndTpFb)
+
 
 local istp = false
 local p = game.Players.LocalPlayer
