@@ -49,9 +49,12 @@ local function showLoading(gui)
     barFill.BorderSizePixel = 0
     Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 10)
     --//////
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/UI.lua"))()
-
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/Check.lua"))()
+end)
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/UI.lua"))()
+end)
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/THEME_UI.lua"))()
 end)
@@ -59,7 +62,6 @@ end)
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/delete"))()
 end)
-
     task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/Part.lua"))()
 end)
