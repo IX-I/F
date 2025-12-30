@@ -1237,59 +1237,113 @@ state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     elseif key == Enum.KeyCode.D then holdingDKey = false
     end
 end)
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager") 
-local localPlayer = Players.LocalPlayer
-local isRunning = false 
-Tabs.keybinds:AddKeybind("Keybind", {
-    Title = "Stel Ball",
+local PLS = game:GetService("Players")
+local XVZVIM = game:GetService("VirtualInputManager")
+local WKS = game:GetService("Workspace")
+
+local LP = PLS.LocalPlayer
+local active = false
+
+local function isGK()
+    return LP:GetAttribute("TeamPosition") == "GK"
+end
+
+local function tapE()
+    XVZVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    XVZVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+end
+
+local function enemyPlayerHRP(ownerName)
+    local p = PLS:FindFirstChild(ownerName)
+    if p and p ~= LP and p.Team ~= LP.Team then
+        local c = p.Character
+        if c and c:FindFirstChild("HumanoidRootPart") then
+            return c.HumanoidRootPart
+        end
+    end
+end
+
+local function enemyAgentHRP()
+    local sys = WKS:FindFirstChild("Systems")
+    local ag = sys and sys:FindFirstChild("Agents")
+    if not ag then return end
+    local myTeam = LP.Team and LP.Team.Name
+    if not myTeam then return end
+    for _, m in ipairs(ag:GetChildren()) do
+        if m:IsA("Model") and m:GetAttribute("HasBall") == true then
+            local side = m:GetAttribute("IsHomeOrAway")
+            if side and side ~= myTeam then
+                return m:FindFirstChild("HumanoidRootPart") or m.PrimaryPart
+            end
+        end
+    end
+end
+
+Tabs.keybinds:AddKeybind("AltBind", {
+    Title = "Steal Ball",
     Mode = "Toggle",
     Default = "Three",
     Callback = function()
-        isRunning = not isRunning 
-        if isRunning then
-            task.spawn(function()
-                while isRunning do
-                    local football = game.workspace.Misc.Football
-                    local networkOwner = football and football:GetAttribute("NetworkOwner")
-                    local localTeam = localPlayer.Team and localPlayer.Team.Name
-                    if localTeam ~= "Home" and localTeam ~= "Away" then
-                        isRunning = false
-                        break
-                    end
-                    if networkOwner and typeof(networkOwner) == "string" then
-                        local ownerPlayer = Players:FindFirstChild(networkOwner)
-                        if ownerPlayer and ownerPlayer ~= localPlayer then
-                            local ownerTeam = ownerPlayer.Team and ownerPlayer.Team.Name
-                            if ownerTeam ~= localTeam then
-                                if ownerPlayer.Character and ownerPlayer.Character.HumanoidRootPart then
-                                    localPlayer.Character.HumanoidRootPart.CFrame = ownerPlayer.Character.HumanoidRootPart.CFrame
-                                    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-                                    task.wait() 
-                                    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-                                    local player = game.Players.LocalPlayer
-                                    local character = player.Character
-                                    local football = game.workspace.Misc.Football
-                                    if character and character:FindFirstChild("HumanoidRootPart") and football then
-                                        football.Position = character.HumanoidRootPart.Position
-                                        football.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
-                                        football.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
-                                    end
-                                end
-                            else
-                                isRunning = false
-                            end
-                        elseif ownerPlayer == localPlayer then
-                            isRunning = false
-                        end
-                    end
-                    task.wait(0.05) 
-                end
-            end)
+        if isGK() then
+            active = false
+            return
         end
+
+        active = not active
+        if not active then return end
+
+        task.spawn(function()
+            while active do
+                if isGK() then
+                    active = false
+                    break
+                end
+
+                local char = LP.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                local misc = WKS:FindFirstChild("Misc")
+                local ball = misc and misc:FindFirstChild("Football")
+                if not hrp or not ball then
+                    active = false
+                    break
+                end
+
+                local teamName = LP.Team and LP.Team.Name
+                if teamName ~= "Home" and teamName ~= "Away" then
+                    active = false
+                    break
+                end
+
+                local owner = ball:GetAttribute("NetworkOwner")
+                if owner == LP.Name then
+                    active = false
+                    break
+                end
+
+                local tgt
+                if typeof(owner) == "string" then
+                    tgt = enemyPlayerHRP(owner)
+                end
+
+                if not tgt then
+                    tgt = enemyAgentHRP()
+                end
+
+                if tgt then
+                    hrp.CFrame = tgt.CFrame
+                    tapE()
+                    ball.Position = hrp.Position
+                    ball.AssemblyLinearVelocity = Vector3.new()
+                    ball.AssemblyAngularVelocity = Vector3.new()
+                end
+
+                task.wait(0.05)
+            end
+        end)
     end
 })
+
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
