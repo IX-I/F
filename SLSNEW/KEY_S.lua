@@ -60,6 +60,9 @@ task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/delete"))()
 end)
 
+    task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/Part.lua"))()
+end)
     --\\\\\\
 
     local start = tick()
