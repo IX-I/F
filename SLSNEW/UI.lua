@@ -1,9 +1,6 @@
-
-
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-
 local Window = Fluent:CreateWindow({
     Title = "NOTHING X",
     SubTitle = "",
@@ -21,10 +18,7 @@ local Tabs = {
     keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
     save = Window:AddTab({Title = "", Icon = "save"})
 }
-
 Window:SelectTab()
-
-
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local XVIM = game:GetService("VirtualInputManager")
@@ -141,8 +135,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end
     end
 })
-
-
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "not kick ball (GK)",
     Mode = "Toggle",
@@ -151,14 +143,12 @@ Tabs.keybinds:AddKeybind("Keybind", {
         task.spawn(function()
             local misc = workspace:FindFirstChild("Misc")
             if not misc then return end
-
             local footballs = {}
             for _, obj in pairs(misc:GetChildren()) do
                 if obj.Name == "Football" then
                     table.insert(footballs, obj)
                 end
             end
-
             if #footballs == 0 then
                 misc.ChildAdded:Wait()
                 for _, obj in pairs(misc:GetChildren()) do
@@ -167,7 +157,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
                     end
                 end
             end
-
             for _, football in pairs(footballs) do
                 if football:GetAttribute("Enabled") == nil then
                     football:SetAttribute("Enabled", false)
@@ -178,7 +167,6 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end)
     end
 })
-
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -298,18 +286,14 @@ end)
 local P = game.Players.LocalPlayer
 local def, hsx = 2, 2
 local iha = false
-
 local function upd()
     local h = P.Character and P.Character:FindFirstChild("Humanoid")
     if h then h.HipHeight = iha and hsx or def end
 end
-
 local function check() iha = P.Team and (P.Team.Name=="Home" or P.Team.Name=="Away") end
-
 P.CharacterAdded:Connect(function() check() upd() end)
 P:GetPropertyChangedSignal("Team"):Connect(function() check() upd() end)
 if P.Character then check() upd() end
-
 Tabs.all:AddInput("InputHipHeight", {
     Title="Hip Height | on match",
     Description="-3-55 | Default 2",
@@ -320,8 +304,6 @@ Tabs.all:AddInput("InputHipHeight", {
         if iha then upd() end
     end
 })
-
-
 local pls = game:GetService("Players")
 local lp = pls.LocalPlayer
 local vim = game:GetService("VirtualInputManager")
@@ -687,9 +669,7 @@ local moveFieldToggle = Tabs.all:AddToggle("MoveFieldToggle", {
     Callback = function(value)
         local field = workspace.Stadium.Field.Bounds:FindFirstChild("Field")
         if not field then return end
-
         local currentSize = field.Size
-
         if value then
             field.Size = Vector3.new(currentSize.X, 0, currentSize.Z)
         else
@@ -697,9 +677,6 @@ local moveFieldToggle = Tabs.all:AddToggle("MoveFieldToggle", {
         end
     end
 })
-
-
-
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Tp ball",
     Mode = "Toggle",
@@ -715,8 +692,6 @@ local football = game.workspace.Misc.Football
         end
     end
 })
-
-
 local XVXvim = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
 local workspace = game:GetService("Workspace")
@@ -780,8 +755,6 @@ workspace.Misc.ChildAdded:Connect(function(c)
         c:GetPropertyChangedSignal("Parent"):Connect()
     end
 end)
-
-
 local istp = false
 local p = game.Players.LocalPlayer
 local uis = game:GetService("UserInputService")
@@ -847,15 +820,12 @@ Tabs.XXX:AddButton({
         end
     end
 })
-
 Tabs.XXX:AddButton({
     Title = "Respawn",
     Callback = function()
         game.Players.LocalPlayer.Character:BreakJoints()
     end
 })
-
-
 local ks, vma = 80, 80
 local ce = false
 local p = game.Players.LocalPlayer
@@ -1214,19 +1184,15 @@ end)
 local PLS = game:GetService("Players")
 local XVZVIM = game:GetService("VirtualInputManager")
 local WKS = game:GetService("Workspace")
-
 local LP = PLS.LocalPlayer
 local active = false
-
 local function isGK()
     return LP:GetAttribute("TeamPosition") == "GK"
 end
-
 local function tapE()
     XVZVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
     XVZVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
 end
-
 local function enemyPlayerHRP(ownerName)
     local p = PLS:FindFirstChild(ownerName)
     if p and p ~= LP and p.Team ~= LP.Team then
@@ -1236,7 +1202,6 @@ local function enemyPlayerHRP(ownerName)
         end
     end
 end
-
 local function enemyAgentHRP()
     local sys = WKS:FindFirstChild("Systems")
     local ag = sys and sys:FindFirstChild("Agents")
@@ -1252,7 +1217,6 @@ local function enemyAgentHRP()
         end
     end
 end
-
 Tabs.keybinds:AddKeybind("AltBind", {
     Title = "Steal Ball",
     Mode = "Toggle",
@@ -1262,17 +1226,14 @@ Tabs.keybinds:AddKeybind("AltBind", {
             active = false
             return
         end
-
         active = not active
         if not active then return end
-
         task.spawn(function()
             while active do
                 if isGK() then
                     active = false
                     break
                 end
-
                 local char = LP.Character
                 local hrp = char and char:FindFirstChild("HumanoidRootPart")
                 local misc = WKS:FindFirstChild("Misc")
@@ -1281,48 +1242,37 @@ Tabs.keybinds:AddKeybind("AltBind", {
                     active = false
                     break
                 end
-
                 local teamName = LP.Team and LP.Team.Name
                 if teamName ~= "Home" and teamName ~= "Away" then
                     active = false
                     break
                 end
-
                 local owner = ball:GetAttribute("NetworkOwner")
-
                 if owner == LP.Name then
                     active = false
                     break
                 end
-
                 local tgt
                 if typeof(owner) == "string" then
                     tgt = enemyPlayerHRP(owner)
                 end
-
                 if not tgt then
                     tgt = enemyAgentHRP()
                 end
-
                 if tgt then
                     hrp.CFrame = tgt.CFrame
                     tapE()
                 end
-
                 if owner ~= LP.Name then
                     ball.CFrame = hrp.CFrame
                     ball.AssemblyLinearVelocity = Vector3.new()
                     ball.AssemblyAngularVelocity = Vector3.new()
                 end
-
                 task.wait(0.08)
             end
         end)
     end
 })
-
-
-
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
@@ -1367,15 +1317,23 @@ end
 LocalPlayer.CharacterAdded:Connect(function(character)
     task.wait(1)
 end)
-
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeamsService = game:GetService("Teams")
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
-local positions = {"CF", "LF", "RF", "CM", "LB", "RB", "GK"}
+local positions7v7 = {"None","CF", "LF", "RF", "CM", "LB", "RB", "GK"}
+local positions4v4 = {"None","CF", "LF", "RF", "GK"}
 local teams = {"None", "Random", "Home", "Away"}
+local placeId = game.PlaceId
+local currentPositions = positions7v7 
+if placeId == 12177325772 then
+    currentPositions = positions4v4
+elseif placeId == 127060568647054 or placeId == 126195208568849 then
+    currentPositions = positions7v7
+else
+    currentPositions = positions7v7 
+end
 local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
     Title = "Team",
     Values = teams,
@@ -1384,7 +1342,7 @@ local TeamDropdown = Tabs.XXXV:AddDropdown("Dropdown_Team", {
 })
 local PositionDropdown = Tabs.XXXV:AddDropdown("Dropdown_Position", {
     Title = "Position",
-    Values = {"None", "CF", "LF", "RF", "CM", "LB", "RB", "GK"},
+    Values = currentPositions,
     Multi = false,
     Default = "None"
 })
@@ -1431,7 +1389,7 @@ local function joinTeam(teamName, position, force)
     end
 end
 local function getRandomPosition()
-    return positions[math.random(1, #positions)]
+    return currentPositions[math.random(1, #currentPositions)]
 end
 local function getScoresAndTime()
     local gui = LocalPlayer.PlayerGui:FindFirstChild("GameGui")
@@ -1607,13 +1565,6 @@ game:GetService("RunService").RenderStepped:Connect(function()
         resetHbToDefault()
     end
 end)
-
-
-
-
-
-
-
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
