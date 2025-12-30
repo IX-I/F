@@ -27,7 +27,7 @@ local isRunning = false
 local threads = {}
 local PLACE_ID = game.PlaceId
 local goalPositions = {
-    ["4v4"] = {Away = Vector3.new(-8, 11, -96), Home = Vector3.new(-32, 11, -372)},
+    ["4v4"] = {Home = Vector3.new(-8, 11, -96), Away = Vector3.new(-32, 11, -372)},
     ["7v7"] = {Away = Vector3.new(-6, 11, -48), Home = Vector3.new(-30, 11, -422)},
     ["pro7v7"] = {Away = Vector3.new(-6, 11, -48), Home = Vector3.new(-30, 11, -422)}
 }
