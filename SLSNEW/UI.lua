@@ -28,14 +28,11 @@ local threads = {}
 local PLACE_ID = game.PlaceId
 local goalPositions = {
     ["4v4"] = {Home = Vector3.new(-8, 11, -96), Away = Vector3.new(-32, 11, -372)},
-    ["7v7"] = {Away = Vector3.new(-6, 11, -48), Home = Vector3.new(-30, 11, -422)},
-    ["pro7v7"] = {Away = Vector3.new(-6, 11, -48), Home = Vector3.new(-30, 11, -422)}
+    ["7v7"] = {Home = Vector3.new(-6, 11, -48), Away = Vector3.new(-30, 11, -422)},
 }
 local function getGoalPos(teamName)
     if PLACE_ID == 12177325772 then
         return teamName == "Home" and goalPositions["4v4"].Home or goalPositions["4v4"].Away
-    elseif PLACE_ID == 127060568647054 or PLACE_ID == 126195208568849 then
-        return teamName == "Home" and goalPositions["7v7"].Home or goalPositions["7v7"].Away
     else
         return teamName == "Home" and goalPositions["7v7"].Home or goalPositions["7v7"].Away
     end
