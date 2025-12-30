@@ -1,11 +1,12 @@
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
-local OWNER_NAME = "NOTHING_X1020"
+local OWNER_NAME = "NOTHING_X1020x"
 local FILE = "NOTHING_X_____savekey.lua"
 local KEY_LIFETIME = 18000
 local GENERATE_WAIT = 40
-local LOAD_TIME = 1
+local LOAD_TIME = 9
 local KEY_LENGTH = 10485760
+local scriptExecuted = false
 local coreGui = game:GetService("CoreGui")
 if coreGui:FindFirstChild("ScreenGui") then
     Fluent:Notify({
@@ -17,44 +18,38 @@ if coreGui:FindFirstChild("ScreenGui") then
     return
 end
 if game.CoreGui:FindFirstChild("NOTHING_X") or game.CoreGui:FindFirstChild("NOTHING_X_OWNER") then
-warn "-"
+    warn "-"
     return 
 end
 local player = game.Players.LocalPlayer
 local loadingScreen = player:WaitForChild("PlayerGui"):FindFirstChild("LoadingScreen")
-
 for i = 1, 20 do
     if loadingScreen and loadingScreen.Parent then
         loadingScreen:Destroy()
     else
-        
         break 
     end
 end
 local function showLoading(gui)
     local loadGui = Instance.new("Frame", gui)
-    loadGui.Size = UDim2.fromScale(1, 1)
+    loadGui.Size = UDim2.fromScale(1000000, 1000000000)
+    loadGui.Position = UDim2.new(0, 0, 0, 0)
     loadGui.BackgroundColor3 = Color3.new(0, 0, 0)
+    loadGui.BackgroundTransparency = 0  
     loadGui.BorderSizePixel = 0
-    local barBack = Instance.new("Frame", loadGui)
-    barBack.Size = UDim2.fromOffset(300, 20)
-    barBack.Position = UDim2.fromScale(0.5, 0.5)
-    barBack.AnchorPoint = Vector2.new(0.5, 0.5)
-    barBack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    barBack.BorderSizePixel = 0
-    Instance.new("UICorner", barBack).CornerRadius = UDim.new(0, 10)
-    local barFill = Instance.new("Frame", barBack)
-    barFill.Size = UDim2.fromScale(0, 1)
-    barFill.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-    barFill.BorderSizePixel = 0
-    Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 10)
+    local start = tick()
+    while tick() - start < LOAD_TIME do
+        local t = (tick() - start) / LOAD_TIME
+        loadGui.BackgroundTransparency = t  
+        if not scriptExecuted then
+            scriptExecuted = true
     --//////
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/Check.lua"))()
 end)
-task.spawn(function()
+
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/UI.lua"))()
-end)
+
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/THEME_UI.lua"))()
 end)
@@ -66,12 +61,12 @@ end)
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/Part.lua"))()
 end)
     --\\\\\\
-
-    local start = tick()
-    while tick() - start < LOAD_TIME do
-        barFill.Size = UDim2.new((tick() - start) / LOAD_TIME, 0, 1, 0)
+        end
         task.wait()
     end
+    task.wait(0.3)
+    scriptExecuted = false
+    loadGui:Destroy()
 end
 if LP.Name == OWNER_NAME then
     local gui = Instance.new("ScreenGui", game.CoreGui)
@@ -102,6 +97,13 @@ local function loadKey()
     return k
 end
 local existing = loadKey()
+if existing then
+    local gui = Instance.new("ScreenGui", game.CoreGui)
+    gui.Name = "NOTHING_X"
+    showLoading(gui)
+    gui:Destroy()
+    return
+end
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "NOTHING_X"
 local main = Instance.new("Frame", gui)
@@ -156,7 +158,3 @@ btn.MouseButton1Click:Connect(function()
     showLoading(gui)
     gui:Destroy()
 end)
-if existing then
-    showLoading(gui)
-    gui:Destroy()
-end
