@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
-local OWNER_NAME = "NOTHING_X1020"
+local OWNER_NAME = "NOTHING_X1021"
 local FILE = "NOTHING_X_____savekey.lua"
 local KEY_LIFETIME = 18000
 local GENERATE_WAIT = 40
