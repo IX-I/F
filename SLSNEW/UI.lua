@@ -1335,6 +1335,7 @@ end
 LocalPlayer.CharacterAdded:Connect(function(character)
     task.wait(1)
 end)
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeamsService = game:GetService("Teams")
 local CoreGui = game:GetService("CoreGui")
@@ -1344,7 +1345,7 @@ local positions7v7 = {"None","CF", "LF", "RF", "CM", "LB", "RB", "GK"}
 local positions4v4 = {"None","CF", "LF", "RF", "GK"}
 local teams = {"None", "Random", "Home", "Away"}
 local placeId = game.PlaceId
-local currentPositions = positions7v7 
+local currentPositions = positions7v7
 if placeId == 12177325772 then
     currentPositions = positions4v4
 elseif placeId == 127060568647054 or placeId == 126195208568849 then
@@ -1370,7 +1371,7 @@ local AutoToggle = Tabs.XXXV:AddToggle("Tog_Auto", {
     Default = false
 })
 local AutoScoreToggle = Tabs.XXXV:AddToggle("Tog_ScoreJoin", {
-    Title = "AUTO Join Win Team (on Last 6 sek | on lobby )",
+    Title = "AUTO Join Win Team (on Last 3 sek | On Lobby)",
     Default = false
 })
 local function hasScreenGui()
@@ -1386,13 +1387,20 @@ end
 local function joinTeam(teamName, position, force)
     if teamName == "None" or position == "None" then return end
     if teamName == "Random" then
+        if LocalPlayer.Team and LocalPlayer.Team.Name ~= "None" then
+            return
+        end
         if not preChosenTeam then
             preChosenTeam = (math.random(1, 2) == 1) and "Home" or "Away"
         end
         teamName = preChosenTeam
     end
     if not force and LocalPlayer.Team and (LocalPlayer.Team.Name == "Home" or LocalPlayer.Team.Name == "Away") then
-        return
+        if teamName ~= "Random" then
+            force = true
+        else
+            return
+        end
     end
     local requestJoinEvent = getRequestJoinEvent()
     if requestJoinEvent then
@@ -1401,7 +1409,7 @@ local function joinTeam(teamName, position, force)
             local args = {{Team = teamObj, TeamPosition = position}}
             pcall(function()
                 requestJoinEvent:FireServer(unpack(args))
-                preChosenTeam = nil 
+                preChosenTeam = nil
             end)
         end
     end
@@ -1426,7 +1434,7 @@ end
 local JoinButton = Tabs.XXXV:AddButton({
     Title = "Join",
     Callback = function()
-        joinTeam(TeamDropdown.Value, PositionDropdown.Value, true)
+        joinTeam(TeamDropdown.Value, PositionDropdown.Value, true) 
     end
 })
 task.spawn(function()
@@ -1437,7 +1445,7 @@ task.spawn(function()
             AutoScoreToggle:Set(false)
         end
         if AutoToggle.Value then
-            if not LocalPlayer.Team or LocalPlayer.Team.Name == "None" then
+            if not LocalPlayer.Team or LocalPlayer.Team.Name == "None" or TeamDropdown.Value ~= "Random" then
                 joinTeam(TeamDropdown.Value, PositionDropdown.Value, false)
             else
                 preChosenTeam = nil
@@ -1447,17 +1455,18 @@ task.spawn(function()
             if not LocalPlayer.Team or LocalPlayer.Team.Name == "None" then
                 local homeScore, awayScore, timeLeft = getScoresAndTime()
                 if not homeScore or not awayScore or not timeLeft then continue end
-                if timeLeft <= 6 then
+                if timeLeft <= 3 then
                     local targetTeam = "Home"
                     if awayScore > homeScore then
                         targetTeam = "Away"
                     end
-                    joinTeam(targetTeam, getRandomPosition(), false)
+                    joinTeam(targetTeam, getRandomPosition(), true)
                 end
             end
         end
     end
 end)
+
 local dsx, dsy, dsz = 4.521276473999023, 5.7297587394714355, 2.397878408432007
 local dt, dc = 1, Color3.fromRGB(255, 255, 255)
 local hsx, hsy, hsz = dsx, dsy, dsz
