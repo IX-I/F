@@ -22,9 +22,9 @@ Window:SelectTab()
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local XVIM = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local isRunning = false
-local threads = {}
 local PLACE_ID = game.PlaceId
 local goalPositions = {
     ["4v4"] = {Home = Vector3.new(-8, 11, -96), Away = Vector3.new(-32, 11, -372)},
@@ -47,9 +47,7 @@ end
 local function getEnemyPlayerWithBall(owner)
     local plr = Players:FindFirstChild(owner)
     if plr and plr ~= LocalPlayer and plr.Team ~= LocalPlayer.Team then
-        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-            return plr.Character.HumanoidRootPart
-        end
+        return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
     end
 end
 local function getEnemyAgentWithBall()
@@ -58,78 +56,101 @@ local function getEnemyAgentWithBall()
     local myTeam = LocalPlayer.Team and LocalPlayer.Team.Name
     if not myTeam then return end
     for _, model in ipairs(agentsFolder:GetChildren()) do
-        if model:IsA("Model") then
-            local hasBall = model:GetAttribute("HasBall")
-            local side = model:GetAttribute("IsHomeOrAway")
-            if hasBall == true and side and side ~= myTeam then
-                return model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
-            end
+        if model:IsA("Model") and model:GetAttribute("HasBall") and model:GetAttribute("IsHomeOrAway") ~= myTeam then
+            return model:FindFirstChild("HumanoidRootPart") or model.PrimaryPart
         end
     end
 end
 Tabs.keybinds:AddKeybind("Keybind", {
-    Title = "Auto gol",
+    Title = "Auto Gol :)",
     Mode = "Toggle",
     Default = "F1",
     Callback = function(state)
         isRunning = state
-        if not state then
-            threads = {}
-            return
-        end
+        if not state then return end
         task.spawn(function()
             while isRunning do
                 local team = LocalPlayer.Team
-                if team and (team.Name == "Home" or team.Name == "Away") then
-                    break
-                end
+                if team and (team.Name == "Home" or team.Name == "Away") then break end
                 task.wait()
             end
         end)
-        for i = 1, 140 do
-            local co = coroutine.create(function()
-                while isRunning do
-                    local football = Workspace:WaitForChild("Misc"):FindFirstChild("Football")
-                    if not football then task.wait() continue end
-                    local char = getChar()
-                    local hrp = char:FindFirstChild("HumanoidRootPart")
-                    if not hrp then task.wait() continue end
+        local char = getChar()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+        local connections = {}
+        for i = 1, 25 do
+            task.spawn(function()
+                local conn
+                conn = RunService.Stepped:Connect(function()
+                    if not isRunning then conn:Disconnect() return end
                     local team = LocalPlayer.Team
-                    if not team then task.wait() continue end
+                    if not team then return end
+                    local football = Workspace:FindFirstChild("Misc") and Workspace.Misc:FindFirstChild("Football")
+                    if not football then return end
                     local goalPos = getGoalPos(team.Name)
                     local owner = football:GetAttribute("NetworkOwner")
                     local teamPos = LocalPlayer:GetAttribute("TeamPosition")
                     if owner ~= LocalPlayer.Name then
-                        if teamPos ~= "GK" then
-                            pcall(function()
-                                loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/TP.lua"))()
-                            end)
-                        end
                         football.Position = hrp.Position
                         football.AssemblyLinearVelocity = Vector3.zero
                         football.AssemblyAngularVelocity = Vector3.zero
                     else
-                        XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
-                        XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
                         football.Position = goalPos
                         football.AssemblyLinearVelocity = Vector3.zero
                         football.AssemblyAngularVelocity = Vector3.zero
+                        XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
+                        XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
                     end
                     if teamPos ~= "GK" then
-                        local target =
-                            (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
-                            or getEnemyAgentWithBall()
+                        local target = (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
+                                       or getEnemyAgentWithBall()
                         if target then
                             hrp.CFrame = target.CFrame
                             pressE()
                         end
                     end
-                    task.wait()
-                end
+                end)
+                table.insert(connections, conn)
             end)
-            coroutine.resume(co)
-            table.insert(threads, co)
         end
+        task.spawn(function()
+            task.wait() 
+            for i = 1, 200 do
+                task.spawn(function()
+                    local conn
+                    conn = RunService.Stepped:Connect(function()
+                        if not isRunning then conn:Disconnect() return end
+                        local team = LocalPlayer.Team
+                        if not team then return end
+                        local football = Workspace:FindFirstChild("Misc") and Workspace.Misc:FindFirstChild("Football")
+                        if not football then return end
+                        local goalPos = getGoalPos(team.Name)
+                        local owner = football:GetAttribute("NetworkOwner")
+                        local teamPos = LocalPlayer:GetAttribute("TeamPosition")
+                        if owner ~= LocalPlayer.Name then
+                            football.Position = hrp.Position
+                            football.AssemblyLinearVelocity = Vector3.zero
+                            football.AssemblyAngularVelocity = Vector3.zero
+                        else
+                            football.Position = goalPos
+                            football.AssemblyLinearVelocity = Vector3.zero
+                            football.AssemblyAngularVelocity = Vector3.zero
+                            XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
+                            XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
+                        end
+                        if teamPos ~= "GK" then
+                            local target = (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
+                                           or getEnemyAgentWithBall()
+                            if target then
+                                hrp.CFrame = target.CFrame
+                                pressE()
+                            end
+                        end
+                    end)
+                    table.insert(connections, conn)
+                end)
+            end
+        end)
     end
 })
 Tabs.keybinds:AddKeybind("Keybind", {
