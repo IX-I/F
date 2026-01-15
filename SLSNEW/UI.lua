@@ -78,7 +78,7 @@ Tabs.keybinds:AddKeybind("Keybind", {
         local char = getChar()
         local hrp = char:WaitForChild("HumanoidRootPart")
         local connections = {}
-        for i = 1, 25 do
+        for i = 1, 16 do
             task.spawn(function()
                 local conn
                 conn = RunService.Stepped:Connect(function()
@@ -91,6 +91,12 @@ Tabs.keybinds:AddKeybind("Keybind", {
                     local owner = football:GetAttribute("NetworkOwner")
                     local teamPos = LocalPlayer:GetAttribute("TeamPosition")
                     if owner ~= LocalPlayer.Name then
+                        if teamPos ~= "GK" then
+local p = game.Players.LocalPlayer
+local t = p.Team and p.Team.Name
+local c = game.PlaceId == 12177325772 and {CFrame.new(-17,11,-250), CFrame.new(-17,11,-217)} or {CFrame.new(-17,11,-255), CFrame.new(-16,11,-214)}
+p.Character.HumanoidRootPart.CFrame = t == "Home" and c[2] or t == "Away" and c[1] or p.Character.HumanoidRootPart.CFrame
+                        end
                         football.Position = hrp.Position
                         football.AssemblyLinearVelocity = Vector3.zero
                         football.AssemblyAngularVelocity = Vector3.zero
@@ -127,7 +133,13 @@ Tabs.keybinds:AddKeybind("Keybind", {
                         local goalPos = getGoalPos(team.Name)
                         local owner = football:GetAttribute("NetworkOwner")
                         local teamPos = LocalPlayer:GetAttribute("TeamPosition")
-                        if owner ~= LocalPlayer.Name then
+                    if owner ~= LocalPlayer.Name then
+                        if teamPos ~= "GK" then
+local p = game.Players.LocalPlayer
+local t = p.Team and p.Team.Name
+local c = game.PlaceId == 12177325772 and {CFrame.new(-17,11,-250), CFrame.new(-17,11,-217)} or {CFrame.new(-17,11,-255), CFrame.new(-16,11,-214)}
+p.Character.HumanoidRootPart.CFrame = t == "Home" and c[2] or t == "Away" and c[1] or p.Character.HumanoidRootPart.CFrame
+                        end
                             football.Position = hrp.Position
                             football.AssemblyLinearVelocity = Vector3.zero
                             football.AssemblyAngularVelocity = Vector3.zero
