@@ -1,3 +1,4 @@
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
@@ -16,9 +17,11 @@ local Tabs = {
                 XXX = Window:AddTab({Title = "", Icon = "code"}),
         XXXV = Window:AddTab({Title = "", Icon = "flag"}),
     keybinds = Window:AddTab({Title = "", Icon = "keyboard"}),
+		autogol = Window:AddTab({Title = "", Icon = "menu"}),
     save = Window:AddTab({Title = "", Icon = "save"})
 }
 Window:SelectTab()
+task.spawn(function()
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local XVIM = game:GetService("VirtualInputManager")
@@ -26,6 +29,7 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local isRunning = false
 local PLACE_ID = game.PlaceId
+local dubValue = 150
 local goalPositions = {
     ["4v4"] = {Home = Vector3.new(-8, 11, -96), Away = Vector3.new(-32, 11, -372)},
     ["7v7"] = {Home = Vector3.new(-6, 11, -48), Away = Vector3.new(-30, 11, -422)},
@@ -40,13 +44,9 @@ end
 local function getChar()
     return LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
 end
-local function pressE()
-    XVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
-    XVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
-end
 local function getEnemyPlayerWithBall(owner)
     local plr = Players:FindFirstChild(owner)
-    if plr and plr ~= LocalPlayer and plr.Team ~= LocalPlayer.Team then
+    if plr and plr ~= LocalPlayer then
         return plr.Character and plr.Character:FindFirstChild("HumanoidRootPart")
     end
 end
@@ -61,110 +61,81 @@ local function getEnemyAgentWithBall()
         end
     end
 end
-Tabs.keybinds:AddKeybind("Keybind", {
+local function handleFootball(hrp)
+    local football = Workspace:FindFirstChild("Misc") and Workspace.Misc:FindFirstChild("Football")
+    if not football then return end
+    local team = LocalPlayer.Team
+    if not team then return end
+    local goalPos = getGoalPos(team.Name)
+    local owner = football:GetAttribute("NetworkOwner")
+    local teamPos = LocalPlayer:GetAttribute("TeamPosition")
+    if owner ~= LocalPlayer.Name then
+        if teamPos ~= "GK" then
+            local p = LocalPlayer
+            local t = p.Team and p.Team.Name
+            local c = PLACE_ID == 12177325772 and {CFrame.new(-17,11,-250), CFrame.new(-17,11,-217)} or {CFrame.new(-17,11,-255), CFrame.new(-16,11,-214)}
+            p.Character.HumanoidRootPart.CFrame = t == "Home" and c[2] or t == "Away" and c[1] or p.Character.HumanoidRootPart.CFrame
+        end
+        football.Position = hrp.Position
+    else
+	        if teamPos ~= "GK" then
+	    hrp.CFrame = CFrame.new(-5, 40, -234)
+		end
+		XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
+        XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
+        football.Position = goalPos
+    end
+    football.AssemblyLinearVelocity = Vector3.zero
+    football.AssemblyAngularVelocity = Vector3.zero
+    if teamPos ~= "GK" then
+        local target = (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
+                       or getEnemyAgentWithBall()
+        if target then
+            hrp.CFrame = target.CFrame
+    XVIM:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+    XVIM:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        end
+    end
+end
+
+
+local dubautogol = Tabs.autogol:AddInput("Inputautogol", {
+    Title = "dub",
+    Description = "dub is made slower game / faster gol",
+    Default = dubValue, 
+    Numeric = true,
+    Callback = function(v)
+        dubValue = tonumber(v)
+    end
+})
+
+Tabs.autogol:AddKeybind("Keybind", {
     Title = "Auto Gol :)",
     Mode = "Toggle",
     Default = "F1",
     Callback = function(state)
         isRunning = state
         if not state then return end
-        task.spawn(function()
-            while isRunning do
-                local team = LocalPlayer.Team
-                if team and (team.Name == "Home" or team.Name == "Away") then break end
-                task.wait()
-            end
-        end)
         local char = getChar()
         local hrp = char:WaitForChild("HumanoidRootPart")
-        local connections = {}
-        for i = 1, 16 do
-            task.spawn(function()
-                local conn
-                conn = RunService.Stepped:Connect(function()
-                    if not isRunning then conn:Disconnect() return end
-                    local team = LocalPlayer.Team
-                    if not team then return end
-                    local football = Workspace:FindFirstChild("Misc") and Workspace.Misc:FindFirstChild("Football")
-                    if not football then return end
-                    local goalPos = getGoalPos(team.Name)
-                    local owner = football:GetAttribute("NetworkOwner")
-                    local teamPos = LocalPlayer:GetAttribute("TeamPosition")
-                    if owner ~= LocalPlayer.Name then
-                        if teamPos ~= "GK" then
-local p = game.Players.LocalPlayer
-local t = p.Team and p.Team.Name
-local c = game.PlaceId == 12177325772 and {CFrame.new(-17,11,-250), CFrame.new(-17,11,-217)} or {CFrame.new(-17,11,-255), CFrame.new(-16,11,-214)}
-p.Character.HumanoidRootPart.CFrame = t == "Home" and c[2] or t == "Away" and c[1] or p.Character.HumanoidRootPart.CFrame
-                        end
-                        football.Position = hrp.Position
-                        football.AssemblyLinearVelocity = Vector3.zero
-                        football.AssemblyAngularVelocity = Vector3.zero
-                    else
-                        football.Position = goalPos
-                        football.AssemblyLinearVelocity = Vector3.zero
-                        football.AssemblyAngularVelocity = Vector3.zero
-                        XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
-                        XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
-                    end
-                    if teamPos ~= "GK" then
-                        local target = (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
-                                       or getEnemyAgentWithBall()
-                        if target then
-                            hrp.CFrame = target.CFrame
-                            pressE()
-                        end
-                    end
-                end)
-                table.insert(connections, conn)
-            end)
-        end
-        task.spawn(function()
-            task.wait() 
-            for i = 1, 200 do
-                task.spawn(function()
-                    local conn
-                    conn = RunService.Stepped:Connect(function()
-                        if not isRunning then conn:Disconnect() return end
-                        local team = LocalPlayer.Team
-                        if not team then return end
-                        local football = Workspace:FindFirstChild("Misc") and Workspace.Misc:FindFirstChild("Football")
-                        if not football then return end
-                        local goalPos = getGoalPos(team.Name)
-                        local owner = football:GetAttribute("NetworkOwner")
-                        local teamPos = LocalPlayer:GetAttribute("TeamPosition")
-                    if owner ~= LocalPlayer.Name then
-                        if teamPos ~= "GK" then
-local p = game.Players.LocalPlayer
-local t = p.Team and p.Team.Name
-local c = game.PlaceId == 12177325772 and {CFrame.new(-17,11,-250), CFrame.new(-17,11,-217)} or {CFrame.new(-17,11,-255), CFrame.new(-16,11,-214)}
-p.Character.HumanoidRootPart.CFrame = t == "Home" and c[2] or t == "Away" and c[1] or p.Character.HumanoidRootPart.CFrame
-                        end
-                            football.Position = hrp.Position
-                            football.AssemblyLinearVelocity = Vector3.zero
-                            football.AssemblyAngularVelocity = Vector3.zero
-                        else
-                            football.Position = goalPos
-                            football.AssemblyLinearVelocity = Vector3.zero
-                            football.AssemblyAngularVelocity = Vector3.zero
-                            XVIM:SendMouseButtonEvent(0,0,0,true,game,0)
-                            XVIM:SendMouseButtonEvent(0,0,0,false,game,0)
-                        end
-                        if teamPos ~= "GK" then
-                            local target = (typeof(owner) == "string" and owner ~= LocalPlayer.Name and getEnemyPlayerWithBall(owner))
-                                           or getEnemyAgentWithBall()
-                            if target then
-                                hrp.CFrame = target.CFrame
-                                pressE()
-                            end
-                        end
-                    end)
-                    table.insert(connections, conn)
-                end)
+        local conn
+        conn = RunService.Stepped:Connect(function()
+            if not isRunning then 
+                conn:Disconnect() 
+                return 
+            end
+            local team = LocalPlayer.Team
+            if not team or (team.Name ~= "Home" and team.Name ~= "Away") then return end
+            for i = 1, dubValue do  
+                if not isRunning then break end  
+                handleFootball(hrp)
             end
         end)
     end
 })
+end)
+task.spawn(function()
+
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "not kick ball (GK)",
     Mode = "Toggle",
@@ -197,6 +168,9 @@ Tabs.keybinds:AddKeybind("Keybind", {
         end)
     end
 })
+end)
+task.spawn(function()
+
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
@@ -281,6 +255,9 @@ LocalPlayer.CharacterAdded:Connect(function()
         LocalPlayer:SetAttribute("EquippedTaunts", HttpService:JSONEncode(OldTauntsBackup))
     end
 end)
+end)
+task.spawn(function()
+
 Tabs.all:AddSection("Jump / Hip Height / Spam / Pass")
 local coreGui = game:GetService("CoreGui")
 local sjp = 50
@@ -707,6 +684,9 @@ local moveFieldToggle = Tabs.all:AddToggle("MoveFieldToggle", {
         end
     end
 })
+end)
+task.spawn(function()
+
 Tabs.keybinds:AddKeybind("Keybind", {
     Title = "Tp ball",
     Mode = "Toggle",
@@ -722,6 +702,8 @@ local football = game.workspace.Misc.Football
         end
     end
 })
+end)
+task.spawn(function()
 local XVXvim = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
 local workspace = game:GetService("Workspace")
@@ -785,6 +767,8 @@ workspace.Misc.ChildAdded:Connect(function(c)
         c:GetPropertyChangedSignal("Parent"):Connect()
     end
 end)
+end)
+task.spawn(function()
 local istp = false
 local p = game.Players.LocalPlayer
 local uis = game:GetService("UserInputService")
@@ -830,6 +814,9 @@ if Tabs and Tabs.keybinds then
         end
     })
 end
+end)
+task.spawn(function()
+
 Tabs.XXX:AddButton({
     Title = "Join  Pro Server",
     Callback = function()
@@ -856,6 +843,9 @@ Tabs.XXX:AddButton({
         game.Players.LocalPlayer.Character:BreakJoints()
     end
 })
+end)
+task.spawn(function()
+
 local ks, vma = 80, 80
 local ce = false
 local p = game.Players.LocalPlayer
@@ -980,6 +970,9 @@ uis.InputBegan:Connect(function(i, gp)
         end
     end
 end)
+end)
+task.spawn(function()
+
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -1097,6 +1090,9 @@ Tabs.XXX:AddKeybind("Keybind", {
     end
 })
 setupFlyAnimation()
+end)
+task.spawn(function()
+
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -1247,6 +1243,9 @@ local function enemyAgentHRP()
         end
     end
 end
+end)
+task.spawn(function()
+
 Tabs.keybinds:AddKeybind("AltBind", {
     Title = "Steal Ball",
     Mode = "Toggle",
@@ -1298,11 +1297,12 @@ Tabs.keybinds:AddKeybind("AltBind", {
                     ball.AssemblyLinearVelocity = Vector3.new()
                     ball.AssemblyAngularVelocity = Vector3.new()
                 end
-                task.wait(0.08)
+                task.wait(0.1)
             end
         end)
     end
 })
+end)
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local LocalPlayer = Players.LocalPlayer
