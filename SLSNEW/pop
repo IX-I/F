@@ -1,0 +1,11 @@
+local Players = game:GetService("Players")
+local Chat = game:GetService("Chat")
+local player = Players.LocalPlayer
+local message = "_X⸝⸝"
+if player and player.Character and player.Character:FindFirstChild("Head") then
+    local head = player.Character.Head
+    Chat:Chat(head, message, Enum.ChatColor.White)
+	Chat:Chat(head, message, Enum.ChatColor.White)
+    Chat:Chat(head, message, Enum.ChatColor.White)
+
+end
