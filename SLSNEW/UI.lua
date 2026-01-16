@@ -1207,6 +1207,8 @@ state.inputEndedConnection = UserInputService.InputEnded:Connect(function(input)
     elseif key == Enum.KeyCode.D then holdingDKey = false
     end
 end)
+		task.spawn(function()
+
 local PLS = game:GetService("Players")
 local XVZVIM = game:GetService("VirtualInputManager")
 local WKS = game:GetService("Workspace")
@@ -1244,7 +1246,6 @@ local function enemyAgentHRP()
     end
 end
 end)
-task.spawn(function()
 
 Tabs.keybinds:AddKeybind("AltBind", {
     Title = "Steal Ball",
